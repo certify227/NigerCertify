@@ -22,7 +22,7 @@ if (isset($_POST['upload'])) {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>WebShell IT4U - Offensive Interface</title>
+    <title>WebShell Niger Certify - Offensive Interface</title>
     <style>
         body {
             background-color: #121212;
