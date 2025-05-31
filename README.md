@@ -1,4 +1,4 @@
-# 🛠 Webshell Niger Certify Offensive Lab
+# 🛠 Niger Certify Offensive Lab
 
 > **Auteur :** Niger certify – Consultant & Formateur en Sécurité Informatique  
 > **Public cible :** Étudiants, stagiaires, passionnés de cybersécurité  
