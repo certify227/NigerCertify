@@ -45,3 +45,22 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 
 ```php
 find / -perm -4000 2>/dev/null
+```
+
+### Agent commercial de contact
+
+`agent_commercial.py` analyse une URL publique, extrait les emails et les numeros de telephone visibles, puis suit quelques liens internes de type contact/a-propos.
+
+Exemple:
+
+```bash
+python3 agent_commercial.py https://example.com --json
+```
+
+Options utiles:
+
+- `--json` affiche les resultats en JSON.
+- `--follow-contact-links 3` limite le nombre de pages internes contact/a-propos a analyser.
+- `--timeout 10` definit le timeout HTTP en secondes.
+
+L'outil se limite aux pages accessibles publiquement en HTTP/HTTPS et ne contourne pas les protections d'un site.
