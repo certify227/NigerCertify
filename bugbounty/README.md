@@ -1,21 +1,27 @@
-# 🎯 WebBounty — Outil de Bug Bounty Web
+# ⚡ BountyStrike
 
-> **Usage éthique uniquement** — N'utilisez cet outil que sur des cibles pour lesquelles vous disposez d'une autorisation explicite (programme de bug bounty, pentest contractuel, lab personnel type DVWA, HackTheBox, etc.)
+> **Strike First. Hunt Smart.**
+>
+> Outil offensif de bug bounty web par **Niger Certify Offensive Lab**
+>
+> **Usage éthique uniquement** — cibles autorisées seulement (bug bounty, pentest, labs)
 
 ---
 
 ## Fonctionnalités
 
-| Module | Capacités |
-|--------|-----------|
-| **Reconnaissance** | DNS, SSL/TLS, fingerprinting, robots.txt, sitemap, sous-domaines, crawl, emails |
-| **Scan vulnérabilités** | Headers, CORS, cookies, fichiers sensibles, XSS, SQLi, SSRF, open redirect, CSRF |
-| **Scan agressif** | LFI, SSTI, CMDi, XXE, Host header injection, CRLF, IDOR, cache poisoning, secrets exposés |
-| **JWT** | Extraction, décodage, alg:none, brute-force secret HMAC, claims sensibles, privilege escalation |
-| **GraphQL** | Découverte endpoints, introspection, field suggestions, batching, DoS alias, mutations non auth |
-| **Nuclei** | Intégration Nuclei (si installé) + 20 checks CVE intégrés (Spring, Docker, K8s, etc.) |
-| **Fuzzing** | Répertoires, paramètres cachés, endpoints JS |
-| **Rapports** | Export HTML + JSON |
+| Module | Flag | Capacités |
+|--------|------|-----------|
+| **Reconnaissance** | `--recon` | DNS, SSL, fingerprinting, sous-domaines, crawl |
+| **Scan vulnérabilités** | `--scan` | Headers, CORS, XSS, SQLi, fichiers sensibles |
+| **Scan agressif** | `--aggressive` | LFI, SSTI, CMDi, XXE, IDOR, secrets exposés |
+| **SSRF avancé** | `--ssrf` | AWS/GCP/Azure metadata, bypass encoding, blind SSRF |
+| **Subdomain Takeover** | `--takeover` | GitHub, Heroku, S3, Vercel, Netlify, Azure... |
+| **JWT** | `--jwt` | alg:none, brute-force HMAC, claims sensibles |
+| **GraphQL** | `--graphql` | Introspection, batching, DoS alias |
+| **GraphQL Fuzz** | `--graphql-fuzz` | Injection SQL/SSTI, brute-force champs, batch mutations |
+| **Nuclei** | `--nuclei` | Intégration Nuclei + 20 checks CVE intégrés |
+| **Fuzzing** | `--fuzz` | Répertoires, paramètres, endpoints JS |
 
 ---
 
@@ -25,7 +31,7 @@
 cd bugbounty
 pip install -r requirements.txt
 
-# Optionnel — Nuclei pour scans CVE avancés
+# Optionnel — Nuclei
 go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 nuclei -update-templates
 ```
@@ -34,55 +40,39 @@ nuclei -update-templates
 
 ## Utilisation
 
+### Mode brutal — tout activer
+
+```bash
+python3 bountystrike.py -t https://cible.com --brutal
+```
+
 ### Scan complet
 
 ```bash
-python3 webbounty.py -t https://example.com --full
+python3 bountystrike.py -t https://cible.com --full
 ```
 
-### Mode brutal (tout activer)
+### Modules ciblés
 
 ```bash
-python3 webbounty.py -t https://target.com --brutal
-```
+# SSRF cloud metadata + bypass
+python3 bountystrike.py -t https://cible.com --ssrf
 
-Active : recon + scan + fuzz + aggressive + JWT + GraphQL + Nuclei
+# Subdomain takeover
+python3 bountystrike.py -t cible.com --takeover --recon
 
-### Modules individuels
+# Fuzzing GraphQL
+python3 bountystrike.py -t https://cible.com --graphql --graphql-fuzz
 
-```bash
-# Scan agressif (LFI, SSTI, CMDi, XXE, IDOR, secrets)
-python3 webbounty.py -t https://target.com --aggressive
-
-# Analyse JWT
-python3 webbounty.py -t https://target.com --jwt
-
-# Scan GraphQL
-python3 webbounty.py -t https://target.com --graphql
-
-# Nuclei / checks CVE
-python3 webbounty.py -t https://target.com --nuclei
-
-# Combinaison ciblée
-python3 webbounty.py -t https://target.com --jwt --graphql --aggressive --nuclei
+# Combo offensive
+python3 bountystrike.py -t https://cible.com --ssrf --takeover --aggressive --jwt
 ```
 
 ### Via Burp Suite
 
 ```bash
-python3 webbounty.py -t https://target.com --brutal --proxy http://127.0.0.1:8080 --no-ssl-verify
-```
-
-### Options avancées
-
-```bash
-python3 webbounty.py -t https://target.com \
-  --brutal \
-  --threads 20 \
-  --timeout 15 \
-  --nuclei-templates /path/to/templates \
-  --report rapport.html \
-  -v
+python3 bountystrike.py -t https://cible.com --brutal \
+  --proxy http://127.0.0.1:8080 --no-ssl-verify -v
 ```
 
 ---
@@ -91,46 +81,27 @@ python3 webbounty.py -t https://target.com \
 
 ```
 bugbounty/
-├── webbounty.py
+├── bountystrike.py         # Point d'entrée principal
+├── webbounty.py            # Alias de compatibilité
 ├── modules/
+│   ├── brand.py            # Branding BountyStrike
 │   ├── recon.py
 │   ├── scanner.py
-│   ├── aggressive.py      # LFI, SSTI, CMDi, XXE, IDOR...
-│   ├── jwt_scanner.py     # Analyse et attaques JWT
-│   ├── graphql_scanner.py # Scan GraphQL offensif
-│   ├── nuclei_scanner.py  # Nuclei + CVE intégrés
+│   ├── aggressive.py
+│   ├── ssrf_scanner.py     # SSRF avancé
+│   ├── takeover.py         # Subdomain takeover
+│   ├── jwt_scanner.py
+│   ├── graphql_scanner.py
+│   ├── graphql_fuzzer.py   # Fuzzing GraphQL
+│   ├── nuclei_scanner.py
 │   ├── fuzzer.py
 │   ├── reporter.py
 │   └── utils.py
 └── wordlists/
-    ├── subdomains.txt
-    ├── directories.txt
-    ├── parameters.txt
-    └── jwt_secrets.txt
 ```
-
----
-
-## Tests couverts
-
-| Catégorie | Sévérité | Module |
-|-----------|----------|--------|
-| LFI / Path Traversal | Critical | aggressive |
-| SSTI | Critical | aggressive |
-| Command Injection | Critical | aggressive |
-| XXE | Critical | aggressive |
-| JWT alg:none / secret faible | Critical | jwt |
-| GraphQL introspection | High | graphql |
-| IDOR | High | aggressive |
-| Host Header Injection | High | aggressive |
-| CRLF Injection | High | aggressive |
-| Cache Poisoning | High | aggressive |
-| Secrets exposés (AWS, Stripe, GitHub) | Critical | aggressive |
-| CVE / misconfigurations | Critical-Info | nuclei |
-| SQLi / XSS / SSRF | Critical-High | scanner |
 
 ---
 
 ## Avertissement légal
 
-Cet outil est fourni à des fins **pédagogiques et de recherche en sécurité autorisée** uniquement. L'utilisation non autorisée contre des systèmes tiers est **illégale**.
+Outil **pédagogique** pour la recherche en sécurité autorisée. Usage non autorisé = **illégal**.

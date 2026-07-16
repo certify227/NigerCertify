@@ -73,8 +73,8 @@ XXE_PAYLOAD = """<?xml version="1.0" encoding="UTF-8"?>
 
 CRLF_PAYLOADS = [
     "%0d%0aSet-Cookie: injected=true",
-    "%0d%0aX-Injected: webbounty",
-    "%0aX-Injected: webbounty",
+    "%0d%0aX-Injected: bountystrike",
+    "%0aX-Injected: bountystrike",
     "%0dSet-Cookie: session=hijacked",
 ]
 

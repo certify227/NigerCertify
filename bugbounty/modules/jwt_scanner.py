@@ -22,7 +22,7 @@ DEFAULT_SECRETS = [
     "qwerty", "letmein", "welcome", "monkey", "dragon", "master",
     "football", "shadow", "sunshine", "princess", "access", "login",
     "passw0rd", "default", "private", "public", "token", "auth",
-    "mysecret", "s3cr3t", "hunter2", "bugbounty", "webbounty",
+    "mysecret", "s3cr3t", "hunter2", "bugbounty", "bountystrike",
 ]
 
 

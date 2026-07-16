@@ -1,4 +1,4 @@
-"""Génération de rapports pour WebBounty."""
+"""Génération de rapports pour BountyStrike."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .brand import TOOL_NAME, TOOL_VERSION
 from .utils import Colors, Finding
 
 
@@ -93,7 +94,7 @@ class ReportGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebBounty Report — {_escape(self.target)}</title>
+    <title>{TOOL_NAME} Report — {_escape(self.target)}</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; }}
@@ -117,7 +118,7 @@ class ReportGenerator:
 </head>
 <body>
     <div class="container">
-        <h1>🎯 WebBounty — Rapport de Bug Bounty</h1>
+        <h1>⚡ {TOOL_NAME} v{TOOL_VERSION} — Rapport de Bug Bounty</h1>
         <p class="meta">Cible: {_escape(self.target)} | Généré: {self.timestamp}</p>
 
         <div class="stats">

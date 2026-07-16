@@ -1,4 +1,4 @@
-"""Utilitaires partagés pour WebBounty."""
+"""Utilitaires partagés pour BountyStrike."""
 
 from __future__ import annotations
 
@@ -13,6 +13,8 @@ from typing import Any
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
+from .brand import TOOL_AUTHOR, TOOL_NAME, TOOL_TAGLINE, TOOL_VERSION
 
 
 @dataclass
@@ -100,7 +102,7 @@ def create_session(
     session.headers.update(
         {
             "User-Agent": user_agent
-            or "WebBounty/1.0 (Bug Bounty Research Tool; +https://github.com)",
+            or f"{TOOL_NAME}/{TOOL_VERSION} (Bug Bounty; {TOOL_AUTHOR})",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
         }
@@ -221,20 +223,20 @@ def get_ssl_info(hostname: str, port: int = 443) -> dict[str, Any]:
 
 
 def print_banner() -> None:
-  """Affiche la bannière WebBounty."""
-  banner = f"""
-{Colors.CYAN}{Colors.BOLD}
- ██╗    ██╗███████╗██████╗ ██████╗  ██████╗ ██╗   ██╗███╗   ██╗████████╗██╗   ██╗
- ██║    ██║██╔════╝██╔══██╗██╔══██╗██╔═══██╗██║   ██║████╗  ██║╚══██╔══╝╚██╗ ██╔╝
- ██║ █╗ ██║█████╗  ██████╔╝██████╔╝██║   ██║██║   ██║██╔██╗ ██║   ██║    ╚████╔╝ 
- ██║███╗██║██╔══╝  ██╔══██╗██╔══██╗██║   ██║██║   ██║██║╚██╗██║   ██║     ╚██╔╝  
- ╚███╔███╔╝███████╗██████╔╝██████╔╝╚██████╔╝╚██████╔╝██║ ╚████║   ██║      ██║   
-  ╚══╝╚══╝ ╚══════╝╚═════╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝   ╚═╝      ╚═╝   
-{Colors.RESET}
-{Colors.YELLOW}  Outil de Bug Bounty Web — Recon | Scan | Fuzz | Report{Colors.RESET}
-{Colors.WHITE}  Usage éthique uniquement — Autorisation requise{Colors.RESET}
+    """Affiche la bannière BountyStrike."""
+    banner = f"""
+{Colors.RED}{Colors.BOLD}
+ ██████╗  ██████╗ ██╗   ██╗███╗   ██╗████████╗██╗   ██╗
+ ██╔══██╗██╔═══██╗██║   ██║████╗  ██║╚══██╔══╝╚██╗ ██╔╝
+ ██████╔╝██║   ██║██║   ██║██╔██╗ ██║   ██║    ╚████╔╝
+ ██╔══██╗██║   ██║██║   ██║██║╚██╗██║   ██║     ╚██╔╝
+ ██████╔╝╚██████╔╝╚██████╔╝██║ ╚████║   ██║      ██║
+ ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝   ╚═╝      ╚═╝
+{Colors.CYAN}{Colors.BOLD}███████╗████████╗██████╗ ██╗██╗  ██╗███████╗{Colors.RESET}
+{Colors.YELLOW}  {TOOL_NAME} v{TOOL_VERSION} — {TOOL_TAGLINE}{Colors.RESET}
+{Colors.WHITE}  {TOOL_AUTHOR} | Usage éthique uniquement{Colors.RESET}
 """
-  print(banner)
+    print(banner)
 
 
 def print_finding(finding: Finding) -> None:

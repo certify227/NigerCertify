@@ -113,7 +113,7 @@ class FuzzerModule:
         found: list[str] = []
 
         def check_param(param: str) -> str | None:
-            test_url = build_url_with_params(base, {param: "webbounty_test"})
+            test_url = build_url_with_params(base, {param: "bountystrike_probe"})
             resp = safe_request(self.session, "GET", test_url)
             if not resp:
                 return None
@@ -121,7 +121,7 @@ class FuzzerModule:
             if (
                 resp.status_code != baseline_status
                 or abs(len(resp.content) - baseline_size) > 100
-                or "webbounty_test" in resp.text
+                or "bountystrike_probe" in resp.text
             ):
                 return param
             return None
@@ -203,7 +203,7 @@ class FuzzerModule:
 
     def _get_baseline_response(self) -> dict[str, Any] | None:
         """Obtient une réponse baseline pour filtrer les faux positifs."""
-        fake_url = f"{self.base_url}/webbounty_nonexistent_{hash(self.target) % 99999}"
+        fake_url = f"{self.base_url}/bountystrike_probe_{hash(self.target) % 99999}"
         resp = safe_request(self.session, "GET", fake_url)
         if resp:
             return {"size": len(resp.content), "status": resp.status_code}
