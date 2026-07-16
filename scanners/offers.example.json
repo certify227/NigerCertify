@@ -1,0 +1,44 @@
+{
+  "offers": [
+    {
+      "name": "Audit Cybersécurité",
+      "pitch": "Identifiez vos failles avant qu'un attaquant ne le fasse — audit complet + plan de remédiation.",
+      "keywords": ["sécurité", "cyber", "pentest", "vulnérabilité", "audit", "conformité"],
+      "sectors": ["Cybersécurité", "Informatique / IT", "Finance", "Santé"],
+      "pain_points": ["Sécurité insuffisante", "Conformité réglementaire"],
+      "technologies": ["WordPress", "Cloudflare"]
+    },
+    {
+      "name": "Formation CEH / OSCP",
+      "pitch": "Montez en compétences vos équipes avec nos parcours certifiants en cybersécurité offensive.",
+      "keywords": ["formation", "certification", "ceh", "oscp", "compétence", "apprentissage"],
+      "sectors": ["Formation", "Informatique / IT", "Cybersécurité"],
+      "pain_points": ["Besoin de formation"],
+      "technologies": []
+    },
+    {
+      "name": "Accompagnement RGPD",
+      "pitch": "Mise en conformité RGPD clé en main : audit, DPO externalisé, registre des traitements.",
+      "keywords": ["rgpd", "gdpr", "données personnelles", "conformité", "privacy"],
+      "sectors": ["Finance", "Santé", "E-commerce", "Marketing / Communication"],
+      "pain_points": ["Conformité réglementaire", "Sécurité insuffisante"],
+      "technologies": ["HubSpot", "Google Analytics"]
+    },
+    {
+      "name": "Développement Web & Refonte",
+      "pitch": "Sites modernes, performants et sécurisés — de la refonte WordPress au SaaS sur mesure.",
+      "keywords": ["développement", "site web", "refonte", "application", "digital"],
+      "sectors": ["Informatique / IT", "E-commerce", "Marketing / Communication"],
+      "pain_points": ["Transformation digitale", "Infrastructure obsolète"],
+      "technologies": ["WordPress", "Wix", "Shopify", "React"]
+    },
+    {
+      "name": "Outsourcing IT / Infogérance",
+      "pitch": "Externalisez votre infrastructure IT et concentrez-vous sur votre cœur de métier.",
+      "keywords": ["infogérance", "maintenance", "support", "infrastructure", "cloud"],
+      "sectors": ["Informatique / IT", "Industrie", "PME"],
+      "pain_points": ["Infrastructure obsolète", "Transformation digitale"],
+      "technologies": ["Cloudflare"]
+    }
+  ]
+}
