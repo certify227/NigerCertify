@@ -45,3 +45,16 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 
 ```php
 find / -perm -4000 2>/dev/null
+```
+
+### 🔹 Agent commercial de contact
+
+`commercial_agent.py` récupère les emails et numéros de téléphone publics depuis une URL.
+Il analyse la page fournie, quelques pages de contact du même domaine, les liens `mailto:` et les liens `tel:`.
+
+```bash
+python3 commercial_agent.py https://example.com
+python3 commercial_agent.py https://example.com --json --max-pages 8
+```
+
+> À utiliser uniquement sur des sites publics et dans un cadre autorisé.
