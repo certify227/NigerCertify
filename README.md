@@ -45,3 +45,30 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 
 ```php
 find / -perm -4000 2>/dev/null
+```
+
+---
+
+## 🆕 Scanner Bug Bounty Web (safe by design)
+
+Un nouveau scanner CLI Python est disponible dans `scanners/web_bugbounty_tool.py`.
+
+### Capacités
+
+- crawl limité au même hôte avec profondeur configurable,
+- extraction des liens, scripts, formulaires et paramètres d’URL,
+- détection d’en-têtes de sécurité manquants,
+- analyse des cookies (`Secure`, `HttpOnly`, `SameSite`),
+- heuristique sur les formulaires POST sans jeton CSRF,
+- sondage d’endpoints courants (`robots.txt`, `sitemap.xml`, `/.git/HEAD`, `swagger`, `graphql`, etc.),
+- export des résultats en JSON et Markdown.
+
+### Exemple d’utilisation
+
+```bash
+python3 scanners/web_bugbounty_tool.py https://example.com \
+  --depth 2 \
+  --max-pages 25 \
+  --json report.json \
+  --markdown report.md
+```
