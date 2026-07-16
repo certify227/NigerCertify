@@ -83,6 +83,8 @@ def deobfuscate_text(text: str) -> str:
         normalized = normalized.replace(source, target)
         normalized = normalized.replace(source.upper(), target)
         normalized = normalized.replace(source.title(), target)
+    normalized = re.sub(r"\s*@\s*", "@", normalized)
+    normalized = re.sub(r"\s*\.\s*", ".", normalized)
     return normalized
 
 
