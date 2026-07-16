@@ -45,3 +45,29 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 
 ```php
 find / -perm -4000 2>/dev/null
+
+---
+
+## 🕵️‍♂️ Nouvel outil bug bounty web
+
+Le script `web_bugbounty_tool.py` ajoute un scanner orienté **applications web** :
+
+- crawl intelligent (liens, scripts, formulaires),
+- détection d'open redirect,
+- détection de XSS réfléchi,
+- détection de mauvaises configurations CORS,
+- détection de méthodes HTTP dangereuses,
+- détection de fichiers sensibles exposés,
+- génération de rapports JSON + Markdown.
+
+### Exécution rapide
+
+```bash
+python3 web_bugbounty_tool.py --url https://example.com --depth 2 --max-urls 200
+```
+
+### Tests
+
+```bash
+python3 -m unittest -v test_web_bugbounty_tool.py
+```
