@@ -1,0 +1,4 @@
+# Dépendances de web_bugbounty
+requests>=2.28
+# Optionnel mais recommandé pour une énumération DNS plus fiable :
+dnspython>=2.3
