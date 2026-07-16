@@ -41,6 +41,16 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 - Upload de fichiers
 - Menu de post-exploitation (SUID, sudo, cron, capabilities...)
 
+### 🔹 Agent commercial (nouveau)
+
+Script Python pour extraire automatiquement des **emails** et **numeros de telephone** depuis une URL:
+
+```bash
+python agent_commercial.py https://exemple.com --json
+```
+
+Le script scanne l’URL de depart puis quelques pages internes du meme domaine (contact/about/support...) pour augmenter le taux de detection.
+
 ### 🔹 Privesc rapide (PHP + Bash)
 
 ```php
