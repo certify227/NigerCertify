@@ -1,6 +1,9 @@
+import subprocess
+import sys
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 from commercial_agent import extract_contacts, extract_emails, extract_phones, normalize_start_url
 
@@ -70,6 +73,19 @@ class CommercialAgentTest(unittest.TestCase):
         self.assertEqual(normalize_start_url("example.test"), "https://example.test")
         self.assertEqual(extract_emails("Contact: Admin@Example.TEST"), {"admin@example.test"})
         self.assertEqual(extract_phones("Tel: +33 1 42 68 53 00"), {"+33 1 42 68 53 00"})
+
+    def test_cli_outputs_contacts(self):
+        script = Path(__file__).resolve().parents[1] / "commercial_agent.py"
+        completed = subprocess.run(
+            [sys.executable, str(script), self.base_url, "--max-pages", "3"],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+
+        self.assertIn("sales@example.test", completed.stdout)
+        self.assertIn("contact@example.test", completed.stdout)
+        self.assertIn("+221771234567", completed.stdout)
 
 
 if __name__ == "__main__":
