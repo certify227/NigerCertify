@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""Alias de compatibilité — utilisez bountystrike.py"""
+"""Alias — utilisez bountystrike.py (BountyStrike v3.0)."""
 
-from bountystrike import main
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+import runpy
+runpy.run_path("bountystrike.py", run_name="__main__")

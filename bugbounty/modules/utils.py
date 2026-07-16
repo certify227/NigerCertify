@@ -121,8 +121,9 @@ def safe_request(
     **kwargs: Any,
 ) -> requests.Response | None:
     """Effectue une requête HTTP en gérant les erreurs."""
+    timeout = kwargs.pop("timeout", session.timeout)
     try:
-        return session.request(method, url, timeout=session.timeout, **kwargs)
+        return session.request(method, url, timeout=timeout, **kwargs)
     except requests.RequestException:
         return None
 

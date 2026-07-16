@@ -1,27 +1,30 @@
-# ⚡ BountyStrike
+# ⚡ BountyStrike v3.0
 
 > **Strike First. Hunt Smart.**
 >
-> Outil offensif de bug bounty web par **Niger Certify Offensive Lab**
->
-> **Usage éthique uniquement** — cibles autorisées seulement (bug bounty, pentest, labs)
+> Outil offensif complet de bug bounty web — **Niger Certify Offensive Lab**
 
 ---
 
-## Fonctionnalités
+## Modules inclus (40+)
 
-| Module | Flag | Capacités |
-|--------|------|-----------|
-| **Reconnaissance** | `--recon` | DNS, SSL, fingerprinting, sous-domaines, crawl |
-| **Scan vulnérabilités** | `--scan` | Headers, CORS, XSS, SQLi, fichiers sensibles |
-| **Scan agressif** | `--aggressive` | LFI, SSTI, CMDi, XXE, IDOR, secrets exposés |
-| **SSRF avancé** | `--ssrf` | AWS/GCP/Azure metadata, bypass encoding, blind SSRF |
-| **Subdomain Takeover** | `--takeover` | GitHub, Heroku, S3, Vercel, Netlify, Azure... |
-| **JWT** | `--jwt` | alg:none, brute-force HMAC, claims sensibles |
-| **GraphQL** | `--graphql` | Introspection, batching, DoS alias |
-| **GraphQL Fuzz** | `--graphql-fuzz` | Injection SQL/SSTI, brute-force champs, batch mutations |
-| **Nuclei** | `--nuclei` | Intégration Nuclei + 20 checks CVE intégrés |
-| **Fuzzing** | `--fuzz` | Répertoires, paramètres, endpoints JS |
+| Catégorie | Modules |
+|-----------|---------|
+| **Recon** | DNS, SSL, techno, robots.txt, crt.sh, Wayback, Shodan, sous-domaines, crawl |
+| **Infra** | TLS avancé, SPF/DMARC, vhost discovery, WAF detection |
+| **Cloud** | S3, GCS, Azure Blob, Firebase |
+| **Scan** | Headers, CORS, cookies, XSS, SQLi, SSRF, fichiers sensibles |
+| **Offensif** | LFI, SSTI, CMDi, XXE, IDOR, CRLF, cache poisoning, secrets |
+| **Avancé** | XSS DOM/blind/stored, SQLi boolean/time, NoSQL, upload, OOB |
+| **Auth** | JWT, OAuth, SAML, account takeover, password reset poisoning |
+| **API** | GraphQL, OpenAPI/Swagger, WebSocket, SOAP hints |
+| **Réseau** | SSRF cloud+bypass, HTTP smuggling CL.TE/TE.CL |
+| **Logique** | Race conditions, prix négatif, manipulation |
+| **Injection** | LDAP, prototype pollution, deserialization |
+| **Source** | .git dump, clickjacking, CSP bypass |
+| **Takeover** | 22 services (GitHub, S3, Vercel, Netlify...) |
+| **Externe** | Nuclei, ffuf, dalfox, sqlmap |
+| **Rapports** | HTML, JSON, HackerOne, Burp XML, diff, SQLite, dashboard |
 
 ---
 
@@ -31,77 +34,61 @@
 cd bugbounty
 pip install -r requirements.txt
 
-# Optionnel — Nuclei
+# Optionnel
 go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-nuclei -update-templates
+go install github.com/ffuf/ffuf/v2@latest
+go install github.com/hahwul/dalfox/v2@latest
 ```
 
 ---
 
 ## Utilisation
 
-### Mode brutal — tout activer
-
 ```bash
+# Mode brutal — absolument tout
 python3 bountystrike.py -t https://cible.com --brutal
-```
 
-### Scan complet
+# Scan complet v3
+python3 bountystrike.py -t https://cible.com --extended
 
-```bash
-python3 bountystrike.py -t https://cible.com --full
-```
+# Multi-cibles
+python3 bountystrike.py -l targets.txt --full
 
-### Modules ciblés
+# Authentifié
+python3 bountystrike.py -t https://cible.com --extended \
+  --bearer TOKEN --cookie "session=abc123"
 
-```bash
-# SSRF cloud metadata + bypass
-python3 bountystrike.py -t https://cible.com --ssrf
+# OOB (Interactsh/Collaborator)
+python3 bountystrike.py -t https://cible.com --extended \
+  --oob-callback xyz.oast.fun
 
-# Subdomain takeover
-python3 bountystrike.py -t cible.com --takeover --recon
-
-# Fuzzing GraphQL
-python3 bountystrike.py -t https://cible.com --graphql --graphql-fuzz
-
-# Combo offensive
-python3 bountystrike.py -t https://cible.com --ssrf --takeover --aggressive --jwt
-```
-
-### Via Burp Suite
-
-```bash
+# Exports
 python3 bountystrike.py -t https://cible.com --brutal \
-  --proxy http://127.0.0.1:8080 --no-ssl-verify -v
+  --export-h1 rapport_h1.md --export-burp rapport.xml
+
+# Dashboard web
+python3 bountystrike.py --dashboard --dashboard-port 8888
+
+# Diff de scans
+python3 bountystrike.py --diff old.json new.json
 ```
 
 ---
 
-## Structure
+## Flags principaux
 
-```
-bugbounty/
-├── bountystrike.py         # Point d'entrée principal
-├── webbounty.py            # Alias de compatibilité
-├── modules/
-│   ├── brand.py            # Branding BountyStrike
-│   ├── recon.py
-│   ├── scanner.py
-│   ├── aggressive.py
-│   ├── ssrf_scanner.py     # SSRF avancé
-│   ├── takeover.py         # Subdomain takeover
-│   ├── jwt_scanner.py
-│   ├── graphql_scanner.py
-│   ├── graphql_fuzzer.py   # Fuzzing GraphQL
-│   ├── nuclei_scanner.py
-│   ├── fuzzer.py
-│   ├── reporter.py
-│   └── utils.py
-└── wordlists/
-```
+| Flag | Description |
+|------|-------------|
+| `--brutal` | Active TOUS les modules + outils externes |
+| `--extended` | Tous les modules avancés v3 |
+| `--full` | Scan complet standard |
+| `-l FILE` | Fichier multi-cibles |
+| `--scope-file` | Fichier de scope (*.domain.com) |
+| `--shodan-key` | Clé API Shodan |
+| `--external-tools` | ffuf, dalfox, sqlmap |
 
 ---
 
-## Avertissement légal
+## Avertissement
 
-Outil **pédagogique** pour la recherche en sécurité autorisée. Usage non autorisé = **illégal**.
+Usage **éthique uniquement** — cibles autorisées seulement.
