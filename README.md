@@ -45,6 +45,7 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 
 ```php
 find / -perm -4000 2>/dev/null
+```
 
 ---
 
