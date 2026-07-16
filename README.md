@@ -45,3 +45,20 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 
 ```php
 find / -perm -4000 2>/dev/null
+```
+
+### 🔹 Extracteur de contacts depuis une URL
+
+Le script `scanners/url_contact_extractor.py` agit comme un mini agent commercial : il prend une URL publique, visite la page de depart puis quelques pages internes pertinentes (`contact`, `about`, `team`, etc.) et remonte les emails et numeros de telephone trouves.
+
+Exemple :
+
+```bash
+python3 scanners/url_contact_extractor.py https://example.com --max-pages 5 --json
+```
+
+Resultat :
+
+- sortie texte lisible par defaut,
+- option `--json` pour integrer l'outil dans un autre script,
+- conservation des URLs sources pour chaque email ou numero detecte.
