@@ -307,10 +307,11 @@ def _analyze_page(page: PageRecord, findings: list[Finding]) -> None:
 def _probe_common_paths(base_url: str, timeout: int, paths: Iterable[str], delay: float) -> list[dict]:
     results = []
     origin = f"{urlparse(base_url).scheme}://{urlparse(base_url).netloc}"
+    interesting_statuses = {401, 403, 405}
     for path in paths:
         candidate = urljoin(origin, path)
         response = _request(candidate, timeout=timeout, method="GET")
-        if response["status"] and response["status"] < 500:
+        if (200 <= response["status"] < 400) or response["status"] in interesting_statuses:
             results.append({"url": candidate, "status": response["status"]})
         time.sleep(delay)
     return results
