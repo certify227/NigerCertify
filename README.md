@@ -30,6 +30,31 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 
 ---
 
+## 🆕 Outil agent commercial
+
+Le dépôt inclut maintenant `sales_contact_agent.py`, un script CLI qui prend une URL, explore la page de départ puis quelques liens internes pertinents (`contact`, `about`, `support`, etc.) et retourne en JSON les emails et numéros de téléphone détectés.
+
+### Utilisation
+
+```bash
+python3 sales_contact_agent.py https://exemple.com --max-pages 6
+```
+
+### Exemple de sortie
+
+```json
+{
+  "input_url": "https://exemple.com",
+  "normalized_url": "https://exemple.com",
+  "visited_pages": ["https://exemple.com", "https://exemple.com/contact"],
+  "emails": [{"value": "contact@exemple.com", "sources": ["https://exemple.com/contact"]}],
+  "phones": [{"value": "+33123456789", "sources": ["https://exemple.com/contact"]}],
+  "errors": []
+}
+```
+
+---
+
 ## 🧪 Exemples d’outils inclus
 
 ### 🔹 Webshell Avancé
