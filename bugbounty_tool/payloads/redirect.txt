@@ -1,0 +1,5 @@
+https://evil.example.com/
+//evil.example.com/
+/\evil.example.com
+https:%2f%2fevil.example.com
+//google.com/%2f..

