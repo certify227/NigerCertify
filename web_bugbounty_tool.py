@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 import ssl
 
@@ -159,7 +159,7 @@ class BugBountyScanner:
         if insecure:
             self.context.check_hostname = False
             self.context.verify_mode = ssl.CERT_NONE
-        self.opener = build_opener(NoRedirectHandler())
+        self.opener = build_opener(NoRedirectHandler(), HTTPSHandler(context=self.context))
 
     @staticmethod
     def _normalize_url(url: str) -> str:
@@ -192,7 +192,7 @@ class BugBountyScanner:
         req = Request(url=url, method=method, headers=req_headers)
         start = time.perf_counter()
         try:
-            with self.opener.open(req, timeout=self.timeout, context=self.context) as response:
+            with self.opener.open(req, timeout=self.timeout) as response:
                 body = response.read().decode("utf-8", errors="replace")
                 headers_map = {k.lower(): v for k, v in response.headers.items()}
                 elapsed = int((time.perf_counter() - start) * 1000)
