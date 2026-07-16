@@ -95,7 +95,10 @@ def normalize_phone(candidate: str) -> str | None:
 
 
 def extract_emails(text: str) -> set[str]:
-    return {match.lower() for match in EMAIL_REGEX.findall(text)}
+    # Supporte des formats comme "name [at] domain [dot] com" avec espaces.
+    compacted = re.sub(r"(?<=\w)\s*@\s*(?=\w)", "@", text)
+    compacted = re.sub(r"(?<=\w)\s*\.\s*(?=\w)", ".", compacted)
+    return {match.lower() for match in EMAIL_REGEX.findall(compacted)}
 
 
 def extract_phones(text: str) -> set[str]:
