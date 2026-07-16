@@ -1,0 +1,2 @@
+# Dépendances de WebHunt
+requests>=2.28
