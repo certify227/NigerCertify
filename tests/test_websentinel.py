@@ -4,7 +4,9 @@ import sys
 import tempfile
 import threading
 import unittest
+from contextlib import redirect_stderr
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from io import StringIO
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -107,7 +109,8 @@ class WebSentinelTests(unittest.TestCase):
 
     def test_cli_requires_authorization_flag(self):
         with self.assertRaises(SystemExit) as raised:
-            main([self.base_url])
+            with redirect_stderr(StringIO()):
+                main([self.base_url])
         self.assertEqual(raised.exception.code, 2)
 
     def test_cli_writes_json_report(self):
