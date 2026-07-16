@@ -1,3 +1,56 @@
+# web-bounty-audit
+
+`web-bounty-audit` est un outil CLI d'audit **hors ligne** pour applications web.
+Il analyse des captures HAR exportees depuis le navigateur ou un proxy afin de
+mettre en evidence des problemes frequents de securite sans lancer de scan
+actif contre une cible.
+
+## Capacites
+
+- Analyse des en-tetes de securite HTTP
+- Verification des cookies (`Secure`, `HttpOnly`, `SameSite`)
+- Detection des erreurs CORS courantes
+- Extraction d'endpoints depuis HTML, JavaScript, `robots.txt` et XML
+- Detection des mots de passe servis en HTTP et des source maps exposees
+- Export des rapports en JSON et Markdown
+
+## Installation
+
+```bash
+python3 -m pip install -e .
+```
+
+## Utilisation
+
+```bash
+web-bounty-audit tests/fixtures/sample.har --json report.json --markdown report.md
+```
+
+Ou sans installation:
+
+```bash
+PYTHONPATH=src python3 -m web_bounty_audit.cli tests/fixtures/sample.har
+```
+
+## Exemple de sortie
+
+```text
+Scanned inputs: 1
+Requests analyzed: 3
+Issues found: 13
+Unique endpoints: 6
+Risk score: 44
+Top issues:
+  [high] Wildcard CORS with credentials enabled
+  [medium] Missing Content-Security-Policy header
+  [medium] Session cookie missing Secure flag
+```
+
+## Usage responsable
+
+Cet outil est concu pour l'audit defensif de ressources dont vous avez
+l'autorisation d'analyser. Il travaille a partir de captures existantes afin de
+rester compatible avec des revues de securite responsables.
 # 🛠 Niger Certify Offensive Lab
 
 > **Auteur :** Niger certify – Consultant & Formateur en Sécurité Informatique  
