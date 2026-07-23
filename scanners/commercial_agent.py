@@ -35,6 +35,15 @@ DEFAULT_HEADERS = {
 }
 
 EMAIL_PATTERN = re.compile(r"\b[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}\b")
+# Emails protégés : name [at] domain [dot] com — "at"/"dot" doivent être isolés
+OBFUSCATED_EMAIL_PATTERN = re.compile(
+    r"\b([a-zA-Z0-9._%+\-]{1,64})\s*"
+    r"(?:\[\s*at\s*\]|\(\s*at\s\)|\{\s*at\s*\}|(?<=\s)at(?=\s)|@)\s*"
+    r"([a-zA-Z0-9][a-zA-Z0-9.\-]{0,120})\s*"
+    r"(?:\[\s*dot\s*\]|\(\s*dot\s\)|\{\s*dot\s\}|(?<=\s)dot(?=\s)|\.)\s*"
+    r"([a-zA-Z]{2,24})\b",
+    re.IGNORECASE,
+)
 PHONE_PATTERN = re.compile(
     r"(?:\+?\d{1,3}[\s.\-]?(?:\(?\d{1,4}\)?[\s.\-]?)?\d{2,4}[\s.\-]?\d{2,4}[\s.\-]?\d{2,4}[\s.\-]?\d{0,4})"
 )
@@ -57,6 +66,16 @@ FALSE_POSITIVE_EMAIL_SUFFIXES = (
     ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".css", ".js", ".woff", ".woff2",
 )
 GENERIC_EMAIL_PREFIXES = ("noreply", "no-reply", "donotreply", "postmaster", "webmaster")
+# TLDs / domaines typiques de faux positifs d'extraction HTML
+INVALID_EMAIL_TLDS = {
+    "png", "jpg", "jpeg", "gif", "svg", "webp", "css", "js", "html", "htm",
+    "vous", "pour", "avec", "dans", "cette", "votre", "notre", "textes",
+    "organisation", "exemple", "ces", "ion",
+}
+PLACEHOLDER_EMAIL_DOMAINS = {
+    "exemple.com", "example.com", "example.org", "example.net",
+    "domain.com", "email.com", "test.com", "sentry.wixpress.com",
+}
 
 PAGE_KEYWORDS: dict[str, tuple[str, ...]] = {
     "contact": ("contact", "nous-contacter", "nous_contacter", "contactez"),
@@ -167,7 +186,20 @@ def is_valid_email(email: str) -> bool:
     local, domain = email.split("@", 1)
     if not local or not domain or "." not in domain:
         return False
+    if len(local) > 64 or len(email) > 254:
+        return False
     if any(local.startswith(p) for p in GENERIC_EMAIL_PREFIXES):
+        return False
+    tld = domain.rsplit(".", 1)[-1]
+    if tld in INVALID_EMAIL_TLDS or len(tld) < 2:
+        return False
+    if domain in PLACEHOLDER_EMAIL_DOMAINS:
+        return False
+    # Domaine doit ressembler à un hostname (pas une phrase)
+    if " " in domain or domain.startswith(".") or domain.endswith("."):
+        return False
+    labels = domain.split(".")
+    if any(len(label) == 0 for label in labels):
         return False
     return True
 
@@ -175,11 +207,6 @@ def is_valid_email(email: str) -> bool:
 def clean_phone(raw: str) -> str:
     cleaned = re.sub(r"\s+", " ", raw.strip())
     return re.sub(r"[^\d+\s().\-]", "", cleaned).strip(" .-")
-
-
-def is_plausible_phone(phone: str) -> bool:
-    digits = re.sub(r"\D", "", phone)
-    return 8 <= len(digits) <= 15 and len(set(digits)) > 1
 
 
 def format_phone(phone: str, default_region: str = "FR") -> Optional[str]:
@@ -193,7 +220,22 @@ def format_phone(phone: str, default_region: str = "FR") -> Optional[str]:
                 return phonenumbers.format_number(parsed, PhoneNumberFormat.INTERNATIONAL)
         except phonenumbers.NumberParseException:
             pass
+        # Avec phonenumbers installé, on n'accepte que les numéros valides
+        # (évite années, dates, suites numériques…)
+        return None
     return phone
+
+
+def is_plausible_phone(phone: str) -> bool:
+    digits = re.sub(r"\D", "", phone)
+    if not (8 <= len(digits) <= 15):
+        return False
+    if len(set(digits)) <= 1:
+        return False
+    # Rejeter suites trop régulières / années collées (ex. 20012026)
+    if re.fullmatch(r"(19|20)\d{2}(19|20)\d{2}", digits):
+        return False
+    return True
 
 
 def score_email(email: str) -> tuple[int, str]:
@@ -215,6 +257,9 @@ def fetch_page(url: str, timeout: int = 15) -> tuple[Optional[str], Optional[str
         content_type = response.headers.get("Content-Type", "")
         if "text/html" not in content_type and "application/xhtml" not in content_type:
             return None, None, f"Type de contenu non HTML : {content_type}"
+        # Évite les mojibake (UTF-8 lu en latin-1)
+        if not response.encoding or response.encoding.lower() in ("iso-8859-1", "latin-1"):
+            response.encoding = response.apparent_encoding or "utf-8"
         return response.text, response.url, None
     except requests.RequestException as exc:
         return None, None, str(exc)
@@ -280,15 +325,46 @@ def extract_company_from_schema(json_ld: list[dict]) -> dict[str, Any]:
     return info
 
 
+def deobfuscate_emails(text: str) -> set[str]:
+    """Récupère les emails masqués (at/dot, &#64;, etc.)."""
+    found: set[str] = set()
+    decoded = (
+        text.replace("&#64;", "@")
+        .replace("&#x40;", "@")
+        .replace("&amp;#64;", "@")
+        .replace("(at)", "@")
+        .replace("[at]", "@")
+        .replace("(@)", "@")
+    )
+    for match in EMAIL_PATTERN.findall(decoded):
+        if is_valid_email(match):
+            found.add(match.lower())
+    for local, domain, tld in OBFUSCATED_EMAIL_PATTERN.findall(text):
+        email = f"{local}@{domain}.{tld}".lower()
+        if is_valid_email(email):
+            found.add(email)
+    return found
+
+
 def extract_emails(soup: BeautifulSoup, text: str) -> set[str]:
     emails = set()
     for match in EMAIL_PATTERN.findall(text):
         if is_valid_email(match):
             emails.add(match.lower())
+    emails.update(deobfuscate_emails(text))
     for link in soup.select('a[href^="mailto:"]'):
         email = link.get("href", "").replace("mailto:", "").split("?")[0].strip().lower()
         if is_valid_email(email):
             emails.add(email)
+    # data-email / data-mail attributs courants sur sites anti-spam
+    for tag in soup.find_all(attrs={"data-email": True}):
+        raw = tag.get("data-email", "").strip().lower()
+        if is_valid_email(raw):
+            emails.add(raw)
+    for tag in soup.find_all(attrs={"data-mail": True}):
+        raw = tag.get("data-mail", "").strip().lower()
+        if is_valid_email(raw):
+            emails.add(raw)
     return emails
 
 
@@ -390,7 +466,10 @@ def _is_valid_person(name: str, role: str, seen: set[str]) -> bool:
         return False
     if any(c.isdigit() for c in name):
         return False
-    blocked = ("nos services", "notre équipe", "à propos", "contactez")
+    blocked = (
+        "nos services", "notre équipe", "à propos", "contactez",
+        "contact commercial", "contact marketing", "email", "téléphone",
+    )
     return not any(b in name.lower() for b in blocked)
 
 
@@ -526,24 +605,37 @@ def compute_opportunity_score(profile: ProspectProfile) -> int:
 
 
 def analyze_page(html: str, page_url: str, region: str) -> dict[str, Any]:
+    # JSON-LD avant nettoyage (les <script> sont sinon détruits)
+    raw_soup = BeautifulSoup(html, "html.parser")
+    json_ld = extract_json_ld(raw_soup)
+    schema = extract_company_from_schema(json_ld)
+
     soup = clean_soup(html)
     text = soup.get_text(" ", strip=True)
     meta = extract_meta(soup)
-    json_ld = extract_json_ld(soup)
-    schema = extract_company_from_schema(json_ld)
+
+    emails = extract_emails(soup, text)
+    phones = extract_phones(soup, text, region)
+    for e in schema.get("emails", []):
+        if is_valid_email(str(e)):
+            emails.add(str(e).lower())
+    for p in schema.get("phones", []):
+        formatted = format_phone(str(p), region)
+        if formatted:
+            phones.add(formatted)
 
     return {
         "meta": meta,
         "schema": schema,
-        "emails": extract_emails(soup, text),
-        "phones": extract_phones(soup, text, region),
+        "emails": emails,
+        "phones": phones,
         "social": extract_social_links(soup, html),
         "technologies": detect_technologies(html),
         "sectors": detect_sectors(text),
         "pain_points": detect_pain_points(text, html),
         "services": extract_services(soup),
         "team": extract_team_members(soup, page_url),
-        "addresses": set(ADDRESS_PATTERN.findall(text)),
+        "addresses": set(ADDRESS_PATTERN.findall(text)) | set(schema.get("addresses", [])),
         "siret": set(SIRET_PATTERN.findall(text)),
         "text_sample": text[:5000],
     }
@@ -660,6 +752,35 @@ def scan_prospect(
     return profile
 
 
+def print_contacts_only(profile: ProspectProfile) -> None:
+    """Affiche uniquement emails et téléphones — mode agent commercial rapide."""
+    cprint(f"\n{'=' * 60}", "cyan")
+    cprint(f" CONTACTS — {profile.company_name or profile.url}", "cyan", attrs=["bold"])
+    cprint(f"{'=' * 60}", "cyan")
+
+    if profile.error:
+        cprint(f"Erreur : {profile.error}", "red")
+        return
+
+    cprint(f"\nURL : {profile.url}", "white")
+
+    cprint("\n📧 Emails :", "yellow", attrs=["bold"])
+    if profile.emails:
+        for e in profile.emails:
+            cprint(f"  • {e['email']}  (score {e['score']})", "green")
+    else:
+        cprint("  Aucun email trouvé", "yellow")
+
+    cprint("\n📞 Téléphones :", "yellow", attrs=["bold"])
+    if profile.phones:
+        for p in profile.phones:
+            cprint(f"  • {p}", "green")
+    else:
+        cprint("  Aucun téléphone trouvé", "yellow")
+
+    cprint(f"\nPages scannées : {len(profile.pages_scanned)}", "white")
+
+
 def print_prospect_report(profile: ProspectProfile) -> None:
     cprint(f"\n{'=' * 70}", "cyan")
     cprint(f" DOSSIER PROSPECT — {profile.company_name}", "cyan", attrs=["bold"])
@@ -773,6 +894,11 @@ Exemples :
         help="Fichier JSON de vos produits/services pour matching automatique",
     )
     parser.add_argument("--no-follow", action="store_true", help="Analyser uniquement la page d'accueil")
+    parser.add_argument(
+        "--contacts-only",
+        action="store_true",
+        help="Afficher uniquement emails et téléphones",
+    )
     parser.add_argument("--region", default="FR", help="Région téléphone (défaut: FR)")
     parser.add_argument("--timeout", type=int, default=15, help="Timeout HTTP (défaut: 15s)")
     return parser
@@ -810,7 +936,10 @@ def main() -> int:
             offers=offers,
         )
         results.append(profile)
-        print_prospect_report(profile)
+        if args.contacts_only:
+            print_contacts_only(profile)
+        else:
+            print_prospect_report(profile)
 
     if args.output:
         save_results(results, args.output)
