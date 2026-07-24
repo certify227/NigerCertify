@@ -24,13 +24,28 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 | `webshells/`        | Webshells basiques et avancés avec interface stylisée                   |
 | `uploaders/`        | Scripts pour upload de fichiers (inclus bypass MIME type)               |
 | `privesc/`          | Scripts pour énumération et élévation de privilèges                     |
-| `scanners/`         | Outils de reconnaissance ou de détection d'ouvertures                   |
+| `scanners/`         | Outils de reconnaissance + **agent commercial** (emails / téléphones)   |
 | `reverse_shell/`    | Générateur de shell inversé et fichiers de cheat sheet                  |
 | `scripts/postex/`   | Scripts Bash pour la post-exploitation (hash dump, enum, SUID, etc.)    |
 
 ---
 
 ## 🧪 Exemples d’outils inclus
+
+### 🔹 Agent commercial (emails + téléphones)
+
+À partir d’une URL de prospect, l’agent parcourt le site (accueil, contact, à propos…)
+et extrait les contacts exploitables.
+
+```bash
+pip install -r requirements.txt
+
+# CLI — contacts uniquement
+python3 scanners/commercial_agent.py https://prospect.com --contacts-only
+
+# Interface web (ouvrir http://127.0.0.1:8765)
+python3 scanners/agent_commercial_web.py --port 8765
+```
 
 ### 🔹 Webshell Avancé
 
