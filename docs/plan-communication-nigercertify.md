@@ -1,6 +1,6 @@
 # Plan de communication — NigerCertify
 
-**Version :** 2.2 (PECB + LPI)  
+**Version :** 2.3 (tarifs LPI figés)  
 **Marchés :** Niger · Sénégal  
 **Langue principale :** Français  
 **Horizon :** 12 mois (focus 6 mois = **PECB**, secondaire fort = **LPI / LPIC**)  
@@ -11,7 +11,8 @@
 | Offre | Détail |
 |-------|--------|
 | **PECB** | ISO 27001 · ISO 27701 · **10 oct. 2026** · en ligne · 12 mois · 2 retakes · **350 000 FCFA** |
-| **LPI** | **Linux Essentials (LPI LE)** · **LPIC-1** · **LPIC-2** · **LPIC-3** · calendrier/tarif sur demande |
+| **LPI LE** | Linux Essentials · format **mixte** · **150 000 FCFA** |
+| **LPIC-1 / 2 / 3** | Chaque niveau · format **mixte** · **200 000 FCFA** |
 
 > Lab GitHub « offensive » = **canal technique séparé**, jamais mélangé à la com grand public / PME / certifications.
 
@@ -124,7 +125,7 @@
 
 ### LPI / LPIC (20 %)
 - « De Linux Essentials à LPIC-3 — le parcours admin système avec NigerCertify. »
-- « LPI LE · LPIC-1 · LPIC-2 · LPIC-3 — certifications Linux vendor-neutral. »
+- « LPI LE **150 000 FCFA** · LPIC-1/2/3 **200 000 FCFA** / niveau — format **mixte**. »
 - « WhatsApp **94 10 70 74** — répondez LPI + votre niveau. »
 
 ### nBusiness (15 %)
@@ -352,12 +353,12 @@ Checklist avant chaque publication grand public :
 | `docs/kit-operationnel-30j-nigercertify.md` | Scripts + posts + WhatsApp |
 
 ### Reste utile (non bloquant)
-1. Modalités de **paiement** PECB (Mobile Money, virement, acompte)  
-2. **Dates + tarifs LPI** (LE, LPIC-1, LPIC-2, LPIC-3) à figer comme pour le PECB  
+1. Modalités de **paiement** (Mobile Money, virement, acompte) — PECB & LPI  
+2. **Calendrier de démarrage** LPI (prochaine cohorte mixte)  
 3. Preuves : photos, nombre de certifiés, partenaires  
 4. Conditions **tarif groupe** entreprises  
 
 ---
 
-*NigerCertify — Plan de communication v2.2*  
-*PECB 10 oct. 2026 · LPI LE→LPIC-3 · 350 000 FCFA (PECB) · 94 10 70 74 · CouturePro · nBusiness*
+*NigerCertify — Plan de communication v2.3*  
+*PECB 350k · LPI LE 150k · LPIC 200k (mixte) · 94 10 70 74 · CouturePro · nBusiness*

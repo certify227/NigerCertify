@@ -43,23 +43,40 @@ Formation PECB · accès 12 mois · examen + 2 retakes · accompagnement NigerCe
 
 Parcours **Linux Professional Institute** — de l’essentiel à l’expertise système.
 
-| Niveau | Certification | Public | Objectif |
-|--------|---------------|--------|----------|
-| **LPI LE** | **Linux Essentials** | Débutants, reconversion, étudiants | Bases Linux, ligne de commande, open source |
-| **LPIC-1** | Linux Administrator | Techniciens, juniors sysadmin | Administration système Linux junior |
-| **LPIC-2** | Linux Engineer | Sysadmins confirmés | Réseaux, sécurité, services avancés |
-| **LPIC-3** | Linux Enterprise Professional | Seniors / spécialistes | Spécialisations entreprise (niveau expert) |
+| Niveau | Certification | Tarif | Public |
+|--------|---------------|-------|--------|
+| **LPI LE** | **Linux Essentials** | **150 000 FCFA** | Débutants, reconversion, étudiants |
+| **LPIC-1** | Linux Administrator | **200 000 FCFA** | Techniciens, juniors sysadmin |
+| **LPIC-2** | Linux Engineer | **200 000 FCFA** | Sysadmins confirmés |
+| **LPIC-3** | Linux Enterprise Professional | **200 000 FCFA** | Seniors / spécialistes |
+
+| | |
+|--|--|
+| **Modalité** | **Mixte** (présentiel + en ligne) |
+| **Inscription** | WhatsApp **94 10 70 74** — mot-clé `LPI` |
+
+### Objectifs par niveau
+| Niveau | Objectif |
+|--------|----------|
+| **LPI LE** | Bases Linux, ligne de commande, open source |
+| **LPIC-1** | Administration système Linux junior |
+| **LPIC-2** | Réseaux, sécurité, services avancés |
+| **LPIC-3** | Spécialisations entreprise (niveau expert) |
 
 ### Pourquoi LPI avec NigerCertify ?
 - Certifications **vendor-neutral** reconnues internationalement  
-- Parcours progressif clair : **LE → LPIC-1 → LPIC-2 → LPIC-3**  
-- Aligné admin système / devops / support — complément idéal de la cybersécurité PECB  
-- Accompagnement local **Niger & Sénégal**
+- Parcours progressif : **LE → LPIC-1 → LPIC-2 → LPIC-3**  
+- Format **mixte** adapté Niger & Sénégal  
+- Complément idéal de la cybersécurité PECB  
 
-### Modalités & tarif LPI
-Calendrier, format (en ligne / présentiel) et tarifs : **sur demande** via WhatsApp **94 10 70 74** (répondez `LPI` + le niveau souhaité).
+### Modalités & tarifs LPI (figés)
+| Offre | Prix |
+|-------|------|
+| Linux Essentials (LPI LE) | **150 000 FCFA** |
+| LPIC-1 · LPIC-2 · LPIC-3 (chaque niveau) | **200 000 FCFA** |
+| Format | **Mixte** |
 
-> Dès que les dates/tarifs LPI sont figés, ils seront ajoutés ici comme pour la session PECB du 10/10/2026.
+Répondez `LPI` + le niveau (`LE` / `LPIC1` / `LPIC2` / `LPIC3`) au **94 10 70 74**.
 
 ### Parcours conseillé
 ```
@@ -83,8 +100,9 @@ Linux Essentials (LPI LE)
 
 ### LPI
 1. WhatsApp **94 10 70 74** → `LPI`  
-2. Niveau : `LE` / `LPIC1` / `LPIC2` / `LPIC3`  
-3. Recevez calendrier + tarif + modalités  
+2. Niveau : `LE` (150 000 FCFA) / `LPIC1` / `LPIC2` / `LPIC3` (200 000 FCFA chacun)  
+3. Format **mixte** — recevez calendrier + modalités de paiement  
+4. Confirmation de place  
 
 ---
 
@@ -98,7 +116,9 @@ Bonjour, NigerCertify — formations certifiantes (Niger & Sénégal).
    Session en ligne 10 oct. 2026 · 350 000 FCFA
    Accès 12 mois · 2 retakes
 
-2️⃣ LPI — Linux Essentials, LPIC-1, LPIC-2, LPIC-3
+2️⃣ LPI — format mixte
+   • Linux Essentials : 150 000 FCFA
+   • LPIC-1 / LPIC-2 / LPIC-3 : 200 000 FCFA / niveau
    Répondez LPI + le niveau souhaité
 
 Aussi : nBusiness · CouturePro
@@ -116,13 +136,12 @@ Envoyez : nom + norme + e-mail
 
 ### Accueil LPI
 ```
-Parcours LPI chez NigerCertify :
-• LPI LE (Linux Essentials)
-• LPIC-1 · LPIC-2 · LPIC-3
+Parcours LPI chez NigerCertify (format mixte) :
+• LPI LE (Linux Essentials) — 150 000 FCFA
+• LPIC-1 · LPIC-2 · LPIC-3 — 200 000 FCFA / niveau
 
-Indiquez le niveau souhaité (LE / LPIC1 / LPIC2 / LPIC3)
+Indiquez le niveau (LE / LPIC1 / LPIC2 / LPIC3)
 + votre nom et ville/pays.
-Je vous envoie calendrier et tarif.
 ```
 
 ### Relance PECB
@@ -134,10 +153,10 @@ Je vous réserve une place ? (27001 ou 27701 ?)
 
 ### Relance LPI
 ```
-Bonjour, petit suivi sur le parcours LPI (LE / LPIC-1 / 2 / 3).
-Quel niveau visez-vous ? Je vous envoie les détails.
+Bonjour, suivi parcours LPI (mixte).
+LE = 150 000 FCFA · LPIC-1/2/3 = 200 000 FCFA / niveau
+Quel niveau visez-vous ? Je finalise votre dossier.
 ```
-
 ---
 
 ## 5. Autres offres NigerCertify
@@ -161,4 +180,4 @@ Mot-clés : `NBUSINESS` · `COUTUREPRO`
 
 ---
 
-*Catalogue formations NigerCertify — PECB + LPI · maj session PECB 10 octobre 2026.*
+*Catalogue formations NigerCertify — PECB + LPI (mixte) · maj tarifs LPI.*
