@@ -10,7 +10,7 @@
 
 | | |
 |--|--|
-| **Normes** | ISO/IEC **27001** · ISO **27701** · autres normes de la famille sur demande |
+| **Normes** | ISO/IEC **27001** · ISO/IEC **27701** · autres normes de la famille sur demande |
 | **Démarrage** | **10 octobre 2026** |
 | **Modalité** | **100 % en ligne** |
 | **Accès plateforme** | **12 mois** |
@@ -46,7 +46,7 @@
 | Norme | Angle |
 |-------|--------|
 | **ISO/IEC 27001** | Management de la sécurité de l’information (SMSI) |
-| **ISO 27701** | *(préciser le libellé exact PECB / titre du cours sur la fiche d’inscription)* |
+| **ISO/IEC 27701** | Management de la protection de la vie privée (extension privacy du SMSI) |
 | **Autres** | Famille ISO / GRC / cyber — nous indiquer votre besoin |
 
 **Sur WhatsApp, précisez :** la norme souhaitée + Lead Implementer ou Lead Auditor (si applicable).
@@ -98,4 +98,4 @@ Je vous réserve une place ? (norme souhaitée ?)
 ---
 
 *Document commercial — à joindre en PDF / image WhatsApp.  
-Vérifier avant envoi le libellé officiel du cours « ISO 27701 » côté catalogue PECB (homonyme / code exact).*
+Catalogue commercial NigerCertify — session du 10 octobre 2026.*

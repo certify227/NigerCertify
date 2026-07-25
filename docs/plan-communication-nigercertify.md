@@ -347,10 +347,9 @@ Checklist avant chaque publication grand public :
 | `docs/kit-operationnel-30j-nigercertify.md` | Scripts + 12 posts + WhatsApp |
 
 ### Reste utile (non bloquant)
-1. Libellé **officiel PECB** exact pour « ISO 27701 » (code cours / titre)  
-2. Modalités de **paiement** (Mobile Money, virement, acompte)  
-3. Preuves : photos, nombre de certifiés, partenaires  
-4. Conditions **tarif groupe** entreprises  
+1. Modalités de **paiement** (Mobile Money, virement, acompte)  
+2. Preuves : photos, nombre de certifiés, partenaires  
+3. Conditions **tarif groupe** entreprises  
 
 ---
 

@@ -226,7 +226,7 @@ Lien direct à épingler : https://wa.me/22794107074?text=PROGRAMME
 
 Voir `docs/catalogue-pecb-nigercertify.md` — à exporter en PDF/image pour envoi WhatsApp.
 
-**À compléter en interne :** modalités de paiement (Mobile Money / virement) + libellé officiel exact du cours « ISO 27701 » côté PECB.
+**À compléter en interne :** modalités de paiement (Mobile Money / virement).
 
 ---
 
