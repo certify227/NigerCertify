@@ -3,7 +3,7 @@
 Companion du plan v2.0 + catalogue session **10 octobre 2026**.  
 Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emploi.
 
-**Session active :** PECB en ligne · ISO 27001 / ISO 27101 · accès 12 mois · 2 retakes · **350 000 FCFA** · WhatsApp **94 10 70 74**
+**Session active :** PECB en ligne · ISO 27001 / ISO 27701 · accès 12 mois · 2 retakes · **350 000 FCFA** · WhatsApp **94 10 70 74**
 
 ---
 
@@ -13,7 +13,7 @@ Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emploi.
 ```
 NigerCertify — Formations PECB (Niger & Sénégal)
 Prochaine session : 10 octobre 2026 · 100 % en ligne
-ISO 27001 · ISO 27101 · accès 12 mois · 2 retakes
+ISO 27001 · ISO 27701 · accès 12 mois · 2 retakes
 Tarif : 350 000 FCFA
 
 Aussi : nBusiness · CouturePro
@@ -32,7 +32,7 @@ WhatsApp : +227 94 10 70 74
 Merci pour votre message 🙏
 
 Session PECB en ligne — démarrage 10 octobre 2026
-ISO 27001 / ISO 27101 (précisez votre choix)
+ISO 27001 / ISO 27701 (précisez votre choix)
 Accès 12 mois · 2 retakes examens · 350 000 FCFA
 
 Répondez PROGRAMME pour le détail
@@ -53,7 +53,7 @@ Je suis {Votre prénom} de NigerCertify.
 
 Prochaine session PECB :
 📅 10 octobre 2026 · 100 % en ligne
-📘 ISO 27001 / ISO 27101
+📘 ISO 27001 / ISO 27701
 ⏱ Accès 12 mois · 2 retakes examens
 💰 350 000 FCFA
 
@@ -66,7 +66,7 @@ Quelle norme vous intéresse ?
 Bonjour {Prénom},
 Petit suivi sur la session PECB du 10 octobre 2026 (en ligne).
 350 000 FCFA — accès 12 mois + 2 retakes.
-Vous partez sur ISO 27001 ou ISO 27101 ?
+Vous partez sur ISO 27001 ou ISO 27701 ?
 ```
 
 ### C. Relance J+5
@@ -112,7 +112,7 @@ Démo 10 min ?
 > 📅 Démarrage : **10 octobre 2026**
 > 💻 100 % en ligne · accès **12 mois**
 > 🔁 **2 retakes** examens inclus
-> 📘 ISO 27001 · ISO 27101
+> 📘 ISO 27001 · ISO 27701
 > 💰 **350 000 FCFA**
 >
 > WhatsApp : **94 10 70 74**
@@ -131,7 +131,7 @@ Démo 10 min ?
 > ✅ Examen + 2 retakes
 > ✅ Suivi NigerCertify (Niger & Sénégal)
 >
-> Normes : ISO 27001, ISO 27101…
+> Normes : ISO 27001, ISO 27701…
 > 📩 94 10 70 74
 
 ### Post 4 — Dual market
@@ -159,7 +159,7 @@ Démo 10 min ?
 ### Post 8 — Différence certification
 > Un certificat PECB, c’est une preuve internationale.
 > NigerCertify vous y prépare en ligne dès le 10/10/2026.
-> ISO 27001 / ISO 27101 · 350 000 FCFA
+> ISO 27001 / ISO 27701 · 350 000 FCFA
 > 94 10 70 74
 
 ### Post 9 — CouturePro (10 %)
@@ -175,7 +175,7 @@ Démo 10 min ?
 ### Post 11 — Checklist inscription
 > Pour s’inscrire :
 > 1) WhatsApp **94 10 70 74**
-> 2) Nom + e-mail + norme (27001 / 27101)
+> 2) Nom + e-mail + norme (27001 / 27701)
 > 3) Confirmation paiement
 > Démarrage : **10 octobre 2026**
 
@@ -226,7 +226,7 @@ Lien direct à épingler : https://wa.me/22794107074?text=PROGRAMME
 
 Voir `docs/catalogue-pecb-nigercertify.md` — à exporter en PDF/image pour envoi WhatsApp.
 
-**À compléter en interne :** modalités de paiement (Mobile Money / virement) + libellé officiel exact du cours « ISO 27101 » côté PECB.
+**À compléter en interne :** modalités de paiement (Mobile Money / virement) + libellé officiel exact du cours « ISO 27701 » côté PECB.
 
 ---
 

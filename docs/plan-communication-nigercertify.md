@@ -12,7 +12,7 @@
 |--|--|
 | Date | **10 octobre 2026** |
 | Modalité | En ligne · accès **12 mois** |
-| Normes | **ISO 27001**, **ISO 27101**, etc. |
+| Normes | **ISO 27001**, **ISO 27701**, etc. |
 | Examens | Inclus + **2 retakes** |
 | Tarif | **350 000 FCFA** |
 
@@ -120,7 +120,7 @@
 ### PECB (70 %)
 - « Formations PECB avec NigerCertify — Niger & Sénégal. »
 - « Session en ligne dès le **10 octobre 2026** — accès 12 mois, 2 retakes, **350 000 FCFA**. »
-- « ISO 27001 · ISO 27101 — certification internationale, accompagnement local. »
+- « ISO 27001 · ISO 27701 — certification internationale, accompagnement local. »
 - « WhatsApp **94 10 70 74** — répondez PROGRAMME ou JE M’INSCRIS. »
 
 ### nBusiness (20 %)
@@ -347,7 +347,7 @@ Checklist avant chaque publication grand public :
 | `docs/kit-operationnel-30j-nigercertify.md` | Scripts + 12 posts + WhatsApp |
 
 ### Reste utile (non bloquant)
-1. Libellé **officiel PECB** exact pour « ISO 27101 » (code cours / titre)  
+1. Libellé **officiel PECB** exact pour « ISO 27701 » (code cours / titre)  
 2. Modalités de **paiement** (Mobile Money, virement, acompte)  
 3. Preuves : photos, nombre de certifiés, partenaires  
 4. Conditions **tarif groupe** entreprises  

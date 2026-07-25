@@ -10,7 +10,7 @@
 
 | | |
 |--|--|
-| **Normes** | ISO/IEC **27001** · ISO **27101** · autres normes de la famille sur demande |
+| **Normes** | ISO/IEC **27001** · ISO **27701** · autres normes de la famille sur demande |
 | **Démarrage** | **10 octobre 2026** |
 | **Modalité** | **100 % en ligne** |
 | **Accès plateforme** | **12 mois** |
@@ -33,7 +33,7 @@
 
 ## Ce qui est inclus (350 000 FCFA)
 
-1. Parcours de formation **PECB** sur la norme choisie (ex. ISO 27001, ISO 27101…)  
+1. Parcours de formation **PECB** sur la norme choisie (ex. ISO 27001, ISO 27701…)  
 2. Accès en ligne **12 mois**  
 3. Passage d’examen + **2 retakes**  
 4. Accompagnement NigerCertify (orientation, rappels, suivi inscription)  
@@ -46,7 +46,7 @@
 | Norme | Angle |
 |-------|--------|
 | **ISO/IEC 27001** | Management de la sécurité de l’information (SMSI) |
-| **ISO 27101** | *(préciser le libellé exact PECB / titre du cours sur la fiche d’inscription)* |
+| **ISO 27701** | *(préciser le libellé exact PECB / titre du cours sur la fiche d’inscription)* |
 | **Autres** | Famille ISO / GRC / cyber — nous indiquer votre besoin |
 
 **Sur WhatsApp, précisez :** la norme souhaitée + Lead Implementer ou Lead Auditor (si applicable).
@@ -68,7 +68,7 @@
 Bonjour, merci pour votre intérêt pour NigerCertify.
 Session PECB en ligne — démarrage 10 octobre 2026
 Accès 12 mois · 2 retakes examens · 350 000 FCFA
-Normes : ISO 27001, ISO 27101, etc.
+Normes : ISO 27001, ISO 27701, etc.
 
 Répondez avec :
 1) Votre nom
@@ -98,4 +98,4 @@ Je vous réserve une place ? (norme souhaitée ?)
 ---
 
 *Document commercial — à joindre en PDF / image WhatsApp.  
-Vérifier avant envoi le libellé officiel du cours « ISO 27101 » côté catalogue PECB (homonyme / code exact).*
+Vérifier avant envoi le libellé officiel du cours « ISO 27701 » côté catalogue PECB (homonyme / code exact).*
