@@ -4,7 +4,7 @@ Companion du plan v2.2 + catalogue formations.
 Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emploi.
 
 **PECB :** ISO 27001 / 27701 · **10 oct. 2026** · en ligne · 12 mois · 2 retakes · **350 000 FCFA**  
-**LPI :** Linux Essentials (LE) · LPIC-1 · LPIC-2 · LPIC-3 · calendrier/tarif sur demande  
+**LPI :** LE **150 000 FCFA** · LPIC-1/2/3 **200 000 FCFA**/niveau · format **mixte**  
 **WhatsApp :** **94 10 70 74**
 
 ---
@@ -19,7 +19,9 @@ PECB : ISO 27001 · ISO 27701
 Session 10 oct. 2026 · en ligne · 350 000 FCFA
 Accès 12 mois · 2 retakes
 
-LPI : Linux Essentials · LPIC-1 · LPIC-2 · LPIC-3
+LPI (mixte) :
+• Linux Essentials — 150 000 FCFA
+• LPIC-1 / 2 / 3 — 200 000 FCFA / niveau
 
 Aussi : nBusiness · CouturePro
 Répondez PROGRAMME · PECB · LPI · JE M’INSCRIS
@@ -28,7 +30,8 @@ Répondez PROGRAMME · PECB · LPI · JE M’INSCRIS
 ### LinkedIn — accroche
 ```
 PECB (ISO 27001/27701) · LPI (LE → LPIC-3) | Niger & Sénégal
-Session PECB en ligne 10 oct. 2026 · 350 000 FCFA
+PECB en ligne 10 oct. 2026 · 350 000 FCFA
+LPI mixte : LE 150k · LPIC 200k / niveau
 WhatsApp : +227 94 10 70 74
 ```
 
@@ -38,10 +41,12 @@ Merci pour votre message 🙏
 
 1️⃣ PECB — ISO 27001 / 27701
    Session 10 oct. 2026 · 350 000 FCFA
-   Accès 12 mois · 2 retakes → répondez PECB ou JE M’INSCRIS
+   Accès 12 mois · 2 retakes → PECB ou JE M’INSCRIS
 
-2️⃣ LPI — Linux Essentials, LPIC-1, LPIC-2, LPIC-3
-   → répondez LPI + niveau (LE / LPIC1 / LPIC2 / LPIC3)
+2️⃣ LPI — format mixte
+   • Linux Essentials : 150 000 FCFA
+   • LPIC-1 / LPIC-2 / LPIC-3 : 200 000 FCFA / niveau
+   → LPI + niveau (LE / LPIC1 / LPIC2 / LPIC3)
 
 Logiciels : NBUSINESS ou COUTUREPRO
 WhatsApp : 94 10 70 74
@@ -86,18 +91,18 @@ WhatsApp : 94 10 70 74
 ### D. Lead LPI
 ```
 Bonjour {Prénom},
-NigerCertify propose le parcours LPI :
-• LPI LE (Linux Essentials)
-• LPIC-1 · LPIC-2 · LPIC-3
+NigerCertify — parcours LPI en format mixte :
+• LPI LE (Linux Essentials) — 150 000 FCFA
+• LPIC-1 · LPIC-2 · LPIC-3 — 200 000 FCFA / niveau
 
 Quel niveau visez-vous ?
-Je vous envoie calendrier et tarif.
 ```
 
 ### E. Relance LPI
 ```
 Bonjour {Prénom},
-Suivi parcours Linux LPI (LE / LPIC-1 / 2 / 3).
+Suivi LPI (mixte) :
+LE = 150 000 FCFA · LPIC-1/2/3 = 200 000 FCFA / niveau
 Vous avez choisi un niveau ? Je finalise votre dossier.
 ```
 
@@ -154,27 +159,25 @@ Démo 10 min ?
 
 ### Post 4 — Parcours LPI
 > Admin Linux : par où commencer ?
-> Chez NigerCertify, le parcours LPI est clair :
-> **LPI LE** → **LPIC-1** → **LPIC-2** → **LPIC-3**
+> **LPI LE** (150 000 FCFA) → **LPIC-1 / 2 / 3** (200 000 FCFA / niveau)
+> Format **mixte** · NigerCertify
 > Répondez **LPI** au **94 10 70 74**
 
 ### Post 5 — Linux Essentials
-> **LPI Linux Essentials** : le bon premier pas
-> (ligne de commande, open source, bases système).
-> Idéal étudiants & reconversion.
+> **LPI Linux Essentials** — 150 000 FCFA · format mixte
+> Le bon premier pas (commande, open source, bases système).
 > Message **LPI LE** au 94 10 70 74
 
 ### Post 6 — LPIC-1 / 2 / 3
-> Vous êtes déjà sous Linux au quotidien ?
 > Passez au niveau supérieur :
-> **LPIC-1** (admin) · **LPIC-2** (engineer) · **LPIC-3** (enterprise)
-> WhatsApp **94 10 70 74** — mot-clé **LPI**
+> **LPIC-1** · **LPIC-2** · **LPIC-3** — **200 000 FCFA** / niveau
+> Format mixte · WhatsApp **94 10 70 74** — **LPI**
 
 ### Post 7 — Dual certif
 > Deux piliers pour une carrière IT solide :
-> 🛡 **PECB** (ISO 27001 / 27701) — sécurité & conformité
-> 🐧 **LPI** (LE → LPIC-3) — administration Linux
-> NigerCertify · Niger & Sénégal · 94 10 70 74
+> 🛡 **PECB** — 350 000 FCFA (10 oct. 2026)
+> 🐧 **LPI** — LE 150k · LPIC 200k (mixte)
+> 94 10 70 74
 
 ### Post 8 — CTA PECB
 > Une question. Une place.
@@ -209,8 +212,8 @@ Démo 10 min ?
 
 1. `PECB 10 oct 2026 — 350k — 2 retakes — 94107074`  
 2. `ISO 27001 / 27701 en ligne · JE M’INSCRIS`  
-3. `LPI : LE · LPIC-1 · LPIC-2 · LPIC-3 → répondez LPI`  
-4. `Linux Essentials = premier pas admin`  
+3. `LPI mixte : LE 150k · LPIC 200k → répondez LPI`  
+4. `Linux Essentials 150 000 FCFA — premier pas admin`  
 5. `nBusiness démo 10 min`  
 6. `CouturePro ateliers`  
 
@@ -250,8 +253,8 @@ Liens :
 
 Voir `docs/catalogue-formations-nigercertify.md` (PECB + LPI).
 
-**À compléter :** modalités de paiement PECB · **dates & tarifs LPI** (LE, LPIC-1, LPIC-2, LPIC-3).
+**À compléter :** modalités de paiement · calendrier de démarrage LPI (prochaine cohorte mixte).
 
 ---
 
-*Kit 30 jours — NigerCertify · PECB 10/10/2026 · LPI LE→LPIC-3*
+*Kit 30 jours — NigerCertify · PECB 350k · LPI LE 150k · LPIC 200k mixte*
