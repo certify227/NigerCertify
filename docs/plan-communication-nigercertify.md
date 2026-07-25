@@ -64,13 +64,14 @@
 
 ---
 
-## 2. Objectifs (6 mois — mode PECB first)
+## 2. Objectifs (6 mois — mode PECB + LPI)
 
-1. Remplir les sessions **PECB** (inscriptions payantes).
-2. Construire une liste WhatsApp / email de prospects certification (Niger + Sénégal).
-3. Produire **preuves** : photos sessions, témoignages certifiés, logos partenaires.
-4. Maintenir une présence légère mais claire pour **nBusiness** et **CouturePro** (pipeline secondaire).
-5. Protéger la marque : **zéro confusion** avec le lab offensif.
+1. Remplir les sessions **PECB** (inscriptions payantes — session 10/10/2026).
+2. Qualifier un pipeline **LPI / LPIC** (LE → LPIC-3) en parallèle.
+3. Construire une liste WhatsApp / email de prospects certification (Niger + Sénégal).
+4. Produire **preuves** : photos sessions, témoignages certifiés, logos partenaires.
+5. Maintenir une présence légère pour **nBusiness** et **CouturePro**.
+6. Protéger la marque : **zéro confusion** avec le lab offensif.
 
 ### KPI réalistes (budget 20 k FCFA)
 
@@ -188,7 +189,7 @@ Session → témoignage → alumni / upsell autre norme PECB
 
 ---
 
-## 7. Calendrier éditorial mensuel (PECB first)
+## 7. Calendrier éditorial mensuel (PECB + LPI)
 
 ### Répartition des posts
 

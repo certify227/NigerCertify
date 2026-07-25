@@ -1,9 +1,11 @@
-# Kit opérationnel 30 jours — NigerCertify (PECB first)
+# Kit opérationnel 30 jours — NigerCertify (PECB + LPI)
 
-Companion du plan v2.0 + catalogue session **10 octobre 2026**.  
+Companion du plan v2.2 + catalogue formations.  
 Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emploi.
 
-**Session active :** PECB en ligne · ISO 27001 / ISO 27701 · accès 12 mois · 2 retakes · **350 000 FCFA** · WhatsApp **94 10 70 74**
+**PECB :** ISO 27001 / 27701 · **10 oct. 2026** · en ligne · 12 mois · 2 retakes · **350 000 FCFA**  
+**LPI :** Linux Essentials (LE) · LPIC-1 · LPIC-2 · LPIC-3 · calendrier/tarif sur demande  
+**WhatsApp :** **94 10 70 74**
 
 ---
 
@@ -11,19 +13,22 @@ Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emploi.
 
 ### WhatsApp Business — description
 ```
-NigerCertify — Formations PECB (Niger & Sénégal)
-Prochaine session : 10 octobre 2026 · 100 % en ligne
-ISO 27001 · ISO 27701 · accès 12 mois · 2 retakes
-Tarif : 350 000 FCFA
+NigerCertify — Certifications (Niger & Sénégal)
+
+PECB : ISO 27001 · ISO 27701
+Session 10 oct. 2026 · en ligne · 350 000 FCFA
+Accès 12 mois · 2 retakes
+
+LPI : Linux Essentials · LPIC-1 · LPIC-2 · LPIC-3
 
 Aussi : nBusiness · CouturePro
-Répondez PROGRAMME ou JE M’INSCRIS
+Répondez PROGRAMME · PECB · LPI · JE M’INSCRIS
 ```
 
 ### LinkedIn — accroche
 ```
-Formations PECB · Niger & Sénégal | Session en ligne 10 oct. 2026
-ISO 27001 · accès 12 mois · 2 retakes · 350 000 FCFA
+PECB (ISO 27001/27701) · LPI (LE → LPIC-3) | Niger & Sénégal
+Session PECB en ligne 10 oct. 2026 · 350 000 FCFA
 WhatsApp : +227 94 10 70 74
 ```
 
@@ -31,14 +36,14 @@ WhatsApp : +227 94 10 70 74
 ```
 Merci pour votre message 🙏
 
-Session PECB en ligne — démarrage 10 octobre 2026
-ISO 27001 / ISO 27701 (précisez votre choix)
-Accès 12 mois · 2 retakes examens · 350 000 FCFA
+1️⃣ PECB — ISO 27001 / 27701
+   Session 10 oct. 2026 · 350 000 FCFA
+   Accès 12 mois · 2 retakes → répondez PECB ou JE M’INSCRIS
 
-Répondez PROGRAMME pour le détail
-ou JE M’INSCRIS + votre nom + e-mail + norme
+2️⃣ LPI — Linux Essentials, LPIC-1, LPIC-2, LPIC-3
+   → répondez LPI + niveau (LE / LPIC1 / LPIC2 / LPIC3)
 
-Démo logiciel : NBUSINESS ou COUTUREPRO
+Logiciels : NBUSINESS ou COUTUREPRO
 WhatsApp : 94 10 70 74
 ```
 
@@ -61,7 +66,7 @@ Je vous envoie le programme complet ?
 Quelle norme vous intéresse ?
 ```
 
-### B. Relance J+2
+### B. Relance PECB J+2
 ```
 Bonjour {Prénom},
 Petit suivi sur la session PECB du 10 octobre 2026 (en ligne).
@@ -69,7 +74,7 @@ Petit suivi sur la session PECB du 10 octobre 2026 (en ligne).
 Vous partez sur ISO 27001 ou ISO 27701 ?
 ```
 
-### C. Relance J+5
+### C. Relance PECB J+5
 ```
 Bonjour {Prénom},
 Les inscriptions pour le 10 octobre avancent.
@@ -78,7 +83,25 @@ Je peux vous bloquer une place provisoire
 WhatsApp : 94 10 70 74
 ```
 
-### D. Confirmation inscription
+### D. Lead LPI
+```
+Bonjour {Prénom},
+NigerCertify propose le parcours LPI :
+• LPI LE (Linux Essentials)
+• LPIC-1 · LPIC-2 · LPIC-3
+
+Quel niveau visez-vous ?
+Je vous envoie calendrier et tarif.
+```
+
+### E. Relance LPI
+```
+Bonjour {Prénom},
+Suivi parcours Linux LPI (LE / LPIC-1 / 2 / 3).
+Vous avez choisi un niveau ? Je finalise votre dossier.
+```
+
+### F. Confirmation inscription PECB
 ```
 Bien reçu ✅
 Place pour la session du 10/10/2026 — {NORME}
@@ -89,14 +112,14 @@ Voici les modalités de paiement : {À COMPLÉTER}
 Dès réception, vous recevez la confirmation officielle.
 ```
 
-### E. nBusiness
+### G. nBusiness
 ```
 Bonjour {Prénom},
 nBusiness : gestion pour commerce, école, pressing, business.
 Démo WhatsApp 10 min cette semaine ?
 ```
 
-### F. CouturePro
+### H. CouturePro
 ```
 Bonjour {Prénom},
 CouturePro : commandes, tissus, clients pour ateliers de couture.
@@ -105,83 +128,78 @@ Démo 10 min ?
 
 ---
 
-## 3. 12 posts LinkedIn / Facebook (prêts — session 10/10/2026)
+## 3. Posts LinkedIn / Facebook (prêts)
 
-### Post 1 — Lancement session
+### Post 1 — Lancement PECB
 > 🚨 Session PECB — inscriptions ouvertes
-> 📅 Démarrage : **10 octobre 2026**
-> 💻 100 % en ligne · accès **12 mois**
-> 🔁 **2 retakes** examens inclus
+> 📅 **10 octobre 2026** · 💻 100 % en ligne
 > 📘 ISO 27001 · ISO 27701
+> ⏱ Accès **12 mois** · 🔁 **2 retakes**
 > 💰 **350 000 FCFA**
->
-> WhatsApp : **94 10 70 74**
-> Répondez **JE M’INSCRIS**
+> WhatsApp : **94 10 70 74** → **JE M’INSCRIS**
 
 ### Post 2 — Pourquoi ISO 27001
-> ISO 27001, c’est le langage commun de la sécurité de l’information.
-> Avec NigerCertify : formation PECB en ligne dès le **10 octobre 2026**,
-> accès 12 mois + 2 retakes — **350 000 FCFA**.
-> Message au **94 10 70 74**
+> ISO 27001 = langage commun de la sécurité de l’information.
+> Session PECB NigerCertify dès le **10 octobre 2026**
+> 350 000 FCFA · 12 mois · 2 retakes
+> **94 10 70 74**
 
-### Post 3 — Ce qui est inclus
-> Pour 350 000 FCFA, la session du 10/10/2026 inclut :
+### Post 3 — Inclus PECB
+> Pour 350 000 FCFA (session 10/10/2026) :
 > ✅ Formation PECB en ligne
-> ✅ Accès plateforme 12 mois
+> ✅ Accès 12 mois
 > ✅ Examen + 2 retakes
-> ✅ Suivi NigerCertify (Niger & Sénégal)
->
-> Normes : ISO 27001, ISO 27701…
+> ✅ Suivi NigerCertify
 > 📩 94 10 70 74
 
-### Post 4 — Dual market
-> Que vous soyez au **Niger** ou au **Sénégal** :
-> même session en ligne, même exigence PECB.
-> Démarrage **10 octobre 2026** · 350 000 FCFA
-> WhatsApp **94 10 70 74**
+### Post 4 — Parcours LPI
+> Admin Linux : par où commencer ?
+> Chez NigerCertify, le parcours LPI est clair :
+> **LPI LE** → **LPIC-1** → **LPIC-2** → **LPIC-3**
+> Répondez **LPI** au **94 10 70 74**
 
-### Post 5 — Objection « en ligne »
-> En ligne ne veut pas dire seul.
-> Accès 12 mois + 2 retakes = le temps de maîtriser et de réussir.
-> Session du **10 octobre 2026** — places ouvertes.
-> 94 10 70 74
+### Post 5 — Linux Essentials
+> **LPI Linux Essentials** : le bon premier pas
+> (ligne de commande, open source, bases système).
+> Idéal étudiants & reconversion.
+> Message **LPI LE** au 94 10 70 74
 
-### Post 6 — CTA direct
+### Post 6 — LPIC-1 / 2 / 3
+> Vous êtes déjà sous Linux au quotidien ?
+> Passez au niveau supérieur :
+> **LPIC-1** (admin) · **LPIC-2** (engineer) · **LPIC-3** (enterprise)
+> WhatsApp **94 10 70 74** — mot-clé **LPI**
+
+### Post 7 — Dual certif
+> Deux piliers pour une carrière IT solide :
+> 🛡 **PECB** (ISO 27001 / 27701) — sécurité & conformité
+> 🐧 **LPI** (LE → LPIC-3) — administration Linux
+> NigerCertify · Niger & Sénégal · 94 10 70 74
+
+### Post 8 — CTA PECB
 > Une question. Une place.
 > PECB · 10 oct. 2026 · 350 000 FCFA · 2 retakes
-> Écrivez **PROGRAMME** au **94 10 70 74**
+> **PROGRAMME** au **94 10 70 74**
 
-### Post 7 — nBusiness (20 %)
+### Post 9 — nBusiness
 > Commerce, école, pressing, business…
-> **nBusiness** centralise stock, clients et ventes.
-> Démo 10 min → message **NBUSINESS** au 94 10 70 74
-
-### Post 8 — Différence certification
-> Un certificat PECB, c’est une preuve internationale.
-> NigerCertify vous y prépare en ligne dès le 10/10/2026.
-> ISO 27001 / ISO 27701 · 350 000 FCFA
-> 94 10 70 74
-
-### Post 9 — CouturePro (10 %)
-> **CouturePro** — le logiciel des ateliers de couture
-> (commandes, tissus, clients, délais).
-> Message **COUTUREPRO** au 94 10 70 74
+> **nBusiness** : stock, clients, ventes.
+> Démo → **NBUSINESS** au 94 10 70 74
 
 ### Post 10 — Entreprises
-> Vous formez une équipe ?
-> Session PECB du 10 octobre 2026 (en ligne) — tarif 350 000 FCFA / participant.
-> Demandez les conditions groupe au **94 10 70 74**
+> Formez une équipe en ISO **ou** en Linux ?
+> PECB (10/10/2026) + parcours LPI / LPIC
+> Conditions groupe : **94 10 70 74**
 
-### Post 11 — Checklist inscription
-> Pour s’inscrire :
-> 1) WhatsApp **94 10 70 74**
-> 2) Nom + e-mail + norme (27001 / 27701)
-> 3) Confirmation paiement
-> Démarrage : **10 octobre 2026**
+### Post 11 — CouturePro
+> **CouturePro** — ateliers de couture
+> (commandes, tissus, clients, délais)
+> **COUTUREPRO** au 94 10 70 74
 
 ### Post 12 — Récap
 > NigerCertify — certifier les talents, digitaliser les métiers.
-> 🎯 PECB 10/10/2026 · 350 000 FCFA · 2 retakes
+> 🎯 PECB 10/10/2026 · 350 000 FCFA
+> 🐧 LPI LE · LPIC-1 · LPIC-2 · LPIC-3
 > 🛠 nBusiness · CouturePro
 > 📞 94 10 70 74
 
@@ -189,13 +207,17 @@ Démo 10 min ?
 
 ## 4. Statuts WhatsApp (rotation)
 
-1. `Session PECB 10 oct 2026 — 350k — 2 retakes — 94107074`  
-2. `ISO 27001 en ligne · accès 12 mois · JE M’INSCRIS`  
-3. `Niger & Sénégal · même session distancielle`  
-4. `nBusiness démo 10 min` *(1× / sem.)*  
-5. `CouturePro ateliers` *(1× / sem.)*  
+1. `PECB 10 oct 2026 — 350k — 2 retakes — 94107074`  
+2. `ISO 27001 / 27701 en ligne · JE M’INSCRIS`  
+3. `LPI : LE · LPIC-1 · LPIC-2 · LPIC-3 → répondez LPI`  
+4. `Linux Essentials = premier pas admin`  
+5. `nBusiness démo 10 min`  
+6. `CouturePro ateliers`  
 
-Lien direct à épingler : https://wa.me/22794107074?text=PROGRAMME
+Liens :
+- https://wa.me/22794107074?text=PROGRAMME  
+- https://wa.me/22794107074?text=LPI  
+- https://wa.me/22794107074?text=JE%20M%27INSCRIS  
 
 ---
 
@@ -203,9 +225,11 @@ Lien direct à épingler : https://wa.me/22794107074?text=PROGRAMME
 
 | Label | Usage |
 |-------|-------|
-| Lead-PECB | Demande PROGRAMME |
-| Hot-PECB | JE M’INSCRIS / demande paiement |
+| Lead-PECB | Demande PROGRAMME / PECB |
+| Hot-PECB | JE M’INSCRIS |
 | Inscrit-10-10 | Session 10 oct. 2026 confirmée |
+| Lead-LPI | Demande LPI / LE / LPIC |
+| Hot-LPI | Prêt à s’inscrire LPI |
 | Alumni | Certifié |
 | Lead-nBusiness | Démo gestion |
 | Lead-CouturePro | Démo couture |
@@ -215,19 +239,19 @@ Lien direct à épingler : https://wa.me/22794107074?text=PROGRAMME
 
 ## 6. Checklist quotidienne (30 min)
 
-- [ ] Répondre à tous les messages **94 10 70 74** (&lt; 2 h)  
-- [ ] 5 relances leads PECB (scripts B/C)  
+- [ ] Répondre messages **94 10 70 74** (< 2 h)  
+- [ ] 4 relances PECB + 1–2 relances LPI  
 - [ ] 1 statut WhatsApp  
-- [ ] 3×/sem. : publier 1 post de la liste  
+- [ ] 3×/sem. : 1 post (alterner PECB / LPI)  
 
 ---
 
-## 7. Lien catalogue
+## 7. Catalogue
 
-Voir `docs/catalogue-pecb-nigercertify.md` — à exporter en PDF/image pour envoi WhatsApp.
+Voir `docs/catalogue-formations-nigercertify.md` (PECB + LPI).
 
-**À compléter en interne :** modalités de paiement (Mobile Money / virement).
+**À compléter :** modalités de paiement PECB · **dates & tarifs LPI** (LE, LPIC-1, LPIC-2, LPIC-3).
 
 ---
 
-*Kit 30 jours — NigerCertify · session 10 octobre 2026*
+*Kit 30 jours — NigerCertify · PECB 10/10/2026 · LPI LE→LPIC-3*
