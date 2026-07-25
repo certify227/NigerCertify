@@ -119,9 +119,9 @@
 
 ### PECB (70 %)
 - « Formations PECB avec NigerCertify — Niger & Sénégal. »
-- « Certification internationale, accompagnement local. »
-- « Prochaine session : [norme] — [ville] — [dates] — places limitées. »
-- Normes à mettre en avant *(à lister précisément selon votre catalogue)* : ex. ISO 27001, ISO 9001, ISO 22301, Lead Auditor / Lead Implementer, etc.
+- « Session en ligne dès le **10 octobre 2026** — accès 12 mois, 2 retakes, **350 000 FCFA**. »
+- « ISO 27001 · ISO 27101 — certification internationale, accompagnement local. »
+- « WhatsApp **94 10 70 74** — répondez PROGRAMME ou JE M’INSCRIS. »
 
 ### nBusiness (20 %)
 - « nBusiness — la gestion multi-secteur pour commerce, école, pressing et business. »
