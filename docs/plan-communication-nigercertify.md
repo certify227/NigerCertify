@@ -1,22 +1,19 @@
 # Plan de communication — NigerCertify
 
-**Version :** 2.1 (session chiffrée)  
+**Version :** 2.2 (PECB + LPI)  
 **Marchés :** Niger · Sénégal  
 **Langue principale :** Français  
-**Horizon :** 12 mois (focus commercial 6 mois = **formations PECB**)  
-**Budget com :** **20 000 FCFA / mois** → stratégie 95 % organique, zéro campagne payante lourde  
+**Horizon :** 12 mois (focus 6 mois = **PECB**, secondaire fort = **LPI / LPIC**)  
+**Budget com :** **20 000 FCFA / mois** → stratégie 95 % organique  
 **WhatsApp commercial :** **94 10 70 74** ([wa.me/22794107074](https://wa.me/22794107074))
 
-### Session commerciale active
-| | |
-|--|--|
-| Date | **10 octobre 2026** |
-| Modalité | En ligne · accès **12 mois** |
-| Normes | **ISO 27001**, **ISO 27701**, etc. |
-| Examens | Inclus + **2 retakes** |
-| Tarif | **350 000 FCFA** |
+### Sessions / parcours formation
+| Offre | Détail |
+|-------|--------|
+| **PECB** | ISO 27001 · ISO 27701 · **10 oct. 2026** · en ligne · 12 mois · 2 retakes · **350 000 FCFA** |
+| **LPI** | **Linux Essentials (LPI LE)** · **LPIC-1** · **LPIC-2** · **LPIC-3** · calendrier/tarif sur demande |
 
-> Lab GitHub « offensive » = **canal technique séparé**, jamais mélangé à la com grand public / PME / PECB.
+> Lab GitHub « offensive » = **canal technique séparé**, jamais mélangé à la com grand public / PME / certifications.
 
 ---
 
@@ -25,7 +22,7 @@
 | Point | Décision |
 |-------|----------|
 | Géographie | Niger + Sénégal |
-| Priorité 6 mois | **Formations PECB** |
+| Priorité 6 mois | **Formations PECB** (+ parcours **LPI / LPIC** en relais sysadmin) |
 | Logiciels | **CouturePro** (ateliers couture) · **nBusiness** (gestion multi-secteur) |
 | Secteurs nBusiness | Commerce, éducation, business, pressing, etc. |
 | Budget mensuel | 20 000 FCFA |
@@ -38,22 +35,23 @@
 
 ### Essence
 
-**NigerCertify** est un acteur ouest-africain de la **certification professionnelle (PECB)** et des **compétences IT**, qui équipe aussi les PME avec des logiciels de gestion locaux : **nBusiness** et **CouturePro**.
+**NigerCertify** est un acteur ouest-africain de la **certification professionnelle** — **PECB** (ISO / cybersécurité / privacy) et **LPI** (Linux Essentials → LPIC-3) — qui équipe aussi les PME avec **nBusiness** et **CouturePro**.
 
 ### Promesse
 
 > **Certifiez-vous. Structurez votre métier.**  
-> Formations PECB reconnues + outils de gestion pensés pour le terrain (Niger & Sénégal).
+> PECB + LPI reconnus internationalement, accompagnement local Niger & Sénégal, logiciels terrain.
 
 ### Architecture d’offres (priorisée)
 
 | Priorité | Offre | Rôle dans la com (6 mois) |
 |----------|-------|---------------------------|
-| **#1** | Formations **PECB** | 70 % des messages & du temps com |
-| **#2** | **nBusiness** | 20 % — démos ciblées commerce / école / pressing / business |
-| **#3** | **CouturePro** | 10 % — niches ateliers couture (WhatsApp / Facebook) |
-| Satellite | Services IT / cyber | Contenu d’autorité, pas le CTA principal |
-| Hors com publique | Lab GitHub offensif | Réservé communauté technique / pédagogique |
+| **#1** | Formations **PECB** (27001, 27701…) | 60 % des messages — session 10/10/2026 |
+| **#2** | Formations **LPI** (LE, LPIC-1/2/3) | 20 % — parcours Linux / admin système |
+| **#3** | **nBusiness** | 15 % — démos PME |
+| **#4** | **CouturePro** | 5 % — niches ateliers |
+| Satellite | Services IT / cyber | Autorité, pas CTA principal |
+| Hors com publique | Lab GitHub offensif | Communauté technique seulement |
 
 ### Territoire de parole
 
@@ -117,22 +115,27 @@
 
 ## 4. Messages clés
 
-### PECB (70 %)
+### PECB (60 %)
 - « Formations PECB avec NigerCertify — Niger & Sénégal. »
 - « Session en ligne dès le **10 octobre 2026** — accès 12 mois, 2 retakes, **350 000 FCFA**. »
 - « ISO 27001 · ISO 27701 — certification internationale, accompagnement local. »
 - « WhatsApp **94 10 70 74** — répondez PROGRAMME ou JE M’INSCRIS. »
 
-### nBusiness (20 %)
+### LPI / LPIC (20 %)
+- « De Linux Essentials à LPIC-3 — le parcours admin système avec NigerCertify. »
+- « LPI LE · LPIC-1 · LPIC-2 · LPIC-3 — certifications Linux vendor-neutral. »
+- « WhatsApp **94 10 70 74** — répondez LPI + votre niveau. »
+
+### nBusiness (15 %)
 - « nBusiness — la gestion multi-secteur pour commerce, école, pressing et business. »
 - « Moins de cahiers, plus de contrôle : stock, clients, ventes. »
 
-### CouturePro (10 %)
+### CouturePro (5 %)
 - « CouturePro — le logiciel des ateliers de couture. »
 - « Du tissu à la livraison client, tout est suivi. »
 
 ### Ombrelle
-- **NigerCertify : certifier les talents, digitaliser les métiers.**
+- **NigerCertify : certifier les talents (PECB · LPI), digitaliser les métiers.**
 
 ---
 
@@ -191,9 +194,10 @@ Session → témoignage → alumni / upsell autre norme PECB
 
 | Thème | Part | Exemples |
 |-------|------|----------|
-| PECB / certification | 70 % | Norme expliquée, dates, témoignage, « pourquoi Lead Auditor » |
-| nBusiness | 20 % | Mini-démo commerce / pressing / école |
-| CouturePro | 10 % | Avant/après atelier, feature commandes |
+| PECB / certification ISO | 60 % | Session 10/10, 27001/27701, témoignages |
+| LPI / Linux / LPIC | 20 % | Parcours LE→LPIC-3, tip commande Linux |
+| nBusiness | 15 % | Mini-démo commerce / pressing / école |
+| CouturePro | 5 % | Feature commandes atelier |
 
 ### Semaine type (organique)
 
@@ -343,15 +347,16 @@ Checklist avant chaque publication grand public :
 
 | Fichier | Usage |
 |---------|--------|
-| `docs/catalogue-pecb-nigercertify.md` | Fiche offre session 10/10/2026 (à exporter PDF) |
-| `docs/kit-operationnel-30j-nigercertify.md` | Scripts + 12 posts + WhatsApp |
+| `docs/catalogue-formations-nigercertify.md` | Catalogue PECB + LPI (à exporter PDF) |
+| `docs/kit-operationnel-30j-nigercertify.md` | Scripts + posts + WhatsApp |
 
 ### Reste utile (non bloquant)
-1. Modalités de **paiement** (Mobile Money, virement, acompte)  
-2. Preuves : photos, nombre de certifiés, partenaires  
-3. Conditions **tarif groupe** entreprises  
+1. Modalités de **paiement** PECB (Mobile Money, virement, acompte)  
+2. **Dates + tarifs LPI** (LE, LPIC-1, LPIC-2, LPIC-3) à figer comme pour le PECB  
+3. Preuves : photos, nombre de certifiés, partenaires  
+4. Conditions **tarif groupe** entreprises  
 
 ---
 
-*NigerCertify — Plan de communication v2.1*  
-*Session : 10 oct. 2026 · 350 000 FCFA · 94 10 70 74 · PECB · CouturePro · nBusiness*
+*NigerCertify — Plan de communication v2.2*  
+*PECB 10 oct. 2026 · LPI LE→LPIC-3 · 350 000 FCFA (PECB) · 94 10 70 74 · CouturePro · nBusiness*
