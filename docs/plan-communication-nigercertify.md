@@ -1,329 +1,344 @@
 # Plan de communication — NigerCertify
 
-**Version :** 1.0 (brouillon stratégique)  
-**Périmètre :** marque NigerCertify · formations & certification IT · cybersécurité · administration système · logiciels de gestion  
-**Horizon :** 12 mois (avec jalons à 90 jours)
+**Version :** 2.0 (affiné terrain)  
+**Marchés :** Niger · Sénégal  
+**Langue principale :** Français  
+**Horizon :** 12 mois (focus commercial 6 mois = **formations PECB**)  
+**Budget com :** **20 000 FCFA / mois** → stratégie 95 % organique, zéro campagne payante lourde
 
-> Document de travail. Les hypothèses sont marquées *(à confirmer)*.  
-> Objectif : un système de communication clair, crédible et commercialement utile — pas une accumulation de posts.
+> Lab GitHub « offensive » = **canal technique séparé**, jamais mélangé à la com grand public / PME / PECB.
+
+---
+
+## 0. Décisions validées
+
+| Point | Décision |
+|-------|----------|
+| Géographie | Niger + Sénégal |
+| Priorité 6 mois | **Formations PECB** |
+| Logiciels | **CouturePro** (ateliers couture) · **nBusiness** (gestion multi-secteur) |
+| Secteurs nBusiness | Commerce, éducation, business, pressing, etc. |
+| Budget mensuel | 20 000 FCFA |
+| Canaux déjà actifs | Oui (à exploiter avant d’en ouvrir de nouveaux) |
+| Lab offensif GitHub | Séparé de la com grand public |
 
 ---
 
 ## 1. Positionnement
 
-### Essence de marque
+### Essence
 
-**NigerCertify** forme, certifie et équipe les organisations et les professionnels en technologies de l’information — de la cybersécurité à l’administration système — et propose des logiciels de gestion concrets pour opérationnaliser le terrain.
+**NigerCertify** est un acteur ouest-africain de la **certification professionnelle (PECB)** et des **compétences IT**, qui équipe aussi les PME avec des logiciels de gestion locaux : **nBusiness** et **CouturePro**.
 
-### Promesse (proposition de valeur)
+### Promesse
 
-> **Compétences qui tiennent, outils qui servent.**  
-> Nous ne vendons ni la peur ni le jargon : nous rendons les équipes opérationnelles et les métiers mieux gérés.
+> **Certifiez-vous. Structurez votre métier.**  
+> Formations PECB reconnues + outils de gestion pensés pour le terrain (Niger & Sénégal).
+
+### Architecture d’offres (priorisée)
+
+| Priorité | Offre | Rôle dans la com (6 mois) |
+|----------|-------|---------------------------|
+| **#1** | Formations **PECB** | 70 % des messages & du temps com |
+| **#2** | **nBusiness** | 20 % — démos ciblées commerce / école / pressing / business |
+| **#3** | **CouturePro** | 10 % — niches ateliers couture (WhatsApp / Facebook) |
+| Satellite | Services IT / cyber | Contenu d’autorité, pas le CTA principal |
+| Hors com publique | Lab GitHub offensif | Réservé communauté technique / pédagogique |
 
 ### Territoire de parole
 
 | On dit | On ne dit pas |
 |--------|----------------|
-| Expertise terrain, pédagogie, résultats mesurables | « Leader mondial », buzzwords vides |
-| Cybersécurité + admin système + logiciels métier | Uniquement « hacker » / image dark-web |
-| Confiance, conformité, continuité d’activité | Promesses irréalistes (zéro risque) |
-| PME, ateliers, administrations, écoles | Uniquement grandes entreprises Fortune 500 |
-
-### Architecture d’offres (3 piliers)
-
-| Pilier | Contenu | Public principal |
-|--------|---------|------------------|
-| **A — Formation & certification** | Cybersécurité, admin système, parcours certifiants | Étudiants, professionnels IT, entreprises |
-| **B — Services IT / cyber** | Conseil, audit, accompagnement, admin | PME, institutions, écoles |
-| **C — Logiciels** | Gestion multi-secteur + gestion ateliers de couture | Dirigeants PME, gérants d’ateliers |
-
-La communication doit **nommer clairement le pilier** à chaque message (éviter le mélange « on fait tout » sans ancrage).
+| Partner / centre de formation PECB, certifications internationales | « Hacking », dark-web, posture offensive |
+| Compétences ISO, GRC, cybersécurité, continuité | Zéro risque, leader mondial |
+| Logiciels simples pour PME africaines | ERP complexifié, jargon SaaS US |
+| Niger & Sénégal, proximité terrain | Expansion mondiale floue |
 
 ---
 
-## 2. Objectifs de communication (12 mois)
+## 2. Objectifs (6 mois — mode PECB first)
 
-1. **Notoriété qualifiée** : être reconnu comme acteur crédible en formation / cyber / IT *(marché Niger et/ou Nigeria — à confirmer)*.
-2. **Génération de leads** : prospects pour formations + démos logiciels.
-3. **Preuve sociale** : cas clients, témoignages, résultats de formation.
-4. **Cohérence multi-produits** : une marque ombrelle, des messages distincts par offre.
-5. **Recrutement d’ambassadeurs** : formateurs, alumni, partenaires.
+1. Remplir les sessions **PECB** (inscriptions payantes).
+2. Construire une liste WhatsApp / email de prospects certification (Niger + Sénégal).
+3. Produire **preuves** : photos sessions, témoignages certifiés, logos partenaires.
+4. Maintenir une présence légère mais claire pour **nBusiness** et **CouturePro** (pipeline secondaire).
+5. Protéger la marque : **zéro confusion** avec le lab offensif.
 
-### Indicateurs (KPI) — cibles à calibrer
+### KPI réalistes (budget 20 k FCFA)
 
-| KPI | 90 jours | 12 mois |
-|-----|----------|---------|
-| Leads qualifiés / mois | 15–30 | 40–80 |
-| Taux de réponse campagnes outbound | ≥ 8 % | ≥ 12 % |
-| Démos logiciels / mois | 5–10 | 15–25 |
-| Inscriptions formations | selon capacité | +30 % vs baseline |
-| Contenus publiés / mois | 8–12 | 12–16 |
-| Mentions / partages organiques | suivi | ×2 |
-
----
-
-## 3. Publics cibles (personas)
-
-### P1 — Décideur PME
-- **Besoin :** sécuriser le SI, former l’équipe, digitaliser la gestion.
-- **Message :** « Réduisez le risque et gagnez du temps opérationnel. »
-- **Canal :** LinkedIn, email, WhatsApp Business, salons locaux.
-
-### P2 — Responsable / technicien IT
-- **Besoin :** monter en compétences, certifications (CEH, admin, etc.).
-- **Message :** « Des parcours concrets, orientés lab et métier. »
-- **Canal :** LinkedIn, YouTube/TikTok courts, communautés tech, GitHub lab.
-
-### P3 — Étudiant / jeune diplômé
-- **Besoin :** employabilité, portfolio, certification.
-- **Message :** « Devenez opérationnel, pas seulement théorique. »
-- **Canal :** Instagram, TikTok, WhatsApp, écoles partenaires.
-
-### P4 — Gérant d’atelier de couture
-- **Besoin :** suivre commandes, stocks, clients, production.
-- **Message :** « Votre atelier sous contrôle — du tissu à la livraison. »
-- **Canal :** WhatsApp, Facebook, associations de couturiers, démos terrain.
-
-### P5 — Partenaires (écoles, ONG, institutions)
-- **Besoin :** programmes structurés, reporting, conformité.
-- **Message :** « Un partenaire local fiable pour former et équiper. »
-- **Canal :** email formel, RDV, notes de partenariat.
+| KPI | M1–M2 | M3–M6 |
+|-----|-------|-------|
+| Leads PECB qualifiés / mois | 10–20 | 25–40 |
+| Inscriptions sessions | selon capacité | taux de conversion leads ≥ 15 % |
+| Posts LinkedIn / sem. | 3 | 3–4 |
+| Stories / WhatsApp status | 4–5 / sem. | 5–7 / sem. |
+| Démos nBusiness ou CouturePro / mois | 2–4 | 4–8 |
+| Dépenses ads | 0–10 000 FCFA max (test) | seulement si un post convertit déjà |
 
 ---
 
-## 4. Messages clés par offre
+## 3. Publics prioritaires
 
-### Formation & certification
-- « Apprenez en faisant : labs, scénarios réels, certifications. »
-- « Cybersécurité et administration système pour des équipes qui tiennent la production. »
+### P1 — Professionnel / manager (PECB) — **priorité absolue**
+- RSSI, DSI, consultants, responsables qualité/conformité, cadres IT
+- **Message :** « Une certification PECB reconnue, animée près de chez vous (Niger / Sénégal). »
+- **Canaux :** LinkedIn, WhatsApp, email, partenaires entreprises
 
-### Services / conseil
-- « De l’audit à la remédiation — accompagnement mesurable. »
-- « Continuité d’activité, bonnes pratiques, montée en compétences. »
+### P2 — Entreprise / institution
+- RH, direction, administrations, banques, telcos, ONG
+- **Message :** « Montez en compétences vos équipes avec des parcours PECB structurés. »
+- **Canaux :** LinkedIn + relance WhatsApp/email + RDV
 
-### Logiciel multi-secteur
-- « Un outil de gestion pensé pour les réalités multi-activités. »
-- « Centralisez clients, stocks, facturation, suivi — sans complexité inutile. »
+### P3 — Dirigeant PME (nBusiness)
+- Commerce, pressing, écoles privées, petits business
+- **Message :** « nBusiness : gérez stock, clients, caisse — sans usine à gaz. »
+- **Canaux :** WhatsApp, Facebook, démo terrain
 
-### Logiciel ateliers de couture
-- « Commandes, patrons, stocks tissus/fournitures, délais, clients — dans un seul outil. »
-- « Moins de pertes, plus de visibilité sur la production. »
+### P4 — Gérant atelier couture (CouturePro)
+- Ateliers, couturiers, stylistes indépendants
+- **Message :** « CouturePro : commandes, tissus, clients, délais — un seul outil. »
+- **Canaux :** WhatsApp, Facebook, associations
 
-### Message ombrelle (marque)
-- **NigerCertify : former, certifier, gérer.**
-
----
-
-## 5. Système de canaux
-
-### Canaux prioritaires (doit avoir)
-
-| Canal | Rôle | Fréquence |
-|-------|------|-----------|
-| **Site web** | Hub de confiance + conversion (forms, démo, catalogue) | Toujours à jour |
-| **WhatsApp Business** | Relation commerciale locale, relance, support léger | Quotidien |
-| **LinkedIn** | B2B, formations entreprises, thought leadership | 3–5 posts / sem. |
-| **Email / newsletter** | Nurturing leads, annonces sessions | 2 / mois |
-| **YouTube** (ou Reels) | Démos logiciels + labs cyber courts | 2–4 / mois |
-
-### Canaux secondaires
-
-| Canal | Rôle |
-|-------|------|
-| Facebook | Ateliers couture, PME locales, événements |
-| Instagram | Marque employeur, vie d’équipe, extraits formations |
-| TikTok | Snacks pédagogiques cyber / IT pour jeunes |
-| GitHub / lab | Preuve technique (lab pédagogique) — attention au cadrage « défensif / pédagogique » |
-| Partenariats écoles | Pipeline étudiants + crédibilité |
-
-### Règle d’or
-Un contenu = **un public + un pilier + un appel à l’action**.  
-Éviter les posts « fourre-tout » (formation + couture + pentest dans le même message).
+### P5 — Étudiants / juniors IT
+- Secondaire pour PECB (selon prérequis) ; utile pour notoriété long terme
+- **Canaux :** Instagram / WhatsApp écoles (volume bas coût)
 
 ---
 
-## 6. Parcours de communication (funnel)
+## 4. Messages clés
+
+### PECB (70 %)
+- « Formations PECB avec NigerCertify — Niger & Sénégal. »
+- « Certification internationale, accompagnement local. »
+- « Prochaine session : [norme] — [ville] — [dates] — places limitées. »
+- Normes à mettre en avant *(à lister précisément selon votre catalogue)* : ex. ISO 27001, ISO 9001, ISO 22301, Lead Auditor / Lead Implementer, etc.
+
+### nBusiness (20 %)
+- « nBusiness — la gestion multi-secteur pour commerce, école, pressing et business. »
+- « Moins de cahiers, plus de contrôle : stock, clients, ventes. »
+
+### CouturePro (10 %)
+- « CouturePro — le logiciel des ateliers de couture. »
+- « Du tissu à la livraison client, tout est suivi. »
+
+### Ombrelle
+- **NigerCertify : certifier les talents, digitaliser les métiers.**
+
+---
+
+## 5. Système de canaux (budget serré)
+
+### Stack obligatoire (coût ≈ 0–20 k)
+
+| Canal | Usage | Budget |
+|-------|-------|--------|
+| **WhatsApp Business** | Canal #1 commercial : sessions PECB, relances, démos | Gratuit / forfait data |
+| **LinkedIn** | Autorité PECB + B2B Sénégal/Niger | 0 (organique) |
+| **Facebook** | PME + CouturePro + événements | 0–10 k boost occasionnel |
+| **Site / page sessions** | Inscription + crédibilité | Maintenance légère |
+| **Email** (Gmail / Brevo free) | Rappels sessions, nurturing | Gratuit |
+
+### Interdit / différé (budget insuffisant)
+- Campagnes Meta/Google larges
+- Influenceurs payants
+- Agence com
+- Multiplier les nouveaux réseaux « pour être partout »
+
+### Règle lab GitHub
+- Pas de lien « Offensive Lab / webshells » dans posts PECB, landings logiciels, WhatsApp clients PME.
+- Si contenu technique cyber grand public : angle **défense, conformité, bonnes pratiques**, jamais exploitation.
+
+---
+
+## 6. Funnel PECB (cœur du système)
 
 ```
-Découverte → Intérêt → Confiance → Action → Fidélisation
+Post / statut WhatsApp / LinkedIn
+        ↓
+Message intérêt (« Je veux le programme / les dates »)
+        ↓
+Envoi fiche session + prérequis + tarif
+        ↓
+Relance J+2 / J+5
+        ↓
+Inscription + acompte
+        ↓
+Session → témoignage → alumni / upsell autre norme PECB
 ```
 
-| Étape | Contenu type | CTA |
-|-------|--------------|-----|
-| Découverte | Post court, tip cyber, démo 30 s logiciel | Suivre / visiter site |
-| Intérêt | Carrousel « 5 erreurs SI », cas atelier | Télécharger guide / rejoindre WhatsApp |
-| Confiance | Témoignage, avant/après, syllabus | Webinaire / session découverte |
-| Action | Offre session, démo guidée, devis | S’inscrire / réserver démo |
-| Fidélisation | Alumni, tips mensuels, upsell certif / module | Renouveler / parrainer |
+### CTA uniques à utiliser
+- « Demandez le programme PECB »
+- « Réservez votre place — session [ville] »
+- « Recevez le calendrier des certifications »
+
+Éviter les CTA vagues (« Contactez-nous », « Lien en bio » sans offre).
 
 ---
 
-## 7. Calendrier éditorial type (mensuel)
+## 7. Calendrier éditorial mensuel (PECB first)
 
-### Semaine type
+### Répartition des posts
 
-| Jour | Contenu |
-|------|---------|
-| Lun. | Tip cyber / admin (P2) |
-| Mar. | Preuve sociale ou coulisses formation |
-| Mer. | Démo courte logiciel (alterner multi-secteur / couture) |
-| Jeu. | Contenu LinkedIn B2B (décideur) |
-| Ven. | CTA : session / démo / inscription |
-| Sam. | Contenu léger Instagram / communauté (optionnel) |
+| Thème | Part | Exemples |
+|-------|------|----------|
+| PECB / certification | 70 % | Norme expliquée, dates, témoignage, « pourquoi Lead Auditor » |
+| nBusiness | 20 % | Mini-démo commerce / pressing / école |
+| CouturePro | 10 % | Avant/après atelier, feature commandes |
 
-### Rubriques récurrentes
-1. **« Lab du mois »** — exercice pratique (formation)
-2. **« 2 minutes pour gérer mieux »** — feature logiciel
-3. **« Terrain »** — histoire client / atelier
-4. **« Certif focus »** — une compétence, un débouché
+### Semaine type (organique)
 
-### Thèmes trimestriels (exemple année 1)
+| Jour | Action |
+|------|--------|
+| Lun. | LinkedIn : insight PECB (1 norme / 1 bénéfice carrière) |
+| Mar. | WhatsApp status : date session + places |
+| Mer. | Court post Facebook ou LinkedIn preuve (photo salle / certificat — avec accord) |
+| Jeu. | 1 contenu logiciel (nBusiness **ou** CouturePro, en alternance) |
+| Ven. | CTA fort : « Inscription ouverte — répondez PROGRAMME » |
+| Dim. | Relance douce alumni / liste WhatsApp |
 
-| Trimestre | Thème | Priorité commerciale |
-|-----------|-------|----------------------|
-| T1 | Lancement / clarification de l’offre | Notoriété + leads formation |
-| T2 | Digitalisation des PME & ateliers | Démos logiciels |
-| T3 | Cybersécurité pour non-spécialistes | Formations entreprises |
-| T4 | Bilans, certifications, partenariats | Fidélisation + upsell |
-
----
-
-## 8. Plan d’activation commercial (lié à la com)
-
-### Inbound
-- Landing pages : Formation · Logiciel multi-secteur · Atelier couture
-- Formulaires : « Réserver une démo » / « Session découverte »
-- Lead magnet : checklist cybersécurité PME · guide démarrage atelier digital
-
-### Outbound (aligné agent commercial)
-- Ciblage sites PME / ateliers / écoles
-- Message court WhatsApp / email avec **bénéfice + preuve + CTA démo**
-- Relance J+3 / J+7
-
-### Événements
-- Portes ouvertes / journée démo logiciels
-- Ateliers gratuits 1 h « Sécuriser son entreprise »
-- Partenariats associations de couturiers / chambres de métiers
+### Rubriques low-cost
+1. **« 60 secondes PECB »** — une exigence de norme, vulgarisée  
+2. **« Session alert »** — dates Niamey / Dakar / autre  
+3. **« Ils se sont certifiés »** — micro-témoignage  
+4. **« Métier digitalisé »** — 1 feature nBusiness ou CouturePro  
 
 ---
 
-## 9. Identité & ton
+## 8. Activation commerciale (Niger + Sénégal)
 
-### Ton
-- Clair, professionnel, pédagogue
-- Confiant sans arrogance
-- Français accessible *(et/ou anglais / haoussa — à confirmer)*
+### Cibles outbound PECB
+- Entreprises avec DSI / qualité / risque
+- Cabinets conseil, audit, formation
+- Administrations et opérateurs (selon accès)
+- Groupes LinkedIn « cybersécurité Afrique », « ISO », « PECB »
 
-### Style visuel (recommandations)
-- Couleurs stables (charte à figer) — éviter le « look cyber violet néon » générique
-- Photos réelles : salles de formation, ateliers, écrans produit
-- Templates LinkedIn / WhatsApp / pitch deck unifiés
-- Logo + signature mail + papier en-tête alignés
+### Scripts prêts
 
-### Assets à produire (priorité)
-1. One-pager marque NigerCertify  
-2. Fiches produit (×3 : formation, multi-secteur, couture)  
-3. Deck commercial 8–10 slides  
-4. Kit réseaux (bannières, templates posts)  
-5. Scripts démo 5 min / 15 min  
-6. FAQ objections (prix, délais, prérequis)
-
----
-
-## 10. Organisation & gouvernance
-
-| Rôle | Responsabilité |
-|------|----------------|
-| Direction | Validation messages sensibles, partenariats |
-| Com / marketing | Calendrier, contenus, canaux |
-| Commercial | Relances, démos, feedback terrain |
-| Technique / formateurs | Preuves, labs, exactitude pédagogique |
-| Support produit | Cas d’usage logiciels, captures |
-
-**Rituals**
-- Point com hebdo (30 min) : contenus + leads
-- Revue mensuelle KPI
-- Revue trimestrielle positionnement / offres
-
----
-
-## 11. Budget indicatif (relativisé)
-
-Sans chiffres exacts *(à confirmer)* :
-
-| Poste | Priorité |
-|-------|----------|
-| Site + landings | Haute |
-| WhatsApp Business + CRM simple | Haute |
-| Design / templates | Haute |
-| Boost LinkedIn / Facebook (tests) | Moyenne |
-| Vidéo (smartphone pro + montage) | Moyenne |
-| Événements / démos terrain | Haute pour couture & PME |
-| Influenceurs tech locaux | Basse au démarrage |
-
-Principe : **80 % contenu organique + relation**, 20 % paid pour amplifier ce qui convertit.
-
----
-
-## 12. Risques & garde-fous
-
-| Risque | Mitigation |
-|--------|------------|
-| Image trop « offensive / hacking » | Cadrer le lab comme pédagogique / défensif ; séparer com grand public et com technique |
-| Offres trop dispersées | Toujours taguer le pilier ; landings séparées |
-| Promesses sécurité excessives | Langage prudent, éthique, conformité |
-| Logiciel couture mal compris | Démos terrain, vocabulaire métier (commandes, stocks tissus…) |
-| Charge de production contenus | Rubriques récurrentes + templates + batch mensuel |
-
----
-
-## 13. Feuille de route 90 jours
-
-### Jours 1–30 — Fondations
-- [ ] Valider positionnement + messages (atelier interne ½ journée)
-- [ ] Charte visuelle minimale + templates
-- [ ] 3 landings + WhatsApp Business configuré
-- [ ] One-pager + fiches produit
-- [ ] Calendrier éditorial T1 publié
-
-### Jours 31–60 — Preuve & pipeline
-- [ ] 2 témoignages / cas (même courts)
-- [ ] 1 webinaire ou atelier gratuit
-- [ ] 4 démos logiciels filmées (courtes)
-- [ ] Séquence email / WhatsApp de nurturing
-- [ ] Première campagne outbound ciblée
-
-### Jours 61–90 — Optimisation
-- [ ] Analyser KPI, doubler ce qui convertit
-- [ ] Partenariat école ou association couture
-- [ ] Offre packagée (formation + logiciel ou audit + formation)
-- [ ] Revue stratégique et plan T2
-
----
-
-## 14. Exemples de messages prêts à l’emploi
-
-### LinkedIn (décideur)
-> Vos équipes IT n’ont pas besoin de plus de jargon — elles ont besoin d’être opérationnelles.  
-> NigerCertify forme et certifie en cybersécurité & administration système, et équipe les PME avec des logiciels de gestion concrets.  
-> → Réservez une session découverte (lien)
-
-### WhatsApp (atelier couture)
+**WhatsApp — PECB**
 > Bonjour {Prénom},  
-> On a développé un logiciel pour suivre commandes, stocks tissus et clients d’ateliers de couture.  
-> Je peux vous montrer en 10 min sur WhatsApp ou sur place. Ça vous dit ?
+> NigerCertify organise des formations **PECB** au Niger et au Sénégal.  
+> Je peux vous envoyer le programme et les prochaines dates ({norme}).  
+> Vous préférez Niamey, Dakar, ou en ligne ?
 
-### Email (formation)
-> Objet : Session pratique cybersécurité — places limitées  
-> Corps : public / dates / prérequis / bénéfice / CTA inscription
+**LinkedIn — comment / DM**
+> Nous accompagnons les professionnels vers les certifications PECB (ISO / GRC / cyber) avec un suivi local. Prochaine session : [détail]. Je vous envoie le programme ?
+
+**WhatsApp — nBusiness**
+> Bonjour, on a **nBusiness**, un logiciel de gestion pour commerce, école, pressing et business.  
+> Démo de 10 min sur WhatsApp ? 
+
+**WhatsApp — CouturePro**
+> Bonjour, **CouturePro** aide les ateliers de couture à suivre commandes, tissus et clients.  
+> Je vous montre en 10 min ?
+
+### Relances
+- J+2 : programme / tarif  
+- J+5 : places restantes / témoignage  
+- J+10 : report session suivante (ne pas spammer)
 
 ---
 
-## 15. Hypothèses à lever (bloquantes pour affiner)
+## 9. Budget 20 000 FCFA — répartition type
 
-Voir la section questions ci-dessous. Sans ces réponses, le plan reste générique sur : géographie, langues, prix, maturité produit, et priorité commerciale entre formation vs logiciels.
+| Poste | Montant | Notes |
+|-------|---------|-------|
+| Data / communication | 5–8 000 | WhatsApp, LinkedIn mobile |
+| Design (Canva Pro mensuel *si possible*) | 0–7 000 | sinon Canva free + templates |
+| Boost Facebook test (1 post session) | 0–10 000 | **uniquement** sur une session ouverte |
+| Impression flyers (optionnel) | reste | 1 recto PECB pour RDV terrain |
+| **Total** | **≤ 20 000** | |
+
+### Ce qui crée le plus de ROI à ce budget
+1. Statuts WhatsApp + listes de diffusion (PECB)  
+2. 3 posts LinkedIn/semaine bien écrits  
+3. 1 fiche PDF « Catalogue sessions PECB » renvoyée à chaque lead  
+4. 5 appels / messages relationnels par jour ouvrable  
 
 ---
 
-*NigerCertify — Plan de communication v1.0*  
-*Document vivant : à mettre à jour après validation des hypothèses.*
+## 10. Assets à produire (ordre strict)
+
+### Semaine 1–2
+1. Fiche PDF **Catalogue formations PECB** (normes, durée, prérequis, villes, contact)  
+2. 5 visuels Canva templates (session, témoignage, norme, CTA, logiciel)  
+3. Bio LinkedIn + description WhatsApp Business alignées PECB  
+4. Réponse automatique WhatsApp : « Merci — pour le programme PECB, répondez PROGRAMME »
+
+### Semaine 3–4
+5. One-pager **nBusiness** (secteurs : commerce, éducation, business, pressing)  
+6. One-pager **CouturePro**  
+7. 2 scripts démo 10 min (nBusiness / CouturePro)  
+8. Bannière « Lab technique ≠ offre grand public » (règle interne équipe)
+
+### Mois 2+
+9. 3 témoignages écrits (même courts)  
+10. Calendrier trimestriel des sessions (Niamey / Dakar / distanciel)
+
+---
+
+## 11. Identité & ton
+
+- **Ton :** professionnel, clair, rassurant, ouest-africain francophone  
+- **Visuel :** templates sobres (bleu/vert confiance ou charte existante) — **pas** d’esthétique hacker  
+- **Signature :** NigerCertify · Formations PECB · Niger & Sénégal  
+- **Produits nommés :** toujours **CouturePro** et **nBusiness** (orthographe figée)
+
+---
+
+## 12. Feuille de route 90 jours
+
+### Jours 1–30 — Machine PECB
+- [ ] Catalogue PECB PDF + calendrier 1er trimestre  
+- [ ] WhatsApp Business structuré (labels : Lead PECB / Inscrit / Alumni / Logiciel)  
+- [ ] Bio & 9 premiers posts LinkedIn (PECB)  
+- [ ] Liste 50 prospects Niger + 50 Sénégal  
+- [ ] Règle interne : lab GitHub hors com clients  
+
+### Jours 31–60 — Preuve & remplissage
+- [ ] 1 session mise en avant massivement  
+- [ ] 2 témoignages  
+- [ ] 1 atelier découverte gratuit 45 min (teaser PECB)  
+- [ ] 4 démos nBusiness / CouturePro (secondaire)  
+- [ ] Mesure : taux de réponse WhatsApp  
+
+### Jours 61–90 — Industrialiser
+- [ ] Calendrier T2 publié  
+- [ ] Séquence relance standard (copier-coller équipe)  
+- [ ] 1 partenariat école ou entreprise (Sénégal **ou** Niger)  
+- [ ] Revue : quelle norme PECB convertit le mieux → doubler dessus  
+
+---
+
+## 13. Séparation des marques / canaux
+
+```
+Com publique NigerCertify
+├── PECB (priorité)
+├── nBusiness
+└── CouturePro
+
+Canal technique séparé
+└── GitHub / lab pédagogique offensif  ← pas de cross-post commercial
+```
+
+Checklist avant chaque publication grand public :
+- [ ] Pas de webshell / exploit / dark aesthetic  
+- [ ] Offre claire (PECB / nBusiness / CouturePro)  
+- [ ] CTA unique  
+- [ ] Ville ou pays mentionné si session (Niamey / Dakar / ligne)
+
+---
+
+## 14. Points encore utiles à préciser (non bloquants)
+
+Pour la v2.1 du catalogue opérationnel :
+1. **Liste exacte des normes PECB** vendues en premier (ISO 27001, 9001, etc.)  
+2. **Villes / modalités** (présentiel Niamey, Dakar, hybride)  
+3. **Tarifs publics ou « sur devis »**  
+4. **Canaux déjà actifs** : lesquels convertissent le mieux aujourd’hui ?  
+5. **Preuves** : photos sessions, nombre de certifiés, partenaires  
+
+---
+
+*NigerCertify — Plan de communication v2.0*  
+*Validé selon brief : Niger+Sénégal · PECB first · CouturePro & nBusiness · 20 000 FCFA/mois · lab séparé*
