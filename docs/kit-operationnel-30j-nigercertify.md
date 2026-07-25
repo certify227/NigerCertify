@@ -1,6 +1,9 @@
 # Kit opérationnel 30 jours — NigerCertify (PECB first)
 
-Companion du plan v2.0. Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emploi.
+Companion du plan v2.0 + catalogue session **10 octobre 2026**.  
+Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emploi.
+
+**Session active :** PECB en ligne · ISO 27001 / ISO 27101 · accès 12 mois · 2 retakes · **350 000 FCFA** · WhatsApp **94 10 70 74**
 
 ---
 
@@ -9,23 +12,34 @@ Companion du plan v2.0. Budget ≤ 20 000 FCFA. Copier-coller prêt à l’emplo
 ### WhatsApp Business — description
 ```
 NigerCertify — Formations PECB (Niger & Sénégal)
-Certifications professionnelles · Accompagnement local
-Aussi : nBusiness (gestion PME) · CouturePro (ateliers couture)
+Prochaine session : 10 octobre 2026 · 100 % en ligne
+ISO 27001 · ISO 27101 · accès 12 mois · 2 retakes
+Tarif : 350 000 FCFA
 
-Répondez PROGRAMME pour recevoir le catalogue des sessions.
+Aussi : nBusiness · CouturePro
+Répondez PROGRAMME ou JE M’INSCRIS
 ```
 
 ### LinkedIn — accroche
 ```
-Formations PECB · Niger & Sénégal | Certification internationale, accompagnement local
-nBusiness · CouturePro
+Formations PECB · Niger & Sénégal | Session en ligne 10 oct. 2026
+ISO 27001 · accès 12 mois · 2 retakes · 350 000 FCFA
+WhatsApp : +227 94 10 70 74
 ```
 
 ### Réponse rapide WhatsApp
 ```
 Merci pour votre message 🙏
-Pour le catalogue des formations PECB et les prochaines dates, répondez : PROGRAMME
-Pour une démo logiciel : NBUSINESS ou COUTUREPRO
+
+Session PECB en ligne — démarrage 10 octobre 2026
+ISO 27001 / ISO 27101 (précisez votre choix)
+Accès 12 mois · 2 retakes examens · 350 000 FCFA
+
+Répondez PROGRAMME pour le détail
+ou JE M’INSCRIS + votre nom + e-mail + norme
+
+Démo logiciel : NBUSINESS ou COUTUREPRO
+WhatsApp : 94 10 70 74
 ```
 
 ---
@@ -36,162 +50,184 @@ Pour une démo logiciel : NBUSINESS ou COUTUREPRO
 ```
 Bonjour {Prénom},
 Je suis {Votre prénom} de NigerCertify.
-Nous organisons des formations PECB au Niger et au Sénégal
-(certifications internationales, suivi local).
 
-Je vous envoie le programme et le calendrier ?
-Vous êtes plutôt intéressé(e) par quelle thématique
-(sécurité / qualité / continuité / autre) ?
+Prochaine session PECB :
+📅 10 octobre 2026 · 100 % en ligne
+📘 ISO 27001 / ISO 27101
+⏱ Accès 12 mois · 2 retakes examens
+💰 350 000 FCFA
+
+Je vous envoie le programme complet ?
+Quelle norme vous intéresse ?
 ```
 
 ### B. Relance J+2
 ```
 Bonjour {Prénom},
-Je me permets un petit suivi concernant la formation PECB.
-Souhaitez-vous les dates à Niamey, à Dakar, ou en distanciel ?
+Petit suivi sur la session PECB du 10 octobre 2026 (en ligne).
+350 000 FCFA — accès 12 mois + 2 retakes.
+Vous partez sur ISO 27001 ou ISO 27101 ?
 ```
 
-### C. Relance J+5 (urgence douce)
+### C. Relance J+5
 ```
 Bonjour {Prénom},
-Les inscriptions pour la session {norme} ({dates}) avancent.
-Je peux vous bloquer une place provisoire le temps de confirmer ?
+Les inscriptions pour le 10 octobre avancent.
+Je peux vous bloquer une place provisoire
+(norme + e-mail) le temps de confirmer le paiement ?
+WhatsApp : 94 10 70 74
 ```
 
-### D. nBusiness
+### D. Confirmation inscription
+```
+Bien reçu ✅
+Place pour la session du 10/10/2026 — {NORME}
+Tarif : 350 000 FCFA
+Inclus : accès 12 mois + 2 retakes
+
+Voici les modalités de paiement : {À COMPLÉTER}
+Dès réception, vous recevez la confirmation officielle.
+```
+
+### E. nBusiness
 ```
 Bonjour {Prénom},
-nBusiness est notre logiciel de gestion pour commerce, école,
-pressing et business : stock, clients, ventes.
-
-Je vous fais une démo WhatsApp de 10 minutes cette semaine ?
+nBusiness : gestion pour commerce, école, pressing, business.
+Démo WhatsApp 10 min cette semaine ?
 ```
 
-### E. CouturePro
+### F. CouturePro
 ```
 Bonjour {Prénom},
-CouturePro aide les ateliers de couture à suivre
-commandes, stocks tissus et clients.
-
-Je vous montre en 10 min (visio ou sur place) ?
+CouturePro : commandes, tissus, clients pour ateliers de couture.
+Démo 10 min ?
 ```
 
 ---
 
-## 3. 12 posts LinkedIn / Facebook (Mois 1)
+## 3. 12 posts LinkedIn / Facebook (prêts — session 10/10/2026)
 
-Publier ~3/semaine. Adapter [NORME], [VILLE], [DATES].
+### Post 1 — Lancement session
+> 🚨 Session PECB — inscriptions ouvertes
+> 📅 Démarrage : **10 octobre 2026**
+> 💻 100 % en ligne · accès **12 mois**
+> 🔁 **2 retakes** examens inclus
+> 📘 ISO 27001 · ISO 27101
+> 💰 **350 000 FCFA**
+>
+> WhatsApp : **94 10 70 74**
+> Répondez **JE M’INSCRIS**
 
-### Post 1 — Positionnement
-> Une certification internationale a plus de valeur quand l’accompagnement est local.
-> NigerCertify prépare aux certifications **PECB** au **Niger** et au **Sénégal**.
-> 📩 Commentez PROGRAMME ou envoyez un message.
+### Post 2 — Pourquoi ISO 27001
+> ISO 27001, c’est le langage commun de la sécurité de l’information.
+> Avec NigerCertify : formation PECB en ligne dès le **10 octobre 2026**,
+> accès 12 mois + 2 retakes — **350 000 FCFA**.
+> Message au **94 10 70 74**
 
-### Post 2 — Bénéfice carrière
-> Ce que change une certification PECB dans un parcours pro :
-> 1) un langage commun avec les auditeurs
-> 2) une preuve de compétence transferable
-> 3) un cadre pour améliorer le SI / la qualité / la continuité
-> Prochaine session : [DATES] — [VILLE]
+### Post 3 — Ce qui est inclus
+> Pour 350 000 FCFA, la session du 10/10/2026 inclut :
+> ✅ Formation PECB en ligne
+> ✅ Accès plateforme 12 mois
+> ✅ Examen + 2 retakes
+> ✅ Suivi NigerCertify (Niger & Sénégal)
+>
+> Normes : ISO 27001, ISO 27101…
+> 📩 94 10 70 74
 
-### Post 3 — CTA session
-> 🚨 Inscriptions ouvertes
-> Formation PECB — [NORME]
-> 📍 [VILLE] · 📅 [DATES]
-> Places limitées.
-> Répondez « JE M’INSCRIS » en message privé.
+### Post 4 — Dual market
+> Que vous soyez au **Niger** ou au **Sénégal** :
+> même session en ligne, même exigence PECB.
+> Démarrage **10 octobre 2026** · 350 000 FCFA
+> WhatsApp **94 10 70 74**
 
-### Post 4 — Mythe
-> Mythe : « La certification, c’est juste un papier. »
-> Réalité : c’est un cadre pour décider mieux (risques, contrôles, preuves).
-> C’est exactement ce que l’on travaille en session PECB chez NigerCertify.
+### Post 5 — Objection « en ligne »
+> En ligne ne veut pas dire seul.
+> Accès 12 mois + 2 retakes = le temps de maîtriser et de réussir.
+> Session du **10 octobre 2026** — places ouvertes.
+> 94 10 70 74
 
-### Post 5 — Témoignage (template)
-> « {Citation courte} »
-> — {Prénom}, {poste}, certifié(e) [NORME]
-> Merci à nos apprenants. Prochaine session : [DATES]
+### Post 6 — CTA direct
+> Une question. Une place.
+> PECB · 10 oct. 2026 · 350 000 FCFA · 2 retakes
+> Écrivez **PROGRAMME** au **94 10 70 74**
 
-### Post 6 — nBusiness
+### Post 7 — nBusiness (20 %)
 > Commerce, école, pressing, business…
-> nBusiness centralise stock, clients et ventes sans complexité inutile.
-> Démo 10 min → message NBUSINESS
+> **nBusiness** centralise stock, clients et ventes.
+> Démo 10 min → message **NBUSINESS** au 94 10 70 74
 
-### Post 7 — Coulisses formation
-> Ce qu’on voit en salle : questions terrain, cas réels, préparation à l’examen.
-> Moins de slides inutiles. Plus de pratique utile.
-> #PECB #NigerCertify
+### Post 8 — Différence certification
+> Un certificat PECB, c’est une preuve internationale.
+> NigerCertify vous y prépare en ligne dès le 10/10/2026.
+> ISO 27001 / ISO 27101 · 350 000 FCFA
+> 94 10 70 74
 
-### Post 8 — CouturePro
-> Les ateliers de couture perdent du temps (et de l’argent) sans suivi clair.
-> CouturePro : commandes · tissus · clients · délais.
-> Message COUTUREPRO pour une démo.
+### Post 9 — CouturePro (10 %)
+> **CouturePro** — le logiciel des ateliers de couture
+> (commandes, tissus, clients, délais).
+> Message **COUTUREPRO** au 94 10 70 74
 
-### Post 9 — Dual market
-> Niamey ↔ Dakar
-> Même exigence PECB. Accompagnement local NigerCertify.
-> Demandez le calendrier des sessions.
+### Post 10 — Entreprises
+> Vous formez une équipe ?
+> Session PECB du 10 octobre 2026 (en ligne) — tarif 350 000 FCFA / participant.
+> Demandez les conditions groupe au **94 10 70 74**
 
-### Post 10 — Objection prix
-> Une certification coûte.
-> Ne pas structurer ses processus coûte aussi — souvent plus cher, plus tard.
-> On détaille ROI et prérequis dans le programme. Demandez-le.
+### Post 11 — Checklist inscription
+> Pour s’inscrire :
+> 1) WhatsApp **94 10 70 74**
+> 2) Nom + e-mail + norme (27001 / 27101)
+> 3) Confirmation paiement
+> Démarrage : **10 octobre 2026**
 
-### Post 11 — Checklist
-> Avant de choisir une session PECB, vérifiez :
-> ✓ norme adaptée à votre poste
-> ✓ prérequis
-> ✓ dates / ville
-> ✓ accompagnement post-session
-> On vous envoie la checklist + catalogue sur demande.
-
-### Post 12 — CTA fin de mois
-> Récap du mois : formations PECB · démos nBusiness & CouturePro
-> Une question = un message.
+### Post 12 — Récap
 > NigerCertify — certifier les talents, digitaliser les métiers.
+> 🎯 PECB 10/10/2026 · 350 000 FCFA · 2 retakes
+> 🛠 nBusiness · CouturePro
+> 📞 94 10 70 74
 
 ---
 
-## 4. Statuts WhatsApp (quotidien léger)
+## 4. Statuts WhatsApp (rotation)
 
-Alterner :
-- Date session + ville
-- « Répondez PROGRAMME »
-- Photo salle / certificat (avec accord)
-- 1 slide norme vulgarisée
-- 1 slide nBusiness ou CouturePro (1 jour / 2)
+1. `Session PECB 10 oct 2026 — 350k — 2 retakes — 94107074`  
+2. `ISO 27001 en ligne · accès 12 mois · JE M’INSCRIS`  
+3. `Niger & Sénégal · même session distancielle`  
+4. `nBusiness démo 10 min` *(1× / sem.)*  
+5. `CouturePro ateliers` *(1× / sem.)*  
+
+Lien direct à épingler : https://wa.me/22794107074?text=PROGRAMME
 
 ---
 
-## 5. Labels WhatsApp Business (à créer)
+## 5. Labels WhatsApp Business
 
 | Label | Usage |
 |-------|-------|
-| Lead-PECB | Demande programme |
-| Hot-PECB | Veut s’inscrire |
-| Inscrit | Acompte / inscrit |
-| Alumni | Déjà certifié |
+| Lead-PECB | Demande PROGRAMME |
+| Hot-PECB | JE M’INSCRIS / demande paiement |
+| Inscrit-10-10 | Session 10 oct. 2026 confirmée |
+| Alumni | Certifié |
 | Lead-nBusiness | Démo gestion |
 | Lead-CouturePro | Démo couture |
-| Entreprise | Compte société |
+| Entreprise | Compte société / groupe |
 
 ---
 
 ## 6. Checklist quotidienne (30 min)
 
-- [ ] 5 messages / relances leads PECB  
+- [ ] Répondre à tous les messages **94 10 70 74** (&lt; 2 h)  
+- [ ] 5 relances leads PECB (scripts B/C)  
 - [ ] 1 statut WhatsApp  
-- [ ] Répondre à tous les « PROGRAMME » < 2 h  
-- [ ] (3×/sem.) publier 1 post LinkedIn de la liste  
+- [ ] 3×/sem. : publier 1 post de la liste  
 
 ---
 
-## 7. Ce qu’il faut encore me donner pour finaliser le catalogue
+## 7. Lien catalogue
 
-- Liste des normes PECB vendues en premier  
-- Prochaines dates (Niamey / Dakar / ligne)  
-- Tarif affiché ou « sur devis »  
-- Lien d’inscription / numéro WhatsApp officiel  
+Voir `docs/catalogue-pecb-nigercertify.md` — à exporter en PDF/image pour envoi WhatsApp.
+
+**À compléter en interne :** modalités de paiement (Mobile Money / virement) + libellé officiel exact du cours « ISO 27101 » côté PECB.
 
 ---
 
-*Kit 30 jours — NigerCertify v2.0*
+*Kit 30 jours — NigerCertify · session 10 octobre 2026*

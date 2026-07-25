@@ -1,10 +1,20 @@
 # Plan de communication — NigerCertify
 
-**Version :** 2.0 (affiné terrain)  
+**Version :** 2.1 (session chiffrée)  
 **Marchés :** Niger · Sénégal  
 **Langue principale :** Français  
 **Horizon :** 12 mois (focus commercial 6 mois = **formations PECB**)  
-**Budget com :** **20 000 FCFA / mois** → stratégie 95 % organique, zéro campagne payante lourde
+**Budget com :** **20 000 FCFA / mois** → stratégie 95 % organique, zéro campagne payante lourde  
+**WhatsApp commercial :** **94 10 70 74** ([wa.me/22794107074](https://wa.me/22794107074))
+
+### Session commerciale active
+| | |
+|--|--|
+| Date | **10 octobre 2026** |
+| Modalité | En ligne · accès **12 mois** |
+| Normes | **ISO 27001**, **ISO 27101**, etc. |
+| Examens | Inclus + **2 retakes** |
+| Tarif | **350 000 FCFA** |
 
 > Lab GitHub « offensive » = **canal technique séparé**, jamais mélangé à la com grand public / PME / PECB.
 
@@ -329,16 +339,20 @@ Checklist avant chaque publication grand public :
 
 ---
 
-## 14. Points encore utiles à préciser (non bloquants)
+## 14. Documents opérationnels liés
 
-Pour la v2.1 du catalogue opérationnel :
-1. **Liste exacte des normes PECB** vendues en premier (ISO 27001, 9001, etc.)  
-2. **Villes / modalités** (présentiel Niamey, Dakar, hybride)  
-3. **Tarifs publics ou « sur devis »**  
-4. **Canaux déjà actifs** : lesquels convertissent le mieux aujourd’hui ?  
-5. **Preuves** : photos sessions, nombre de certifiés, partenaires  
+| Fichier | Usage |
+|---------|--------|
+| `docs/catalogue-pecb-nigercertify.md` | Fiche offre session 10/10/2026 (à exporter PDF) |
+| `docs/kit-operationnel-30j-nigercertify.md` | Scripts + 12 posts + WhatsApp |
+
+### Reste utile (non bloquant)
+1. Libellé **officiel PECB** exact pour « ISO 27101 » (code cours / titre)  
+2. Modalités de **paiement** (Mobile Money, virement, acompte)  
+3. Preuves : photos, nombre de certifiés, partenaires  
+4. Conditions **tarif groupe** entreprises  
 
 ---
 
-*NigerCertify — Plan de communication v2.0*  
-*Validé selon brief : Niger+Sénégal · PECB first · CouturePro & nBusiness · 20 000 FCFA/mois · lab séparé*
+*NigerCertify — Plan de communication v2.1*  
+*Session : 10 oct. 2026 · 350 000 FCFA · 94 10 70 74 · PECB · CouturePro · nBusiness*
