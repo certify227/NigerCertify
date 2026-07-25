@@ -162,6 +162,7 @@ def build_word() -> Path:
         doc,
         [
             "1 contenu = 1 public + 1 offre + 1 CTA",
+            "Chaque publication = Titre + Contenu + Hashtags (voir Excel)",
             "Répartition : PECB 60 % · LPI 20 % · nBusiness 15 % · CouturePro 5 %",
             "Pas de contenu lab offensif / webshell sur Facebook, LinkedIn, YouTube grand public",
             "Toujours indiquer WhatsApp 94 10 70 74 et un mot-clé clair",
@@ -196,34 +197,69 @@ def build_word() -> Path:
 
 
 # --- Excel calendar ---
+# Chaque post = (titre, contenu, hashtags, cta)
 
 THEMES = {
     "PECB": {
         "fill": "1F6B4F",
         "posts": [
             (
-                "Session PECB 10 oct. 2026 — inscriptions ouvertes",
-                "ISO 27001 · ISO 27701 · en ligne · 12 mois · 2 retakes · 350 000 FCFA\nWhatsApp 94 10 70 74 — JE M’INSCRIS",
+                "Session PECB — inscriptions ouvertes (10 oct. 2026)",
+                "Les inscriptions sont ouvertes pour la session PECB NigerCertify.\n\n"
+                "📅 Démarrage : 10 octobre 2026\n"
+                "💻 100 % en ligne\n"
+                "📘 ISO/IEC 27001 · ISO/IEC 27701\n"
+                "⏱ Accès plateforme 12 mois\n"
+                "🔁 2 retakes examens inclus\n"
+                "💰 Tarif : 350 000 FCFA\n\n"
+                "Niger & Sénégal — certification internationale, accompagnement local.\n\n"
+                f"👉 WhatsApp {WHATSAPP} — écrivez JE M’INSCRIS",
+                "#PECB #ISO27001 #ISO27701 #Cybersécurité #Certification #NigerCertify #Niger #Sénégal #FormationEnLigne",
                 "JE M’INSCRIS",
             ),
             (
-                "Pourquoi ISO 27001 ?",
-                "Le langage commun de la sécurité de l’information. Session PECB NigerCertify dès le 10/10/2026.",
+                "Pourquoi se certifier ISO 27001 ?",
+                "ISO 27001, c’est le langage commun de la sécurité de l’information.\n\n"
+                "Avec NigerCertify, vous préparez votre certification PECB :\n"
+                "• Session en ligne dès le 10 octobre 2026\n"
+                "• Accès 12 mois + 2 retakes\n"
+                "• Tarif : 350 000 FCFA\n\n"
+                "Idéal pour RSSI, IT, consultants et équipes conformité.\n\n"
+                f"📩 Demandez le programme au {WHATSAPP} (mot-clé PROGRAMME)",
+                "#ISO27001 #PECB #SécuritéDeLInformation #SMSI #FormationIT #NigerCertify #AfriqueDeLOuest",
                 "PROGRAMME",
             ),
             (
-                "Ce qui est inclus pour 350 000 FCFA",
-                "Formation PECB + accès 12 mois + examen + 2 retakes + suivi NigerCertify.",
+                "350 000 FCFA : ce qui est vraiment inclus",
+                "Pour 350 000 FCFA, la session PECB du 10/10/2026 inclut :\n\n"
+                "✅ Formation PECB (ISO 27001 / 27701)\n"
+                "✅ Accès en ligne 12 mois\n"
+                "✅ Passage d’examen + 2 retakes\n"
+                "✅ Accompagnement NigerCertify\n\n"
+                "Pas de surprise. Un parcours clair pour réussir.\n\n"
+                f"WhatsApp {WHATSAPP} — répondez PECB",
+                "#PECB #Formation #ISO27001 #ISO27701 #CertificationPro #NigerCertify #InvestissementFormation",
                 "PECB",
             ),
             (
-                "ISO 27701 — privacy",
-                "Protéger les données personnelles : extension naturelle du SMSI. Places session 10 oct.",
+                "ISO 27701 : la privacy au cœur du SMSI",
+                "Protéger les données personnelles n’est plus optionnel.\n\n"
+                "ISO/IEC 27701 complète ISO 27001 pour structurer la privacy.\n"
+                "Session PECB NigerCertify — démarrage 10 octobre 2026\n"
+                "En ligne · 12 mois · 2 retakes · 350 000 FCFA\n\n"
+                f"Places limitées → {WHATSAPP}",
+                "#ISO27701 #Privacy #ProtectionDesDonnées #RGPD #PECB #NigerCertify #Conformité",
                 "PROGRAMME",
             ),
             (
-                "Niger & Sénégal — même session en ligne",
-                "Certification internationale, accompagnement local. 94 10 70 74",
+                "Niamey ↔ Dakar : une même session en ligne",
+                "Que vous soyez au Niger ou au Sénégal, la session PECB est la même :\n\n"
+                "• Exigence internationale\n"
+                "• Accompagnement local NigerCertify\n"
+                "• Démarrage 10 octobre 2026\n"
+                "• 350 000 FCFA · 2 retakes\n\n"
+                f"Inscrivez-vous : WhatsApp {WHATSAPP}",
+                "#Niger #Sénégal #PECB #FormationEnLigne #ISO27001 #NigerCertify #Certification",
                 "JE M’INSCRIS",
             ),
         ],
@@ -232,23 +268,49 @@ THEMES = {
         "fill": "2E5A88",
         "posts": [
             (
-                "Parcours LPI : LE → LPIC-1 → LPIC-2 → LPIC-3",
-                "Format mixte. LE 150 000 FCFA · LPIC 200 000 FCFA / niveau.",
+                "Parcours LPI : de Linux Essentials à LPIC-3",
+                "Admin Linux : un chemin clair avec NigerCertify.\n\n"
+                "🐧 LPI LE (Linux Essentials) — 150 000 FCFA\n"
+                "🐧 LPIC-1 · LPIC-2 · LPIC-3 — 200 000 FCFA / niveau\n"
+                "📍 Format mixte (présentiel + en ligne)\n\n"
+                "Progression : LE → LPIC-1 → LPIC-2 → LPIC-3\n\n"
+                f"Répondez LPI au {WHATSAPP} + votre niveau",
+                "#LPI #LPIC #Linux #LinuxEssentials #SysAdmin #NigerCertify #FormationLinux #OpenSource",
                 "LPI",
             ),
             (
-                "Linux Essentials — premier pas",
-                "LPI LE · 150 000 FCFA · mixte. Idéal débutants & reconversion.",
+                "Linux Essentials — le bon premier pas",
+                "Vous débutez sous Linux ou vous vous reconvertissez en IT ?\n\n"
+                "LPI Linux Essentials (LPI LE) chez NigerCertify :\n"
+                "• Bases système & ligne de commande\n"
+                "• Culture open source\n"
+                "• Tarif : 150 000 FCFA\n"
+                "• Format mixte\n\n"
+                f"Message LPI LE au {WHATSAPP}",
+                "#LinuxEssentials #LPILE #Linux #ReconversionIT #Formation #NigerCertify #LPIC",
                 "LPI LE",
             ),
             (
-                "LPIC-1 / 2 / 3 — montez en niveau",
-                "Admin → Engineer → Enterprise. 200 000 FCFA / niveau · format mixte.",
+                "LPIC-1, LPIC-2, LPIC-3 : montez en niveau",
+                "Déjà à l’aise sous Linux ? Passez au niveau supérieur.\n\n"
+                "• LPIC-1 — Administrateur\n"
+                "• LPIC-2 — Engineer\n"
+                "• LPIC-3 — Enterprise\n\n"
+                "Tarif : 200 000 FCFA / niveau · Format mixte\n"
+                "NigerCertify — Niger & Sénégal\n\n"
+                f"WhatsApp {WHATSAPP} — mot-clé LPI",
+                "#LPIC1 #LPIC2 #LPIC3 #LinuxAdmin #DevOps #NigerCertify #CertificationLinux",
                 "LPI",
             ),
             (
-                "Tip Linux (60 sec)",
-                "Une commande utile + lien vers le parcours LPI NigerCertify.",
+                "Tip Linux : une commande, un métier",
+                "Maîtriser Linux, c’est maîtriser le terrain IT.\n\n"
+                "Chaque semaine, NigerCertify vous prépare aux certifications LPI :\n"
+                "LE (150 000 FCFA) · LPIC-1/2/3 (200 000 FCFA) · format mixte.\n\n"
+                "Aujourd’hui : prenez 10 minutes pour réviser une commande.\n"
+                "Demain : visez la certif.\n\n"
+                f"Écrivez LPI au {WHATSAPP}",
+                "#LinuxTip #LPI #SysAdmin #Terminal #OpenSource #NigerCertify #FormationIT",
                 "LPI",
             ),
         ],
@@ -257,13 +319,24 @@ THEMES = {
         "fill": "8A6D1D",
         "posts": [
             (
-                "nBusiness — gestion multi-secteur",
-                "Commerce, école, pressing, business : stock, clients, ventes.",
+                "nBusiness — la gestion multi-secteur",
+                "Commerce, école, pressing, business…\n\n"
+                "nBusiness centralise :\n"
+                "• Stocks\n"
+                "• Clients\n"
+                "• Ventes\n\n"
+                "Sans usine à gaz. Pensé pour les PME du Niger et du Sénégal.\n\n"
+                f"Démo 10 min : écrivez NBUSINESS au {WHATSAPP}",
+                "#nBusiness #GestionPME #Digitalisation #Commerce #Pressing #Éducation #NigerCertify #PME",
                 "NBUSINESS",
             ),
             (
-                "Démo nBusiness 10 min",
-                "Réservez une démo WhatsApp. 94 10 70 74",
+                "Démo nBusiness en 10 minutes",
+                "Envie de voir nBusiness en action ?\n\n"
+                "On vous montre en 10 minutes sur WhatsApp comment suivre stock, clients et ventes.\n"
+                "Idéal commerce, école, pressing et business.\n\n"
+                f"Réservez : {WHATSAPP} — mot-clé NBUSINESS",
+                "#nBusiness #DémoLogiciel #PME #GestionCommerciale #Niger #Sénégal #NigerCertify",
                 "NBUSINESS",
             ),
         ],
@@ -272,8 +345,15 @@ THEMES = {
         "fill": "8B3A4A",
         "posts": [
             (
-                "CouturePro — ateliers de couture",
-                "Commandes, tissus, clients, délais — un seul outil.",
+                "CouturePro — le logiciel des ateliers de couture",
+                "Les ateliers perdent du temps sans suivi clair.\n\n"
+                "CouturePro vous aide à gérer :\n"
+                "• Commandes clients\n"
+                "• Stocks tissus & fournitures\n"
+                "• Délais de livraison\n\n"
+                "Un outil simple pour les couturiers et stylistes.\n\n"
+                f"Démo : écrivez COUTUREPRO au {WHATSAPP}",
+                "#CouturePro #AtelierCouture #Mode #Artisanat #Digitalisation #NigerCertify #GestionAtelier",
                 "COUTUREPRO",
             ),
         ],
@@ -287,17 +367,23 @@ def next_weekday(d: date, weekday: int) -> date:
     return d + timedelta(days=days)
 
 
+def pick_post(offre: str, counters: dict[str, int]) -> tuple[str, str, str, str]:
+    posts = THEMES[offre]["posts"]
+    i = counters[offre] % len(posts)
+    counters[offre] += 1
+    return posts[i]
+
+
 def build_excel(start: date | None = None) -> Path:
-    """Calendrier 12 semaines à partir du prochain lundi (ou start)."""
+    """Calendrier 12 semaines — chaque ligne = Titre + Contenu + Hashtags."""
     if start is None:
         today = date.today()
-        start = next_weekday(today, 0)  # lundi
+        start = next_weekday(today, 0)
         if start == today and today.weekday() != 0:
             start = next_weekday(today + timedelta(days=1), 0)
 
     wb = Workbook()
 
-    # Styles
     header_fill = PatternFill("solid", fgColor="0F4C3A")
     header_font = Font(bold=True, color="FFFFFF", name="Calibri", size=11)
     thin = Border(
@@ -308,33 +394,29 @@ def build_excel(start: date | None = None) -> Path:
     )
     wrap = Alignment(wrap_text=True, vertical="top")
 
-    # --- Feuille Guide ---
     guide = wb.active
     guide.title = "Guide"
     guide["A1"] = "Calendrier de publication NigerCertify"
     guide["A1"].font = Font(bold=True, size=16, color="0F4C3A")
     guide["A2"] = f"WhatsApp : {WHATSAPP}  |  {WA_LINK}"
     guide["A3"] = "Canaux : Facebook · LinkedIn · YouTube"
-    guide["A4"] = "Répartition : PECB 60% · LPI 20% · nBusiness 15% · CouturePro 5%"
-    guide["A5"] = "Période : 12 semaines (colonne Date = jour de publication prévu)"
-    guide["A7"] = "Légende des statuts"
-    guide["A8"] = "À faire / En cours / Publié / Reporté"
-    guide["A10"] = "Consignes"
+    guide["A4"] = "Chaque publication contient : TITRE + CONTENU + HASHTAGS"
+    guide["A5"] = "Répartition : PECB 60% · LPI 20% · nBusiness 15% · CouturePro 5%"
+    guide["A7"] = "Colonnes clés"
     for i, line in enumerate(
         [
-            "1. Adapter le texte au format du canal (LinkedIn plus pro, Facebook plus local, YouTube = script + titre + description).",
-            "2. Toujours finir par un CTA + WhatsApp 94 10 70 74.",
-            "3. Cocher Statut = Publié après mise en ligne ; coller l’URL dans Lien publication.",
-            "4. YouTube : viser 3–8 min (tips) ou Shorts 30–60 s.",
-            "5. Ne jamais publier de contenu lab offensif / exploit sur ces canaux.",
-            "6. Jour type : Lun LinkedIn PECB · Mer Facebook mixte · Ven YouTube · Dim Facebook CTA.",
+            "Titre = accroche à afficher / titre YouTube",
+            "Contenu = texte prêt à copier-coller (ou script YouTube)",
+            "Hashtags = à coller en fin de post (Facebook/LinkedIn) ou dans la description YouTube",
+            "CTA = mot-clé WhatsApp",
+            "Statut = À faire / En cours / Publié / Reporté",
+            "Ne jamais publier de contenu lab offensif sur ces canaux.",
         ],
-        start=11,
+        start=8,
     ):
         guide[f"A{i}"] = line
     guide.column_dimensions["A"].width = 110
 
-    # --- Feuille Calendrier ---
     ws = wb.create_sheet("Calendrier", 0)
     headers = [
         "Semaine",
@@ -342,8 +424,9 @@ def build_excel(start: date | None = None) -> Path:
         "Jour",
         "Canal",
         "Offre",
-        "Titre / Accroche",
-        "Texte / Script (brouillon)",
+        "Titre",
+        "Contenu",
+        "Hashtags",
         "Format",
         "CTA / Mot-clé",
         "Statut",
@@ -358,57 +441,40 @@ def build_excel(start: date | None = None) -> Path:
         cell.alignment = Alignment(wrap_text=True, vertical="center", horizontal="center")
         cell.border = thin
 
-    # Pattern hebdomadaire : canal + offre index
-    # Lun LinkedIn PECB, Mar Facebook LPI, Mer LinkedIn PECB, Jeu YouTube,
-    # Ven Facebook nBusiness/CouturePro alt, Sam YouTube Short (option), Dim Facebook CTA PECB
     week_slots = [
-        (0, "LinkedIn", "PECB", "Post carrousel / texte"),  # Lun
-        (1, "Facebook", "LPI", "Post image + texte"),  # Mar
-        (2, "LinkedIn", "PECB", "Post texte + CTA"),  # Mer
-        (3, "YouTube", "PECB", "Vidéo 5–8 min ou Short"),  # Jeu (alternance LPI)
-        (4, "Facebook", "nBusiness", "Post / Reels"),  # Ven
-        (6, "Facebook", "PECB", "Statut / CTA session"),  # Dim
+        (0, "LinkedIn", "PECB", "Post texte / carrousel"),
+        (1, "Facebook", "LPI", "Post image + texte"),
+        (2, "LinkedIn", "PECB", "Post texte + CTA"),
+        (3, "YouTube", "PECB", "Vidéo 5–8 min ou Short"),
+        (4, "Facebook", "nBusiness", "Post / Reels"),
+        (6, "Facebook", "PECB", "Post CTA session"),
     ]
 
-    pecb_i = lpi_i = nb_i = cp_i = 0
+    counters = {"PECB": 0, "LPI": 0, "nBusiness": 0, "CouturePro": 0}
     row = 2
     for week in range(1, 13):
         week_start = start + timedelta(weeks=week - 1)
         for day_offset, canal, offre_default, fmt in week_slots:
             pub_date = week_start + timedelta(days=day_offset)
 
-            # Alternance YouTube : semaines paires = LPI
             offre = offre_default
             if canal == "YouTube" and week % 2 == 0:
                 offre = "LPI"
-            # Vendredi : 1 semaine sur 4 CouturePro
             if canal == "Facebook" and day_offset == 4 and week % 4 == 0:
                 offre = "CouturePro"
 
+            title, contenu, hashtags, cta = pick_post(offre, counters)
             bundle = THEMES[offre]
-            posts = bundle["posts"]
-            if offre == "PECB":
-                title, body, cta = posts[pecb_i % len(posts)]
-                pecb_i += 1
-            elif offre == "LPI":
-                title, body, cta = posts[lpi_i % len(posts)]
-                lpi_i += 1
-            elif offre == "nBusiness":
-                title, body, cta = posts[nb_i % len(posts)]
-                nb_i += 1
-            else:
-                title, body, cta = posts[cp_i % len(posts)]
-                cp_i += 1
 
-            # YouTube : adapter le format texte en script
-            texte = body
             if canal == "YouTube":
-                texte = (
-                    f"TITRE : {title}\n"
-                    f"HOOK (0–5s) : {title}\n"
-                    f"CORPS : {body}\n"
-                    f"CTA fin : Écrivez {cta} au {WHATSAPP}\n"
-                    f"DESCRIPTION : NigerCertify · Niger & Sénégal · {WA_LINK}?text={cta.replace(' ', '%20')}"
+                contenu = (
+                    f"TITRE VIDÉO : {title}\n\n"
+                    f"HOOK (0–5 s) : {title}\n\n"
+                    f"SCRIPT / CONTENU :\n{contenu}\n\n"
+                    f"CTA ÉCRAN DE FIN : Écrivez {cta} au {WHATSAPP}\n\n"
+                    f"DESCRIPTION YOUTUBE :\n{contenu.split(chr(10))[0]}\n"
+                    f"WhatsApp : {WA_LINK}?text={cta.replace(' ', '%20')}\n"
+                    f"NigerCertify · Niger & Sénégal"
                 )
                 fmt = "YouTube Short (45–60s)" if week % 3 == 0 else "Vidéo 5–8 min"
 
@@ -420,7 +486,8 @@ def build_excel(start: date | None = None) -> Path:
                 canal,
                 offre,
                 title,
-                texte,
+                contenu,
+                hashtags,
                 fmt,
                 cta,
                 "À faire",
@@ -429,44 +496,58 @@ def build_excel(start: date | None = None) -> Path:
                 "",
             ]
             fill = PatternFill("solid", fgColor=bundle["fill"])
-            light = PatternFill("solid", fgColor="E8F5F0" if offre == "PECB" else "EEF3F8" if offre == "LPI" else "F8F3E0" if offre == "nBusiness" else "F8E8EC")
+            light = PatternFill(
+                "solid",
+                fgColor=(
+                    "E8F5F0"
+                    if offre == "PECB"
+                    else "EEF3F8"
+                    if offre == "LPI"
+                    else "F8F3E0"
+                    if offre == "nBusiness"
+                    else "F8E8EC"
+                ),
+            )
 
             for col, val in enumerate(values, 1):
                 cell = ws.cell(row, col, val)
                 cell.border = thin
                 cell.alignment = wrap
-                if col == 5:  # Offre
+                if col == 5:
                     cell.fill = fill
                     cell.font = Font(bold=True, color="FFFFFF")
                 elif col == 4:
                     cell.fill = light
+                elif col in (6, 7, 8):  # Titre, Contenu, Hashtags
+                    cell.font = Font(name="Calibri", size=10)
+            ws.row_dimensions[row].height = 90
             row += 1
 
     widths = {
-        "A": 10,
+        "A": 9,
         "B": 12,
-        "C": 8,
-        "D": 12,
-        "E": 12,
-        "F": 42,
-        "G": 55,
-        "H": 22,
-        "I": 14,
-        "J": 12,
-        "K": 14,
-        "L": 28,
-        "M": 20,
+        "C": 6,
+        "D": 11,
+        "E": 11,
+        "F": 38,
+        "G": 58,
+        "H": 42,
+        "I": 22,
+        "J": 14,
+        "K": 11,
+        "L": 12,
+        "M": 24,
+        "N": 16,
     }
     for col, w in widths.items():
         ws.column_dimensions[col].width = w
-    ws.row_dimensions[1].height = 30
+    ws.row_dimensions[1].height = 32
     ws.freeze_panes = "A2"
-    ws.auto_filter.ref = f"A1:M{row - 1}"
+    ws.auto_filter.ref = f"A1:N{row - 1}"
 
-    # Validation statut
     dv = DataValidation(type="list", formula1='"À faire,En cours,Publié,Reporté"', allow_blank=True)
     ws.add_data_validation(dv)
-    dv.add(f"J2:J{row - 1}")
+    dv.add(f"K2:K{row - 1}")
 
     dv_canal = DataValidation(type="list", formula1='"Facebook,LinkedIn,YouTube"', allow_blank=True)
     ws.add_data_validation(dv_canal)
@@ -476,20 +557,18 @@ def build_excel(start: date | None = None) -> Path:
     ws.add_data_validation(dv_offre)
     dv_offre.add(f"E2:E{row - 1}")
 
-    # --- Feuille Récap ---
     recap = wb.create_sheet("Recap_mensuel")
     recap["A1"] = "Objectif mensuel (indicatif)"
     recap["A1"].font = Font(bold=True, size=14, color="0F4C3A")
-    recap_headers = ["Canal", "Posts / mois (cible)", "Notes"]
-    for col, h in enumerate(recap_headers, 1):
+    for col, h in enumerate(("Canal", "Posts / mois (cible)", "Notes"), 1):
         c = recap.cell(3, col, h)
         c.fill = header_fill
         c.font = header_font
     for r_i, row_data in enumerate(
         [
-            ("LinkedIn", "8–10", "PECB + LPI B2B"),
-            ("Facebook", "10–12", "PECB CTA + LPI + logiciels"),
-            ("YouTube", "4–6", "Alterner tips PECB / Linux + 1 démo logiciel"),
+            ("LinkedIn", "8–10", "Chaque post = Titre + Contenu + Hashtags"),
+            ("Facebook", "10–12", "Coller Hashtags en fin de publication"),
+            ("YouTube", "4–6", "Titre = titre vidéo · Contenu = script · Hashtags = description"),
             ("WhatsApp Status", "20+", "Hors Excel mais quotidien"),
         ],
         start=4,
@@ -498,9 +577,8 @@ def build_excel(start: date | None = None) -> Path:
             recap.cell(r_i, c_i, val).border = thin
     recap.column_dimensions["A"].width = 18
     recap.column_dimensions["B"].width = 22
-    recap.column_dimensions["C"].width = 40
+    recap.column_dimensions["C"].width = 55
 
-    # --- Feuille Offres ---
     offres = wb.create_sheet("Tarifs_offres")
     offres["A1"] = "Grille tarifaire formations"
     offres["A1"].font = Font(bold=True, size=14, color="0F4C3A")
@@ -524,7 +602,7 @@ def build_excel(start: date | None = None) -> Path:
             cell = offres.cell(r_i, c_i, val)
             cell.border = thin
             if c_i == 4 and isinstance(val, int):
-                cell.number_format = '#,##0'
+                cell.number_format = "#,##0"
     for col in range(1, 6):
         offres.column_dimensions[get_column_letter(col)].width = 28
 
