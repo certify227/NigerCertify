@@ -49,4 +49,5 @@ Arrêtée la présente facture proforma à la somme de **quatre millions cent ci
 
 - `facture-proforma-ml-consulting.html` — version imprimable (charte ANPER)
 - `facture-proforma-ml-consulting.pdf` — export PDF
+- `facture-proforma-ml-consulting.docx` — version Word
 - `assets/` — logo, cachet et signature Niger Certify
