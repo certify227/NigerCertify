@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Facture Proforma — Niger Certify × ML CONSULTING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #14231c;
+      --muted: #4a5c52;
+      --line: #d5ddd7;
+      --sand: #f3f0e8;
+      --leaf: #1f6b4a;
+      --leaf-dark: #134833;
+      --accent: #c45c26;
+      --paper: #fffdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(160deg, #e8efe9 0%, #f7f3ea 45%, #ebe4d6 100%);
+      color: var(--ink);
+      font-family: "Source Sans 3", sans-serif;
+      line-height: 1.45;
+      padding: 2rem 1rem 3rem;
+    }
+    .sheet {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 50px rgba(20, 35, 28, 0.08);
+      padding: 2.5rem 2.75rem;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      align-items: flex-start;
+      border-bottom: 3px solid var(--leaf);
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .brand h1 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 2.15rem;
+      margin: 0 0 0.2rem;
+      color: var(--leaf-dark);
+      letter-spacing: 0.02em;
+    }
+    .brand p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+    .doc-meta {
+      text-align: right;
+      min-width: 220px;
+    }
+    .doc-meta .badge {
+      display: inline-block;
+      background: var(--leaf);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.7rem;
+      margin-bottom: 0.6rem;
+    }
+    .doc-meta strong { display: block; font-size: 1.05rem; }
+    .parties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .box {
+      background: var(--sand);
+      border: 1px solid var(--line);
+      padding: 1rem 1.1rem;
+    }
+    .box h2 {
+      margin: 0 0 0.55rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--leaf);
+    }
+    .box p { margin: 0.15rem 0; font-size: 0.95rem; }
+    .ref {
+      background: #eef5f0;
+      border-left: 4px solid var(--leaf);
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.4rem;
+      font-size: 0.94rem;
+    }
+    h3.section {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 1.45rem;
+      margin: 0 0 0.75rem;
+      color: var(--leaf-dark);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      font-size: 0.93rem;
+    }
+    th {
+      text-align: left;
+      background: var(--leaf-dark);
+      color: #fff;
+      padding: 0.65rem 0.7rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 0.7rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #faf8f3; }
+    .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .center { text-align: center; }
+    .totals {
+      margin-left: auto;
+      width: min(360px, 100%);
+      margin-top: 0.5rem;
+    }
+    .totals .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.95rem;
+    }
+    .totals .grand {
+      background: var(--leaf);
+      color: #fff;
+      margin-top: 0.4rem;
+      padding: 0.75rem 0.85rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .packages {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin: 1rem 0 1.5rem;
+    }
+    .pkg {
+      border: 1px solid var(--line);
+      padding: 1rem;
+      background: #fff;
+    }
+    .pkg.featured {
+      border-color: var(--leaf);
+      box-shadow: inset 0 0 0 2px var(--leaf);
+      background: #f4faf6;
+    }
+    .pkg h4 {
+      margin: 0 0 0.35rem;
+      font-size: 1rem;
+      color: var(--leaf-dark);
+    }
+    .pkg .price {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0.4rem 0 0.55rem;
+    }
+    .pkg ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+    .pkg .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--leaf);
+      margin-bottom: 0.3rem;
+    }
+    .terms {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 1.25rem;
+    }
+    .terms h3 { color: var(--ink); font-size: 1rem; margin-bottom: 0.4rem; }
+    .terms ol { margin: 0; padding-left: 1.2rem; }
+    .terms li { margin-bottom: 0.35rem; }
+    footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .sign {
+      margin-top: 1.75rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .sign .line {
+      border-top: 1px solid var(--ink);
+      margin-top: 3rem;
+      padding-top: 0.4rem;
+      font-size: 0.88rem;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .sheet { box-shadow: none; border: none; max-width: none; padding: 0; }
+      .no-print { display: none !important; }
+    }
+    @media (max-width: 740px) {
+      .sheet { padding: 1.25rem; }
+      header, .parties, .packages, .sign, footer { grid-template-columns: 1fr; display: grid; }
+      header { display: grid; }
+      .doc-meta { text-align: left; }
+    }
+    .print-bar {
+      max-width: 900px;
+      margin: 0 auto 1rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .print-bar button {
+      background: var(--leaf-dark);
+      color: #fff;
+      border: 0;
+      padding: 0.65rem 1.1rem;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar no-print">
+    <button type="button" onclick="window.print()">Imprimer / PDF</button>
+  </div>
+
+  <article class="sheet">
+    <header>
+      <div class="brand">
+        <h1>Niger Certify</h1>
+        <p>Conception & développement digital · Cybersécurité · Formation</p>
+        <p>Niamey, Niger · abousayabou92@gmail.com</p>
+      </div>
+      <div class="doc-meta">
+        <div class="badge">Facture proforma</div>
+        <strong>N° NC-PF-2026-0731</strong>
+        <span>Date : 31 juillet 2026</span><br />
+        <span>Validité : 30 jours</span><br />
+        <span>Devise : Francs CFA (XOF)</span>
+      </div>
+    </header>
+
+    <div class="parties">
+      <div class="box">
+        <h2>Émetteur</h2>
+        <p><strong>Niger Certify</strong></p>
+        <p>Prestataire digital & cybersécurité</p>
+        <p>Niamey — République du Niger</p>
+        <p>Email : abousayabou92@gmail.com</p>
+      </div>
+      <div class="box">
+        <h2>Client</h2>
+        <p><strong>ML CONSULTING</strong></p>
+        <p>Cabinet de formation humanitaire & développement</p>
+        <p>Niamey — République du Niger</p>
+        <p>Tél. / WhatsApp : +227 95 88 43 19</p>
+        <p>Email : mlhumanitaire@gmail.com</p>
+      </div>
+    </div>
+
+    <div class="ref">
+      <strong>Objet :</strong> Conception et réalisation d’un site web institutionnel de type
+      <em>bioforce.org</em> (formation humanitaire) pour ML CONSULTING — catalogue formations,
+      actualités, pré-inscriptions, vitrine de marque.<br />
+      <strong>Référence d’analyse :</strong> https://www.bioforce.org/
+    </div>
+
+    <h3 class="section">Formules proposées</h3>
+    <div class="packages">
+      <div class="pkg">
+        <div class="tag">Essentiel</div>
+        <h4>Vitrine + catalogue</h4>
+        <div class="price">1 950 000 F CFA</div>
+        <ul>
+          <li>5–7 pages</li>
+          <li>Design responsive</li>
+          <li>Liste des formations</li>
+          <li>Formulaire contact / WhatsApp</li>
+          <li>SEO de base</li>
+        </ul>
+      </div>
+      <div class="pkg featured">
+        <div class="tag">Recommandé</div>
+        <h4>Professionnel Bioforce</h4>
+        <div class="price">3 950 000 F CFA</div>
+        <ul>
+          <li>Site type Bioforce allégé</li>
+          <li>Catalogue filtrable</li>
+          <li>Actualités + témoignages</li>
+          <li>Pré-inscription / TDR</li>
+          <li>CMS WordPress + formation</li>
+        </ul>
+      </div>
+      <div class="pkg">
+        <div class="tag">Premium</div>
+        <h4>Institutionnel avancé</h4>
+        <div class="price">6 450 000 F CFA</div>
+        <ul>
+          <li>Tout le Professionnel</li>
+          <li>Bilingue FR/EN</li>
+          <li>Espace candidat</li>
+          <li>Chatbot WhatsApp</li>
+          <li>Optimisation perf. avancée</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="section">Détail — Formule Professionnelle (recommandée)</h3>
+    <p style="margin-top:-0.35rem;color:var(--muted);font-size:0.92rem;">
+      Chiffrage calqué sur l’architecture Bioforce, adapté à l’échelle de ML CONSULTING (Niamey).
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:8%">N°</th>
+          <th>Désignation</th>
+          <th class="center" style="width:10%">Qté</th>
+          <th class="num" style="width:22%">Montant (F CFA)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="center">01</td>
+          <td>
+            <strong>Cadrage & analyse concurrentielle</strong><br />
+            Audit fonctionnel de bioforce.org, atelier besoins ML CONSULTING, arborescence, cahier des charges.
+          </td>
+          <td class="center">1</td>
+          <td class="num">250 000</td>
+        </tr>
+        <tr>
+          <td class="center">02</td>
+          <td>
+            <strong>Design UI/UX sur mesure</strong><br />
+            Identité visuelle web, maquettes desktop & mobile, hero de marque, charte couleurs/typo.
+          </td>
+          <td class="center">1</td>
+          <td class="num">450 000</td>
+        </tr>
+        <tr>
+          <td class="center">03</td>
+          <td>
+            <strong>Développement CMS WordPress</strong><br />
+            Thème sur mesure, pages Accueil / À propos / Formations / Actualités / Contact, administration autonome.
+          </td>
+          <td class="center">1</td>
+          <td class="num">1 100 000</td>
+        </tr>
+        <tr>
+          <td class="center">04</td>
+          <td>
+            <strong>Catalogue formations filtrable</strong><br />
+            Fiches formation, filtres (thématique, durée, mode, session), badges (nouveau, places, bourses).
+          </td>
+          <td class="center">1</td>
+          <td class="num">650 000</td>
+        </tr>
+        <tr>
+          <td class="center">05</td>
+          <td>
+            <strong>Module actualités & agenda</strong><br />
+            Blog, annonces de sessions, webinaires / portes ouvertes.
+          </td>
+          <td class="center">1</td>
+          <td class="num">200 000</td>
+        </tr>
+        <tr>
+          <td class="center">06</td>
+          <td>
+            <strong>Conversion & pré-inscription</strong><br />
+            Formulaires (demande TDR, inscription), CTA WhatsApp, témoignages, chiffres clés.
+          </td>
+          <td class="center">1</td>
+          <td class="num">300 000</td>
+        </tr>
+        <tr>
+          <td class="center">07</td>
+          <td>
+            <strong>SEO technique, analytics & responsive</strong><br />
+            Balises, sitemap, vitesse mobile, Google Analytics / Search Console, tests navigateurs.
+          </td>
+          <td class="center">1</td>
+          <td class="num">250 000</td>
+        </tr>
+        <tr>
+          <td class="center">08</td>
+          <td>
+            <strong>Mise en ligne, formation & documentation</strong><br />
+            Configuration hébergement, SSL, formation admin (2 h), guide d’utilisation.
+          </td>
+          <td class="center">1</td>
+          <td class="num">150 000</td>
+        </tr>
+        <tr>
+          <td class="center">09</td>
+          <td>
+            <strong>Intégration contenu initial</strong><br />
+            Jusqu’à 8 formations + 5 actualités + pages institutionnelles (contenus fournis par le client).
+          </td>
+          <td class="center">1</td>
+          <td class="num">200 000</td>
+        </tr>
+        <tr>
+          <td class="center">10</td>
+          <td>
+            <strong>Sécurité de base du site</strong><br />
+            HTTPS, durcissement WordPress, sauvegardes, protections anti-spam formulaires.
+          </td>
+          <td class="center">1</td>
+          <td class="num">200 000</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <div class="row"><span>Sous-total HT</span><span>3 750 000 F CFA</span></div>
+      <div class="row"><span>TVA (exonérée / non applicable*)</span><span>0 F CFA</span></div>
+      <div class="row"><span>Remise démarrage projet (−5 %)</span><span>−187 500 F CFA</span></div>
+      <div class="grand"><span>TOTAL TTC</span><span>3 562 500 F CFA</span></div>
+    </div>
+    <p style="font-size:0.82rem;color:var(--muted);margin-top:0.5rem;">
+      *Sous réserve du régime fiscal applicable au prestataire. Montant en toutes lettres :
+      <strong>trois millions cinq cent soixante-deux mille cinq cents francs CFA</strong>.
+    </p>
+
+    <h3 class="section" style="margin-top:1.75rem;">Options (hors formule)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th class="num">Montant (F CFA)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Version bilingue français / anglais</td>
+          <td class="num">600 000</td>
+        </tr>
+        <tr>
+          <td>Espace candidat (compte + suivi dossiers)</td>
+          <td class="num">450 000</td>
+        </tr>
+        <tr>
+          <td>Chatbot / automatisation WhatsApp Business</td>
+          <td class="num">180 000</td>
+        </tr>
+        <tr>
+          <td>Nom de domaine (.ne ou .com) — 1 an</td>
+          <td class="num">25 000 – 50 000</td>
+        </tr>
+        <tr>
+          <td>Hébergement + maintenance corrective — 12 mois</td>
+          <td class="num">300 000 / an</td>
+        </tr>
+        <tr>
+          <td>Rédaction de contenus (par page)</td>
+          <td class="num">35 000</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="terms">
+      <h3>Conditions commerciales</h3>
+      <ol>
+        <li><strong>Acompte :</strong> 40 % à la commande · <strong>Solde :</strong> 40 % à la validation des maquettes · 20 % à la mise en ligne.</li>
+        <li><strong>Délai estimé :</strong> 4 à 6 semaines après réception de l’acompte et des contenus (logo, textes, photos, liste des formations).</li>
+        <li><strong>Livrables :</strong> site en production, accès admin WordPress, documentation, formation de prise en main.</li>
+        <li><strong>Hors périmètre phase 1 :</strong> plateforme e-learning type Moodle, CRM Salesforce, application mobile native.</li>
+        <li><strong>Validité de l’offre :</strong> 30 jours à compter de la date ci-dessus.</li>
+        <li><strong>Paiement :</strong> virement bancaire ou Mobile Money (coordonnées fournies à la commande).</li>
+      </ol>
+    </div>
+
+    <div class="sign">
+      <div>
+        <strong>Pour Niger Certify</strong>
+        <div class="line">Signature & cachet</div>
+      </div>
+      <div>
+        <strong>Bon pour accord — ML CONSULTING</strong>
+        <div class="line">Nom, date, signature</div>
+      </div>
+    </div>
+
+    <footer>
+      <div>Document proforma — n’est pas une facture définitive.</div>
+      <div>Niger Certify · Offre web inspirée de bioforce.org · Juillet 2026</div>
+    </footer>
+  </article>
+</body>
+</html>
