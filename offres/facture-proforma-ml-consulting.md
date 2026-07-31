@@ -1,63 +1,50 @@
 # Facture Proforma — Niger Certify × ML CONSULTING
 
+Charte visuelle reprise du modèle facture Niger Certify (ANPER).
+
 | | |
 |---|---|
-| **N°** | NC-PF-2026-0731 |
-| **Date** | 31 juillet 2026 |
-| **Validité** | 30 jours |
-| **Devise** | Francs CFA (XOF) |
-| **Émetteur** | Niger Certify — Niamey, Niger |
-| **Client** | ML CONSULTING — Niamey, Niger |
+| **Proforma N°** | 00005 |
+| **Date** | 31/07/2026 |
+| **Client** | ML CONSULTING |
+| **Téléphone** | 95 88 43 19 |
+| **Email** | mlhumanitaire@gmail.com |
+| **Émetteur** | Niger Certify — Niamey SONUCI — Tel. 94107074 |
 | **Référence** | Site type https://www.bioforce.org/ |
 
 ## Objet
 
-Conception et réalisation d’un site web institutionnel de formation humanitaire inspiré de Bioforce pour ML CONSULTING (catalogue, actualités, pré-inscriptions, vitrine de marque).
+**Création du site internet de ML CONSULTING (modèle type Bioforce.org)**
 
-## Formules
+## Prestations
 
-| Formule | Contenu | Montant |
-|---------|---------|---------|
-| **Essentiel** | Vitrine 5–7 pages + liste formations + contact | **1 950 000 F CFA** |
-| **Professionnel (recommandé)** | Site type Bioforce allégé + catalogue filtrable + CMS | **3 950 000 F CFA** |
-| **Premium** | Professionnel + bilingue + espace candidat + chatbot | **6 450 000 F CFA** |
+| Prestations | Montant (FCFA) |
+|-------------|----------------|
+| Conception & réalisation site WordPress type Bioforce (design + intégration + optimisation) | 2 500 000 |
+| Catalogue formations filtrable, actualités & pré-inscriptions | 650 000 |
+| Création et configuration des e-mails professionnels | 100 000 |
+| Maintenance 1 an (sécurité, mises à jour, support) | 300 000 |
+| Hébergement du site internet annuel 1 an | 75 000 |
+| **TOTAL** | **3 625 000** |
 
-## Détail formule Professionnelle
+| | |
+|---|---|
+| Montant HT | 3 625 000 |
+| ISB (2%) | 72 500 |
+| **Net à payer** | **3 625 000** |
 
-| N° | Désignation | Montant (F CFA) |
-|----|-------------|-----------------|
-| 01 | Cadrage & analyse concurrentielle | 250 000 |
-| 02 | Design UI/UX sur mesure | 450 000 |
-| 03 | Développement CMS WordPress | 1 100 000 |
-| 04 | Catalogue formations filtrable | 650 000 |
-| 05 | Module actualités & agenda | 200 000 |
-| 06 | Conversion & pré-inscription | 300 000 |
-| 07 | SEO, analytics & responsive | 250 000 |
-| 08 | Mise en ligne, formation & doc | 150 000 |
-| 09 | Intégration contenu initial | 200 000 |
-| 10 | Sécurité de base du site | 200 000 |
-| | **Sous-total** | **3 750 000** |
-| | Remise démarrage (−5 %) | **−187 500** |
-| | **TOTAL TTC** | **3 562 500 F CFA** |
+Arrêtée la présente facture proforma à la somme de **trois millions six cent vingt-cinq mille (3 625 000) francs CFA**, ce prix inclut l’ISB (2%) qui sera prélevé à la source.
 
-**En lettres :** trois millions cinq cent soixante-deux mille cinq cents francs CFA.
+## Compte : SONIBANK
 
-## Options
+| Code banque | Code guichet | N° Compte | Clé RIB |
+|-------------|--------------|-----------|---------|
+| NE064 | 01001 | 25112911331 | 35 |
 
-| Option | Montant (F CFA) |
-|--------|-----------------|
-| Bilingue FR/EN | 600 000 |
-| Espace candidat | 450 000 |
-| Chatbot WhatsApp Business | 180 000 |
-| Nom de domaine (1 an) | 25 000 – 50 000 |
-| Hébergement + maintenance 12 mois | 300 000 / an |
-| Rédaction contenu (par page) | 35 000 |
+« Montant soumis à ISB au taux de 2% conformément à la réglementation fiscale en vigueur. »
 
-## Conditions
+## Fichiers
 
-1. Acompte 40 % · validation maquettes 40 % · mise en ligne 20 %
-2. Délai : 4 à 6 semaines après acompte et contenus
-3. Hors phase 1 : Moodle, Salesforce, app mobile
-4. Offre valable 30 jours
-
-Version imprimable : `facture-proforma-ml-consulting.html`
+- `facture-proforma-ml-consulting.html` — version imprimable (charte ANPER)
+- `facture-proforma-ml-consulting.pdf` — export PDF
+- `assets/` — logo, cachet et signature Niger Certify
