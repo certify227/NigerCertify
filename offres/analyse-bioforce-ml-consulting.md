@@ -42,3 +42,12 @@ ML Consulting forme et accompagne les métiers de l’action humanitaire à Niam
 - rester administrable en autonomie (WordPress).
 
 Hors périmètre recommandé en phase 1 : portail Salesforce, LMS Moodle complet, chatbot IA, bilingue EN (option).
+
+## Stack retenue pour ML CONSULTING
+
+**Django** (Python) — application web sur mesure :
+- pages institutionnelles + templates responsive ;
+- modèles Formations / Sessions / Actualités / Pré-inscriptions ;
+- back-office Django Admin pour gestion autonome ;
+- filtres catalogue côté serveur ;
+- déploiement VPS (Gunicorn / Nginx) + e-mails professionnels.
