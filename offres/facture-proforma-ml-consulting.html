@@ -3,517 +3,381 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Facture Proforma — Niger Certify × ML CONSULTING</title>
+  <title>Proforma 00005 — Niger Certify × ML CONSULTING</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Carlito:wght@400;700&display=swap" rel="stylesheet" />
   <style>
+    /* Charte Niger Certify (modèle facture ANPER) */
     :root {
-      --ink: #14231c;
-      --muted: #4a5c52;
-      --line: #d5ddd7;
-      --sand: #f3f0e8;
-      --leaf: #1f6b4a;
-      --leaf-dark: #134833;
-      --accent: #c45c26;
-      --paper: #fffdf8;
+      --orange: #ff7900;
+      --orange-title: #e36c09;
+      --orange-bar: #e46c0a;
+      --blue: #0055d2;
+      --blue-footer: #0055d2;
+      --navy: #00224b;
+      --ink: #000;
+      --line: #000;
     }
     * { box-sizing: border-box; }
+    @page { size: A4; margin: 0; }
     body {
       margin: 0;
-      background: linear-gradient(160deg, #e8efe9 0%, #f7f3ea 45%, #ebe4d6 100%);
+      background: #cfd5dc;
+      font-family: "Carlito", "Calibri", "Open Sans", Arial, sans-serif;
       color: var(--ink);
-      font-family: "Source Sans 3", sans-serif;
-      line-height: 1.45;
-      padding: 2rem 1rem 3rem;
     }
-    .sheet {
-      max-width: 900px;
-      margin: 0 auto;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      box-shadow: 0 18px 50px rgba(20, 35, 28, 0.08);
-      padding: 2.5rem 2.75rem;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      gap: 1.5rem;
-      align-items: flex-start;
-      border-bottom: 3px solid var(--leaf);
-      padding-bottom: 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-    .brand h1 {
-      font-family: "Cormorant Garamond", serif;
-      font-size: 2.15rem;
-      margin: 0 0 0.2rem;
-      color: var(--leaf-dark);
-      letter-spacing: 0.02em;
-    }
-    .brand p { margin: 0; color: var(--muted); font-size: 0.92rem; }
-    .doc-meta {
-      text-align: right;
-      min-width: 220px;
-    }
-    .doc-meta .badge {
-      display: inline-block;
-      background: var(--leaf);
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.35rem 0.7rem;
-      margin-bottom: 0.6rem;
-    }
-    .doc-meta strong { display: block; font-size: 1.05rem; }
-    .parties {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .box {
-      background: var(--sand);
-      border: 1px solid var(--line);
-      padding: 1rem 1.1rem;
-    }
-    .box h2 {
-      margin: 0 0 0.55rem;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--leaf);
-    }
-    .box p { margin: 0.15rem 0; font-size: 0.95rem; }
-    .ref {
-      background: #eef5f0;
-      border-left: 4px solid var(--leaf);
-      padding: 0.85rem 1rem;
-      margin-bottom: 1.4rem;
-      font-size: 0.94rem;
-    }
-    h3.section {
-      font-family: "Cormorant Garamond", serif;
-      font-size: 1.45rem;
-      margin: 0 0 0.75rem;
-      color: var(--leaf-dark);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
-      font-size: 0.93rem;
-    }
-    th {
-      text-align: left;
-      background: var(--leaf-dark);
-      color: #fff;
-      padding: 0.65rem 0.7rem;
-      font-weight: 600;
-      font-size: 0.8rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-    td {
-      padding: 0.7rem;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-    tr:nth-child(even) td { background: #faf8f3; }
-    .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .center { text-align: center; }
-    .totals {
-      margin-left: auto;
-      width: min(360px, 100%);
-      margin-top: 0.5rem;
-    }
-    .totals .row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.4rem 0;
-      border-bottom: 1px solid var(--line);
-      font-size: 0.95rem;
-    }
-    .totals .grand {
-      background: var(--leaf);
-      color: #fff;
-      margin-top: 0.4rem;
-      padding: 0.75rem 0.85rem;
-      font-weight: 700;
-      font-size: 1.05rem;
-      display: flex;
-      justify-content: space-between;
-    }
-    .packages {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.85rem;
-      margin: 1rem 0 1.5rem;
-    }
-    .pkg {
-      border: 1px solid var(--line);
-      padding: 1rem;
-      background: #fff;
-    }
-    .pkg.featured {
-      border-color: var(--leaf);
-      box-shadow: inset 0 0 0 2px var(--leaf);
-      background: #f4faf6;
-    }
-    .pkg h4 {
-      margin: 0 0 0.35rem;
-      font-size: 1rem;
-      color: var(--leaf-dark);
-    }
-    .pkg .price {
-      font-family: "Cormorant Garamond", serif;
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: var(--accent);
-      margin: 0.4rem 0 0.55rem;
-    }
-    .pkg ul {
-      margin: 0;
-      padding-left: 1.1rem;
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
-    .pkg .tag {
-      display: inline-block;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--leaf);
-      margin-bottom: 0.3rem;
-    }
-    .terms {
-      font-size: 0.88rem;
-      color: var(--muted);
-      margin-top: 1.25rem;
-    }
-    .terms h3 { color: var(--ink); font-size: 1rem; margin-bottom: 0.4rem; }
-    .terms ol { margin: 0; padding-left: 1.2rem; }
-    .terms li { margin-bottom: 0.35rem; }
-    footer {
-      margin-top: 2rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .sign {
-      margin-top: 1.75rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-    }
-    .sign .line {
-      border-top: 1px solid var(--ink);
-      margin-top: 3rem;
-      padding-top: 0.4rem;
-      font-size: 0.88rem;
-    }
-    @media print {
-      body { background: #fff; padding: 0; }
-      .sheet { box-shadow: none; border: none; max-width: none; padding: 0; }
-      .no-print { display: none !important; }
-    }
-    @media (max-width: 740px) {
-      .sheet { padding: 1.25rem; }
-      header, .parties, .packages, .sign, footer { grid-template-columns: 1fr; display: grid; }
-      header { display: grid; }
-      .doc-meta { text-align: left; }
-    }
-    .print-bar {
-      max-width: 900px;
-      margin: 0 auto 1rem;
+    .toolbar {
+      max-width: 210mm;
+      margin: 12px auto;
       display: flex;
       justify-content: flex-end;
+      gap: 8px;
     }
-    .print-bar button {
-      background: var(--leaf-dark);
+    .toolbar button {
+      background: var(--navy);
       color: #fff;
       border: 0;
-      padding: 0.65rem 1.1rem;
-      font: inherit;
-      font-weight: 600;
+      padding: 10px 16px;
+      font: 700 13px/1 "Open Sans", sans-serif;
       cursor: pointer;
+    }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 24px;
+      background: #fff;
+      position: relative;
+      padding: 18mm 16mm 28mm;
+      box-shadow: 0 8px 28px rgba(0,0,0,.18);
+    }
+    header.top {
+      display: grid;
+      grid-template-columns: 78px 1fr 1fr;
+      gap: 10px 14px;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+    .logo { width: 72px; height: auto; display: block; }
+    .brand-block { padding-top: 2px; }
+    .brand-name {
+      font-family: "Open Sans", sans-serif;
+      font-weight: 700;
+      font-size: 12pt;
+      letter-spacing: 0.01em;
+      margin: 0 0 6px;
+    }
+    .brand-name .o { color: var(--orange); }
+    .brand-name .b { color: var(--blue); }
+    .brand-block .addr {
+      margin: 0;
+      font-family: "Open Sans", sans-serif;
+      font-size: 11pt;
+      color: var(--navy);
+      line-height: 1.35;
+    }
+    .meta-right {
+      justify-self: end;
+      width: 100%;
+      max-width: 230px;
+      padding-top: 8px;
+    }
+    .field {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .field label {
+      font-family: "Open Sans", sans-serif;
+      font-weight: 700;
+      font-size: 11pt;
+      color: var(--navy);
+    }
+    .field .box {
+      border: 1px solid var(--navy);
+      min-height: 22px;
+      padding: 2px 8px;
+      font-size: 10pt;
+      display: flex;
+      align-items: center;
+    }
+    .id-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin: 18px 0 14px;
+      max-width: 340px;
+    }
+    .id-row .field { grid-template-columns: 70px 1fr; margin: 0; }
+    h1.title {
+      margin: 10px 0 16px;
+      text-align: center;
+      font-size: 22pt;
+      font-weight: 700;
+      color: var(--orange-title);
+      line-height: 1.15;
+    }
+    table.prestations {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+      font-size: 11pt;
+    }
+    table.prestations thead th {
+      background: var(--orange-bar);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14pt;
+      padding: 8px 12px;
+      text-align: left;
+      border: 1px solid #000;
+    }
+    table.prestations thead th.amt { text-align: center; width: 28%; }
+    table.prestations td {
+      border-left: 1px solid #000;
+      border-right: 1px solid #000;
+      border-bottom: 1px solid #000;
+      padding: 9px 12px;
+      vertical-align: middle;
+    }
+    table.prestations tr:first-child td { border-top: 0; }
+    table.prestations td.amt {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    table.prestations tr.total td {
+      font-weight: 400;
+    }
+    .summary {
+      width: 78%;
+      max-width: 520px;
+      margin: 8px 0 14px;
+      border-collapse: collapse;
+      font-size: 12pt;
+    }
+    .summary td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #000;
+    }
+    .summary td:first-child {
+      font-weight: 700;
+      width: 38%;
+      border-right: 1px solid #000;
+    }
+    .summary tr:last-child td { border-bottom: 0; }
+    .summary .val { text-align: left; padding-left: 28%; }
+    .amount-words {
+      font-family: Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.35;
+      margin: 14px 0 18px;
+    }
+    .bank-title {
+      font-family: "Open Sans", sans-serif;
+      font-weight: 700;
+      font-size: 16pt;
+      margin: 0 0 10px;
+    }
+    table.rib {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 14pt;
+      margin-bottom: 8px;
+    }
+    table.rib th {
+      font-weight: 400;
+      padding: 4px;
+    }
+    table.rib td {
+      padding: 6px 4px 10px;
+      font-weight: 400;
+    }
+    .signs {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      gap: 6px;
+      margin-top: 8px;
+      min-height: 110px;
+    }
+    .signs .cachet { width: 105px; height: auto; }
+    .signs .signature { width: 68px; height: auto; margin-bottom: 8px; }
+    footer.legal {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 52px;
+      background: var(--orange);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      font-style: italic;
+      font-size: 10pt;
+      padding: 0 24px 0 0;
+      text-align: center;
+    }
+    footer.legal::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 34%;
+      background: var(--blue-footer);
+      clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%);
+    }
+    footer.legal span { position: relative; z-index: 1; }
+    .note-proforma {
+      font-family: Arial, sans-serif;
+      font-size: 9pt;
+      color: #444;
+      margin-top: 4px;
+    }
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none !important; }
+      .page {
+        margin: 0;
+        box-shadow: none;
+        width: auto;
+        min-height: 100vh;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="print-bar no-print">
+  <div class="toolbar">
     <button type="button" onclick="window.print()">Imprimer / PDF</button>
   </div>
 
-  <article class="sheet">
-    <header>
-      <div class="brand">
-        <h1>Niger Certify</h1>
-        <p>Conception & développement digital · Cybersécurité · Formation</p>
-        <p>Niamey, Niger · abousayabou92@gmail.com</p>
+  <article class="page">
+    <header class="top">
+      <img class="logo" src="assets/logo-niger-certify.png" alt="Logo Niger Certify" />
+      <div class="brand-block">
+        <p class="brand-name"><span class="o">NIGER</span><span class="b"> CERTIFY</span></p>
+        <p class="addr">Niger, Niamey SONUCI</p>
+        <p class="addr">Tel: 94107074</p>
       </div>
-      <div class="doc-meta">
-        <div class="badge">Facture proforma</div>
-        <strong>N° NC-PF-2026-0731</strong>
-        <span>Date : 31 juillet 2026</span><br />
-        <span>Validité : 30 jours</span><br />
-        <span>Devise : Francs CFA (XOF)</span>
+      <div class="meta-right">
+        <div class="field">
+          <label>Date:</label>
+          <div class="box">31/07/2026</div>
+        </div>
+        <div class="field">
+          <label>Téléphone</label>
+          <div class="box">95 88 43 19</div>
+        </div>
+        <div class="field">
+          <label>Email:</label>
+          <div class="box">mlhumanitaire@gmail.com</div>
+        </div>
       </div>
     </header>
 
-    <div class="parties">
-      <div class="box">
-        <h2>Émetteur</h2>
-        <p><strong>Niger Certify</strong></p>
-        <p>Prestataire digital & cybersécurité</p>
-        <p>Niamey — République du Niger</p>
-        <p>Email : abousayabou92@gmail.com</p>
+    <div class="id-row">
+      <div class="field">
+        <label>Proforma:</label>
+        <div class="box">00005</div>
       </div>
-      <div class="box">
-        <h2>Client</h2>
-        <p><strong>ML CONSULTING</strong></p>
-        <p>Cabinet de formation humanitaire & développement</p>
-        <p>Niamey — République du Niger</p>
-        <p>Tél. / WhatsApp : +227 95 88 43 19</p>
-        <p>Email : mlhumanitaire@gmail.com</p>
+      <div class="field">
+        <label>Client:</label>
+        <div class="box">ML CONSULTING</div>
       </div>
     </div>
 
-    <div class="ref">
-      <strong>Objet :</strong> Conception et réalisation d’un site web institutionnel de type
-      <em>bioforce.org</em> (formation humanitaire) pour ML CONSULTING — catalogue formations,
-      actualités, pré-inscriptions, vitrine de marque.<br />
-      <strong>Référence d’analyse :</strong> https://www.bioforce.org/
-    </div>
+    <h1 class="title">Création du site internet de ML CONSULTING<br /><span style="font-size:14pt;font-weight:700;">(modèle type Bioforce.org)</span></h1>
 
-    <h3 class="section">Formules proposées</h3>
-    <div class="packages">
-      <div class="pkg">
-        <div class="tag">Essentiel</div>
-        <h4>Vitrine + catalogue</h4>
-        <div class="price">1 950 000 F CFA</div>
-        <ul>
-          <li>5–7 pages</li>
-          <li>Design responsive</li>
-          <li>Liste des formations</li>
-          <li>Formulaire contact / WhatsApp</li>
-          <li>SEO de base</li>
-        </ul>
-      </div>
-      <div class="pkg featured">
-        <div class="tag">Recommandé</div>
-        <h4>Professionnel Bioforce</h4>
-        <div class="price">3 950 000 F CFA</div>
-        <ul>
-          <li>Site type Bioforce allégé</li>
-          <li>Catalogue filtrable</li>
-          <li>Actualités + témoignages</li>
-          <li>Pré-inscription / TDR</li>
-          <li>CMS WordPress + formation</li>
-        </ul>
-      </div>
-      <div class="pkg">
-        <div class="tag">Premium</div>
-        <h4>Institutionnel avancé</h4>
-        <div class="price">6 450 000 F CFA</div>
-        <ul>
-          <li>Tout le Professionnel</li>
-          <li>Bilingue FR/EN</li>
-          <li>Espace candidat</li>
-          <li>Chatbot WhatsApp</li>
-          <li>Optimisation perf. avancée</li>
-        </ul>
-      </div>
-    </div>
-
-    <h3 class="section">Détail — Formule Professionnelle (recommandée)</h3>
-    <p style="margin-top:-0.35rem;color:var(--muted);font-size:0.92rem;">
-      Chiffrage calqué sur l’architecture Bioforce, adapté à l’échelle de ML CONSULTING (Niamey).
-    </p>
-
-    <table>
+    <table class="prestations">
       <thead>
         <tr>
-          <th style="width:8%">N°</th>
-          <th>Désignation</th>
-          <th class="center" style="width:10%">Qté</th>
-          <th class="num" style="width:22%">Montant (F CFA)</th>
+          <th>Prestations</th>
+          <th class="amt">Montant (FCFA)</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="center">01</td>
-          <td>
-            <strong>Cadrage & analyse concurrentielle</strong><br />
-            Audit fonctionnel de bioforce.org, atelier besoins ML CONSULTING, arborescence, cahier des charges.
-          </td>
-          <td class="center">1</td>
-          <td class="num">250 000</td>
+          <td>Conception &amp; réalisation site WordPress type Bioforce (design + intégration + optimisation)</td>
+          <td class="amt">2 500 000</td>
         </tr>
         <tr>
-          <td class="center">02</td>
-          <td>
-            <strong>Design UI/UX sur mesure</strong><br />
-            Identité visuelle web, maquettes desktop & mobile, hero de marque, charte couleurs/typo.
-          </td>
-          <td class="center">1</td>
-          <td class="num">450 000</td>
+          <td>Catalogue formations filtrable, actualités &amp; pré-inscriptions</td>
+          <td class="amt">650 000</td>
         </tr>
         <tr>
-          <td class="center">03</td>
-          <td>
-            <strong>Développement CMS WordPress</strong><br />
-            Thème sur mesure, pages Accueil / À propos / Formations / Actualités / Contact, administration autonome.
-          </td>
-          <td class="center">1</td>
-          <td class="num">1 100 000</td>
+          <td>Création et configuration des e-mails professionnels</td>
+          <td class="amt">100 000</td>
         </tr>
         <tr>
-          <td class="center">04</td>
-          <td>
-            <strong>Catalogue formations filtrable</strong><br />
-            Fiches formation, filtres (thématique, durée, mode, session), badges (nouveau, places, bourses).
-          </td>
-          <td class="center">1</td>
-          <td class="num">650 000</td>
+          <td>Maintenance 1 an (sécurité, mises à jour, support)</td>
+          <td class="amt">300 000</td>
         </tr>
         <tr>
-          <td class="center">05</td>
-          <td>
-            <strong>Module actualités & agenda</strong><br />
-            Blog, annonces de sessions, webinaires / portes ouvertes.
-          </td>
-          <td class="center">1</td>
-          <td class="num">200 000</td>
+          <td>Hébergement du site internet annuel 1 an</td>
+          <td class="amt">75 000</td>
         </tr>
-        <tr>
-          <td class="center">06</td>
-          <td>
-            <strong>Conversion & pré-inscription</strong><br />
-            Formulaires (demande TDR, inscription), CTA WhatsApp, témoignages, chiffres clés.
-          </td>
-          <td class="center">1</td>
-          <td class="num">300 000</td>
-        </tr>
-        <tr>
-          <td class="center">07</td>
-          <td>
-            <strong>SEO technique, analytics & responsive</strong><br />
-            Balises, sitemap, vitesse mobile, Google Analytics / Search Console, tests navigateurs.
-          </td>
-          <td class="center">1</td>
-          <td class="num">250 000</td>
-        </tr>
-        <tr>
-          <td class="center">08</td>
-          <td>
-            <strong>Mise en ligne, formation & documentation</strong><br />
-            Configuration hébergement, SSL, formation admin (2 h), guide d’utilisation.
-          </td>
-          <td class="center">1</td>
-          <td class="num">150 000</td>
-        </tr>
-        <tr>
-          <td class="center">09</td>
-          <td>
-            <strong>Intégration contenu initial</strong><br />
-            Jusqu’à 8 formations + 5 actualités + pages institutionnelles (contenus fournis par le client).
-          </td>
-          <td class="center">1</td>
-          <td class="num">200 000</td>
-        </tr>
-        <tr>
-          <td class="center">10</td>
-          <td>
-            <strong>Sécurité de base du site</strong><br />
-            HTTPS, durcissement WordPress, sauvegardes, protections anti-spam formulaires.
-          </td>
-          <td class="center">1</td>
-          <td class="num">200 000</td>
+        <tr class="total">
+          <td><strong>TOTAL</strong></td>
+          <td class="amt"><strong>3 625 000</strong></td>
         </tr>
       </tbody>
     </table>
 
-    <div class="totals">
-      <div class="row"><span>Sous-total HT</span><span>3 750 000 F CFA</span></div>
-      <div class="row"><span>TVA (exonérée / non applicable*)</span><span>0 F CFA</span></div>
-      <div class="row"><span>Remise démarrage projet (−5 %)</span><span>−187 500 F CFA</span></div>
-      <div class="grand"><span>TOTAL TTC</span><span>3 562 500 F CFA</span></div>
-    </div>
-    <p style="font-size:0.82rem;color:var(--muted);margin-top:0.5rem;">
-      *Sous réserve du régime fiscal applicable au prestataire. Montant en toutes lettres :
-      <strong>trois millions cinq cent soixante-deux mille cinq cents francs CFA</strong>.
+    <table class="summary">
+      <tr>
+        <td>Montant HT</td>
+        <td class="val">3 625 000</td>
+      </tr>
+      <tr>
+        <td>ISB (2%)</td>
+        <td class="val">72 500</td>
+      </tr>
+      <tr>
+        <td>Net à payer :</td>
+        <td class="val"><strong>3 625 000</strong></td>
+      </tr>
+    </table>
+
+    <p class="amount-words">
+      Arrêtée la présente facture proforma à la somme de trois millions six cent vingt-cinq mille
+      (3 625 000) francs CFA, ce prix inclut l’ISB (2%) qui sera prélevé à la source.
     </p>
 
-    <h3 class="section" style="margin-top:1.75rem;">Options (hors formule)</h3>
-    <table>
+    <p class="bank-title">Compte: SONIBANK</p>
+    <table class="rib">
       <thead>
         <tr>
-          <th>Option</th>
-          <th class="num">Montant (F CFA)</th>
+          <th>Code banque</th>
+          <th>Code guichet</th>
+          <th>N° Compte</th>
+          <th>Clé RIB</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Version bilingue français / anglais</td>
-          <td class="num">600 000</td>
-        </tr>
-        <tr>
-          <td>Espace candidat (compte + suivi dossiers)</td>
-          <td class="num">450 000</td>
-        </tr>
-        <tr>
-          <td>Chatbot / automatisation WhatsApp Business</td>
-          <td class="num">180 000</td>
-        </tr>
-        <tr>
-          <td>Nom de domaine (.ne ou .com) — 1 an</td>
-          <td class="num">25 000 – 50 000</td>
-        </tr>
-        <tr>
-          <td>Hébergement + maintenance corrective — 12 mois</td>
-          <td class="num">300 000 / an</td>
-        </tr>
-        <tr>
-          <td>Rédaction de contenus (par page)</td>
-          <td class="num">35 000</td>
+          <td>NE064</td>
+          <td>01001</td>
+          <td>25112911331</td>
+          <td>35</td>
         </tr>
       </tbody>
     </table>
 
-    <div class="terms">
-      <h3>Conditions commerciales</h3>
-      <ol>
-        <li><strong>Acompte :</strong> 40 % à la commande · <strong>Solde :</strong> 40 % à la validation des maquettes · 20 % à la mise en ligne.</li>
-        <li><strong>Délai estimé :</strong> 4 à 6 semaines après réception de l’acompte et des contenus (logo, textes, photos, liste des formations).</li>
-        <li><strong>Livrables :</strong> site en production, accès admin WordPress, documentation, formation de prise en main.</li>
-        <li><strong>Hors périmètre phase 1 :</strong> plateforme e-learning type Moodle, CRM Salesforce, application mobile native.</li>
-        <li><strong>Validité de l’offre :</strong> 30 jours à compter de la date ci-dessus.</li>
-        <li><strong>Paiement :</strong> virement bancaire ou Mobile Money (coordonnées fournies à la commande).</li>
-      </ol>
+    <p class="note-proforma">Document proforma — valable 30 jours · Réf. analyse : https://www.bioforce.org/</p>
+
+    <div class="signs">
+      <img class="cachet" src="assets/cachet-niger-certify.png" alt="Cachet Niger Certify — Directeur Général" />
+      <img class="signature" src="assets/signature-dg.png" alt="Signature" />
     </div>
 
-    <div class="sign">
-      <div>
-        <strong>Pour Niger Certify</strong>
-        <div class="line">Signature & cachet</div>
-      </div>
-      <div>
-        <strong>Bon pour accord — ML CONSULTING</strong>
-        <div class="line">Nom, date, signature</div>
-      </div>
-    </div>
-
-    <footer>
-      <div>Document proforma — n’est pas une facture définitive.</div>
-      <div>Niger Certify · Offre web inspirée de bioforce.org · Juillet 2026</div>
+    <footer class="legal">
+      <span>« Montant soumis à ISB au taux de 2% conformément à la réglementation fiscale en vigueur. »</span>
     </footer>
   </article>
 </body>
