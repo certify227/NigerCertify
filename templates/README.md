@@ -28,8 +28,12 @@ Fichier prêt à l’emploi : `Evaluation_SIEM_NAC_3_offres.xlsx`
 python3 templates/generer_template_siem_nac.py
 ```
 
-## Paramètres actuels (`remplir_offres_siem.py`)
+## Remplir / régénérer l'évaluation
 
-- **Budget** : 50 000 000 FCFA (TCO 3 ans)
-- **Priorité** : Offre A — Microsoft Sentinel
-- Montants TCO en **FCFA** (réf. ~76 220 € HT)
+```bash
+python3 templates/remplir_offres_siem.py
+```
+
+Produit : `Evaluation_SIEM_NAC_3_offres_REMPLI.xlsx`
+
+**Paramètres actuels** : budget 50 M FCFA, priorité Offre A (Sentinel), TCO en FCFA.
