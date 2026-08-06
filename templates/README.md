@@ -22,8 +22,16 @@ Fichier prêt à l’emploi : `Evaluation_SIEM_NAC_3_offres.xlsx`
 3. Ajuster les poids (%) dans `02_Contexte` (totaux = 100).
 4. Lire le classement dans `06_Scores` / `07_Synthese`.
 
-## Régénérer le fichier
+## Régénérer le fichier vierge
 
 ```bash
 python3 templates/generer_template_siem_nac.py
 ```
+
+## Remplir avec l'évaluation Sentinel / FortiSIEM / Wazuh
+
+```bash
+python3 templates/remplir_offres_siem.py
+```
+
+Produit : `Evaluation_SIEM_NAC_3_offres_REMPLI.xlsx`
