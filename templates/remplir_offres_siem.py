@@ -9,6 +9,11 @@ from openpyxl import load_workbook
 SRC = Path(__file__).resolve().parent / "Evaluation_SIEM_NAC_3_offres.xlsx"
 OUT = Path(__file__).resolve().parent / "Evaluation_SIEM_NAC_3_offres_REMPLI.xlsx"
 
+# --- Paramètres projet (adapter ici) ---
+BUDGET_FCFA = 50_000_000  # TCO cible 3 ans
+EUR_PER_FCFA = 1 / 655.957  # XOF (Franc CFA BCEAO)
+BUDGET_EUR_REF = round(BUDGET_FCFA * EUR_PER_FCFA)  # ~76 220 € HT indicatif
+PRIORITY_OFFER = "A"  # Offre prioritaire : Microsoft Sentinel
 # (conformité, note, commentaire) pour A=Sentinel, B=FortiSIEM, C=Wazuh
 SIEM_DATA = {
     5: (
@@ -177,14 +182,14 @@ SIEM_DATA = {
         ("Oui", 5, "Open source + support optionnel — très clair"),
     ),
     44: (
-        ("Partiel", 3, "Puissant mais coût élevé à l'échelle"),
-        ("Oui", 4, "Bon rapport qualité-prix stack unifié"),
-        ("Oui", 5, "Licence quasi nulle ; coût = infra + RH"),
+        ("Oui", 5, f"Budget 50 M FCFA / 3 ans — dimensionnement aligné"),
+        ("Partiel", 2, "Hors budget 50 M FCFA (stack SIEM+NAC)"),
+        ("Oui", 4, "TCO bas mais hors priorité stratégique"),
     ),
     45: (
-        ("Partiel", 2, "Coûts ingestion, archive, connecteurs, burst"),
-        ("Partiel", 3, "Appliances, renew FortiCare, collectors"),
-        ("Partiel", 3, "Coûts cachés : infra, expertise, montée en charge"),
+        ("Partiel", 4, "Ingestion maîtrisée (filtrage AMA) — surveiller burst"),
+        ("Partiel", 2, "Licences multiples + appliances hors enveloppe"),
+        ("Partiel", 3, "Coût infra + RH à anticiper"),
     ),
 }
 
@@ -371,9 +376,9 @@ def main():
     ctx["B7"] = "Microsoft / partenaire"
     ctx["C7"] = "Fortinet / intégrateur"
     ctx["D7"] = "Wazuh / intégrateur OSS"
-    ctx["B8"] = "Évaluation agent — à compléter"
-    ctx["C8"] = "Évaluation agent — à compléter"
-    ctx["D8"] = "Évaluation agent — à compléter"
+    ctx["B8"] = "Éval. agent — priorité Offre A"
+    ctx["C8"] = "Référence comparative"
+    ctx["D8"] = "Référence comparative"
     ctx["B9"] = "06/08/2026"
     ctx["C9"] = "06/08/2026"
     ctx["D9"] = "06/08/2026"
@@ -387,116 +392,152 @@ def main():
     ctx["C12"] = "On-prem / hybride"
     ctx["D12"] = "On-prem / cloud Wazuh"
 
-    # Périmètre type (hypothèses — à ajuster)
-    ctx["B16"] = 2500
-    ctx["B17"] = 500
-    ctx["B18"] = 150
-    ctx["B19"] = 90
-    ctx["B20"] = 24
-    ctx["B21"] = 3
-    ctx["B22"] = 800
-    ctx["B23"] = "Filaire + Wi-Fi + VPN"
+    # Périmètre calibré pour budget 50 M FCFA / 3 ans (Sentinel)
+    ctx["B16"] = 450
+    ctx["E16"] = "Calibré budget 50 M FCFA"
+    ctx["B17"] = 100
+    ctx["E17"] = "~100 EPS — sources prioritaires"
+    ctx["B18"] = 25
+    ctx["E18"] = "Go/jour — avec filtrage ingestion"
+    ctx["B19"] = 60
+    ctx["E19"] = "Rétention chaude Azure"
+    ctx["B20"] = 12
+    ctx["E20"] = "Archive basique"
+    ctx["B21"] = 2
+    ctx["E21"] = "Sites principaux"
+    ctx["B22"] = 120
+    ctx["E22"] = "NAC phase 2 (hors budget initial)"
+    ctx["B23"] = "Filaire + Wi-Fi + M365 / Entra ID"
     ctx["B24"] = "Oui"
-    ctx["B25"] = "Oui"
-    ctx["B26"] = "UE / souveraineté requise"
-    ctx["B27"] = "SOC interne"
-    ctx["B28"] = "À définir"
+    ctx["B25"] = "Partiel"
+    ctx["E25"] = "HA Azure région France / EU"
+    ctx["B26"] = "Région Azure EU — données cloud"
+    ctx["B27"] = "SOC interne — montée en compétences KQL"
+    ctx["B28"] = BUDGET_FCFA
+    ctx["C28"] = "FCFA"
+    ctx["E28"] = (
+        f"TCO 3 ans max | réf. ~{BUDGET_EUR_REF:,} € HT "
+        f"(1 € = 655,957 FCFA) — montants TCO en FCFA"
+    ).replace(",", " ")
     ctx["B29"] = "Q2 2027"
+    ctx["E29"] = "Déploiement progressif Sentinel"
 
-    # Comparaison SIEM seule (NAC hors périmètre offres A/C)
-    ctx["B57"] = 70
-    ctx["B58"] = 30
+    # Pondérations SIEM — priorité critères Sentinel (cloud, intégrations, détection)
+    ctx["B34"] = 30   # Fonctionnalités & détection
+    ctx["B35"] = 15   # Architecture
+    ctx["B36"] = 25   # Intégrations (M365 / Entra / cloud)
+    ctx["B37"] = 10   # Exploitation SOC
+    ctx["B38"] = 10   # Sécurité / conformité
+    ctx["B39"] = 5    # Support
+    ctx["B40"] = 5    # TCO (budget contraint — déjà cadré)
+
+    # Pondérations NAC — phase 2 hors enveloppe initiale
+    ctx["B46"] = 20
+    ctx["B47"] = 15
+    ctx["B48"] = 20
+    ctx["B49"] = 15
+    ctx["B50"] = 15
+    ctx["B51"] = 10
+    ctx["B52"] = 10
+
+    # Projet : SIEM prioritaire (NAC reporté)
+    ctx["B57"] = 90
+    ctx["B58"] = 10
 
     fill_criteria(wb["03_SIEM_Critères"], SIEM_DATA)
     fill_criteria(wb["04_NAC_Critères"], NAC_DATA)
 
-  # TCO indicatif 3 ans € HT — périmètre type 500 EPS / 2500 users
+    # TCO 3 ans en FCFA — Offre A calée sur 50 M ; B/C hors budget (référence)
     tco = wb["05_TCO"]
+    tco["A1"] = "COÛT TOTAL DE POSSESSION (TCO) — 3 ANS — FCFA (Franc CFA)"
     costs = {
-        5: (180000, 120000, 45000),   # SIEM licence Y1
-        6: (195000, 125000, 50000),
-        7: (210000, 130000, 55000),
-        8: (45000, 15000, 0),
-        9: (60000, 20000, 25000),
-        10: (25000, 10000, 0),
-        12: (0, 85000, 0),            # NAC Y1
-        13: (0, 90000, 0),
-        14: (0, 95000, 0),
-        15: (0, 15000, 0),
-        16: (0, 40000, 0),
-        17: (0, 10000, 0),
-        19: (80000, 60000, 35000),    # intég SIEM
-        20: (0, 45000, 0),            # intég NAC
-        21: (25000, 20000, 15000),
-        22: (10000, 10000, 5000),
-        23: (15000, 15000, 10000),
-        25: (15000, 12000, 8000),
-        26: (10000, 10000, 5000),
-        27: (5000, 5000, 0),
-        29: (35000, 25000, 15000),
-        30: (35000, 25000, 15000),
-        31: (35000, 25000, 15000),
+        # Offre A (Sentinel) — total ~50 M FCFA
+        5: (10_500_000, 28_000_000, 12_000_000),
+        6: (11_000_000, 29_000_000, 12_500_000),
+        7: (11_500_000, 30_000_000, 13_000_000),
+        8: (1_500_000, 5_000_000, 0),
+        9: (1_000_000, 3_000_000, 1_000_000),
+        10: (500_000, 2_000_000, 500_000),
+        12: (0, 12_000_000, 0),
+        13: (0, 12_500_000, 0),
+        14: (0, 13_000_000, 0),
+        15: (0, 3_000_000, 0),
+        16: (0, 8_000_000, 0),
+        17: (0, 2_000_000, 0),
+        19: (2_500_000, 8_000_000, 4_000_000),
+        20: (0, 6_000_000, 0),
+        21: (1_500_000, 4_000_000, 1_500_000),
+        22: (1_000_000, 3_000_000, 1_000_000),
+        23: (1_500_000, 4_000_000, 1_500_000),
+        25: (1_500_000, 2_000_000, 1_000_000),
+        26: (1_000_000, 1_500_000, 500_000),
+        27: (500_000, 1_000_000, 0),
+        29: (0, 0, 0),  # support inclus Azure / FortiCare
+        30: (0, 0, 0),
+        31: (0, 0, 0),
         32: (0, 0, 0),
-        34: (0, 0, 25000),            # infra on-prem Wazuh
-        35: (0, 0, 5000),
-        36: (35000, 25000, 20000),
+        34: (0, 0, 3_000_000),
+        35: (0, 0, 500_000),
+        36: (1_000_000, 5_000_000, 1_500_000),
     }
+    tco_comment = (
+        f"FCFA — Budget max {BUDGET_FCFA:,} — Offre A prioritaire"
+    ).replace(",", " ")
     for row, (a, b, c) in costs.items():
         tco.cell(row=row, column=2, value=a)
         tco.cell(row=row, column=3, value=b)
         tco.cell(row=row, column=4, value=c)
-        tco.cell(row=row, column=6, value="Estimation indicative — ajuster selon offres commerciales")
+        tco.cell(row=row, column=5, value="FCFA")
+        tco.cell(row=row, column=6, value=tco_comment)
 
     syn = wb["07_Synthese"]
     syn["B5"] = "Microsoft Sentinel"
     syn["C5"] = "FortiSIEM + FortiNAC"
     syn["D5"] = "Wazuh"
     syn["B16"] = (
-        "Écosystème Microsoft natif (M365, Entra, Defender). "
-        "Détection avancée KQL, SOAR intégré, scalabilité cloud."
+        "PRIORITÉ STRATÉGIQUE. Écosystème Microsoft (M365, Entra, Defender). "
+        "Détection KQL, SOAR Logic Apps, scalabilité cloud. "
+        "Dimensionné pour budget 50 M FCFA / 3 ans."
     )
     syn["C16"] = (
-        "Stack Fortinet unifiée SIEM+NAC+EDR+FW. "
-        "Intégration réseau excellente, déploiement on-prem possible."
+        "Stack Fortinet complète SIEM+NAC — référence comparative. "
+        "Hors enveloppe budgétaire (~95 M FCFA estimés)."
     )
     syn["D16"] = (
-        "Open source, souveraineté totale, TCO licence minimal. "
-        "Compliance templates, flexibilité architecture."
+        "Alternative OSS souveraine — TCO licence faible (~38 M FCFA) "
+        "mais non prioritaire vs Sentinel."
     )
     syn["B17"] = (
-        "Coût ingestion variable, courbe KQL, dépendance cloud Azure. "
-        "NAC absent de l'offre."
+        "NAC non inclus phase 1 ; courbe KQL à planifier. "
+        "Ingestion à monitorer (filtrage AMA)."
     )
-    syn["C17"] = (
-        "UEBA limité, SOAR via FortiSOAR, cloud connectors moins riches. "
-        "Licences multiples (SIEM+NAC+Care)."
-    )
-    syn["D17"] = (
-        "Pas de NAC, UEBA/SOAR limités, charge opérationnelle élevée. "
-        "Moins de références enterprise historiques."
-    )
-    syn["B18"] = "Dépendance hyperscaler, facturation ingestion"
-    syn["C18"] = "Vendor lock-in stack Fortinet"
-    syn["D18"] = "Compétences internes, montée en charge cluster"
-    syn["B19"] = "Clarifier région Azure et coûts archive"
-    syn["C19"] = "Valider périmètre FortiCare et HA"
-    syn["D19"] = "Dimensionnement cluster et support commercial"
-    syn["B21"] = "Offre B — FortiSIEM + FortiNAC"
+    syn["C17"] = "Budget 50 M FCFA insuffisant pour SIEM+NAC Fortinet"
+    syn["D17"] = "Charge ops élevée ; écart fonctionnel vs Sentinel cloud"
+    syn["B18"] = "Dépendance Azure — mitigée par priorité Offre A"
+    syn["C18"] = "TCO ~2× budget cible"
+    syn["D18"] = "Moins d'intégrations M365 natives"
+    syn["B19"] = "Confirmer région Azure EU + engagement ingestion"
+    syn["C19"] = "Non sélectionné — hors budget"
+    syn["D19"] = "Plan B technique uniquement"
+    syn["B21"] = "Offre A — Microsoft Sentinel (prioritaire)"
     syn["A23"] = (
-        "Pour un besoin SIEM+NAC intégré, Fortinet (offre B) offre le meilleur "
-        "couplage technique et un score global équilibré. Microsoft Sentinel (A) "
-        "domine sur cloud/M365 et détection avancée mais sans NAC et avec TCO "
-        "ingestion élevé. Wazuh (C) est optimal pour souveraineté/TCO SIEM seul "
-        "avec équipe technique mature."
+        "L'offre A (Microsoft Sentinel) est recommandée en priorité : elle respecte "
+        f"l'enveloppe budgétaire de 50 000 000 FCFA sur 3 ans (périmètre calibré : "
+        "~100 EPS, ~450 utilisateurs, 2 sites), maximise l'intégration M365/Entra ID "
+        "et offre le meilleur niveau de détection/SOAR dans cette enveloppe. "
+        "Les offres B (~95 M FCFA) et C (~38 M FCFA) servent de référence : B excède "
+        "le budget ; C est moins coûteuse mais ne répond pas à la priorité stratégique "
+        "Microsoft. Le NAC est reporté en phase 2 (budget séparé ou 802.1X progressif)."
     )
     syn["A29"] = (
-        "Scénario A : Sentinel + NAC tiers (Cisco ISE / Aruba ClearPass). "
-        "Scénario C : Wazuh + NAC open source ou tiers."
+        "Plan B : Wazuh si contrainte souveraineté absolue. "
+        "NAC phase 2 : solution tiers ou extension budget."
     )
     syn["A33"] = (
-        "1. PoC 30 jours sur sources critiques | 2. Atelier technique intégrations | "
-        "3. Négociation licences ingestion (A) / FortiCare bundle (B) | "
-        "4. Audit dimensionnement Wazuh (C)"
+        "1. PoC Sentinel 30 jours (sources M365 + AD + firewall) | "
+        "2. Atelier ingestion / filtrage AMA pour tenir le budget | "
+        "3. Négociation EES / Azure commit Microsoft | "
+        "4. Formation KQL SOC (5 jours) | 5. Roadmap NAC phase 2"
     )
 
     wb.save(OUT)

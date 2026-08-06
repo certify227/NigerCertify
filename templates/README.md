@@ -28,10 +28,8 @@ Fichier prêt à l’emploi : `Evaluation_SIEM_NAC_3_offres.xlsx`
 python3 templates/generer_template_siem_nac.py
 ```
 
-## Remplir avec l'évaluation Sentinel / FortiSIEM / Wazuh
+## Paramètres actuels (`remplir_offres_siem.py`)
 
-```bash
-python3 templates/remplir_offres_siem.py
-```
-
-Produit : `Evaluation_SIEM_NAC_3_offres_REMPLI.xlsx`
+- **Budget** : 50 000 000 FCFA (TCO 3 ans)
+- **Priorité** : Offre A — Microsoft Sentinel
+- Montants TCO en **FCFA** (réf. ~76 220 € HT)
