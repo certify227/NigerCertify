@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>📊 Tableau de bord CodeQuest</h1>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin:24px 0;">
+  <div style="background:#58CC02;color:#fff;padding:20px;border-radius:12px;min-width:140px;">
+    <div style="font-size:32px;font-weight:bold;">{{ stats.tracks }}</div>
+    <div>Parcours</div>
+  </div>
+  <div style="background:#1CB0F6;color:#fff;padding:20px;border-radius:12px;min-width:140px;">
+    <div style="font-size:32px;font-weight:bold;">{{ stats.lessons }}</div>
+    <div>Leçons</div>
+  </div>
+  <div style="background:#FF9600;color:#fff;padding:20px;border-radius:12px;min-width:140px;">
+    <div style="font-size:32px;font-weight:bold;">{{ stats.exercises }}</div>
+    <div>Exercices</div>
+  </div>
+  <div style="background:#CE82FF;color:#fff;padding:20px;border-radius:12px;min-width:140px;">
+    <div style="font-size:32px;font-weight:bold;">{{ stats.completions }}</div>
+    <div>Leçons terminées</div>
+  </div>
+</div>
+
+<h2>Parcours récents</h2>
+<table style="width:100%;border-collapse:collapse;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:8px;text-align:left;">Titre</th>
+      <th style="padding:8px;">Leçons</th>
+      <th style="padding:8px;">Exercices</th>
+      <th style="padding:8px;">Publié</th>
+      <th style="padding:8px;">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for track in stats.recent_tracks %}
+    <tr style="border-bottom:1px solid #eee;">
+      <td style="padding:8px;">{{ track.icon }} {{ track.title }}</td>
+      <td style="padding:8px;text-align:center;">{{ track.lesson_count }}</td>
+      <td style="padding:8px;text-align:center;">{{ track.exercise_count }}</td>
+      <td style="padding:8px;text-align:center;">{% if track.is_published %}✅{% else %}❌{% endif %}</td>
+      <td style="padding:8px;">
+        <a href="{% url 'admin:courses_track_change' track.id %}">Modifier</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2 style="margin-top:32px;">Répartition des types d'exercices</h2>
+<ul>
+  {% for item in stats.exercise_types %}
+  <li><strong>{{ item.exercise_type }}</strong> : {{ item.count }}</li>
+  {% endfor %}
+</ul>
+
+<h2 style="margin-top:32px;">Actions rapides</h2>
+<ul>
+  <li><a href="{% url 'admin:courses_track_add' %}">➕ Créer un parcours</a></li>
+  <li><a href="{% url 'admin:courses_lesson_add' %}">➕ Créer une leçon</a></li>
+  <li><a href="{% url 'admin:courses_exercise_add' %}">➕ Créer un exercice</a></li>
+  <li><a href="{% url 'admin:accounts_user_changelist' %}">👥 Gérer les utilisateurs</a></li>
+</ul>
+{% endblock %}
