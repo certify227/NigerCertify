@@ -27,6 +27,9 @@ Ce dépôt a pour but de fournir une collection d’**outils de post-exploitatio
 | `scanners/`         | Outils de reconnaissance + **agent commercial** (emails / téléphones)   |
 | `reverse_shell/`    | Générateur de shell inversé et fichiers de cheat sheet                  |
 | `scripts/postex/`   | Scripts Bash pour la post-exploitation (hash dump, enum, SUID, etc.)    |
+| `backend/`          | API Django REST pour l'app ITLingo                                      |
+| `app/`              | Client Flutter mobile + desktop Windows pour l'app ITLingo             |
+| `docs/`             | Notes d'architecture produit                                            |
 
 ---
 
