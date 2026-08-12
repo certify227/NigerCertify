@@ -11,7 +11,7 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Charge tout le contenu pédagogique (7 parcours, leçons et exercices)"
+    help = "Charge tout le contenu pédagogique (10 parcours, leçons et exercices progressifs)"
 
     def add_arguments(self, parser):
         parser.add_argument(

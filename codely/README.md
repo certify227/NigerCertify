@@ -11,7 +11,7 @@ Application d'apprentissage de l'informatique inspirée de Duolingo.
 | Fonctionnalité | Description |
 |---|---|
 | Parcours thématiques | Python, Réseaux, Cybersécurité, Web, Linux, SQL, Git |
-| Contenu | **7 parcours**, **30 leçons**, **117+ exercices** |
+| Contenu | **10 parcours**, **50 leçons**, **197 exercices** (progression pédagogique) |
 | Exercices variés | QCM, vrai/faux, texte à trous, **défis code Python** |
 | Sandbox Python | Exécution sécurisée côté serveur avec bouton « Exécuter » |
 | Gamification | XP, niveaux, cœurs, séries, classement |
@@ -78,7 +78,7 @@ docker compose up --build
 ## Commandes utiles
 
 ```bash
-# Charger tout le contenu (7 parcours, 30 leçons, 117 exercices)
+# Charger tout le contenu (10 parcours, progression du débutant à l'avancé)
 python manage.py seed_full_content --force
 
 # Exporter le contenu pédagogique
@@ -96,6 +96,9 @@ python manage.py export_content --output content_export.json
 | 🐧 Linux & Systèmes | 2 | Commandes, permissions chmod |
 | 🗄️ Bases de données SQL | 1 | SELECT, JOIN, relations |
 | 📦 Git & Collaboration | 1 | init, commit, branches, merge |
+| 🧠 Algorithmique & Logique | 3 | Algorithmes, recherche, tri, récursion |
+| 🐳 Docker & Conteneurs | 3 | Images, run, Dockerfile, Compose |
+| 📡 Réseaux Avancés | 4 | Routage, VLAN, VPN, diagnostic |
 
 ## Aspects implémentés
 
