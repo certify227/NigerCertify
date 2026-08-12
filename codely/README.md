@@ -10,7 +10,8 @@ Application d'apprentissage de l'informatique inspirée de Duolingo.
 
 | Fonctionnalité | Description |
 |---|---|
-| Parcours thématiques | Python, Réseaux, Cybersécurité |
+| Parcours thématiques | Python, Réseaux, Cybersécurité, Web, Linux, SQL, Git |
+| Contenu | **7 parcours**, **30 leçons**, **117+ exercices** |
 | Exercices variés | QCM, vrai/faux, texte à trous, **défis code Python** |
 | Sandbox Python | Exécution sécurisée côté serveur avec bouton « Exécuter » |
 | Gamification | XP, niveaux, cœurs, séries, classement |
@@ -37,8 +38,8 @@ codely/
 cd codely/backend
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py seed_demo_data
-python manage.py seed_code_exercises
+python manage.py seed_full_content        # première fois
+python manage.py seed_full_content --force  # recharger tout le contenu
 python manage.py runserver
 ```
 
@@ -77,12 +78,24 @@ docker compose up --build
 ## Commandes utiles
 
 ```bash
-# Ajouter les exercices de code
-python manage.py seed_code_exercises
+# Charger tout le contenu (7 parcours, 30 leçons, 117 exercices)
+python manage.py seed_full_content --force
 
 # Exporter le contenu pédagogique
 python manage.py export_content --output content_export.json
 ```
+
+## Parcours disponibles
+
+| Parcours | Unités | Thèmes |
+|----------|--------|--------|
+| 🐍 Python Fondamentaux | 3 | Variables, boucles, listes, dicts, code |
+| 🌐 Réseaux & TCP/IP | 2 | IPv4/IPv6, TCP/UDP, OSI |
+| 🔒 Cybersécurité | 2 | OWASP, XSS, CSRF, crypto TLS |
+| 🌍 Développement Web | 2 | HTML, CSS, JavaScript, DOM |
+| 🐧 Linux & Systèmes | 2 | Commandes, permissions chmod |
+| 🗄️ Bases de données SQL | 1 | SELECT, JOIN, relations |
+| 📦 Git & Collaboration | 1 | init, commit, branches, merge |
 
 ## Aspects implémentés
 

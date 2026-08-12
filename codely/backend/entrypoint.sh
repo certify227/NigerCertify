@@ -8,8 +8,7 @@ done
 echo "✅ PostgreSQL prêt"
 
 python manage.py migrate --noinput
-python manage.py seed_demo_data
-python manage.py seed_code_exercises
+python manage.py seed_full_content --force
 
 if [ "${DJANGO_SUPERUSER_USERNAME}" ]; then
   python manage.py shell -c "
