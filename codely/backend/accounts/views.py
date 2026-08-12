@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from accounts.serializers import LeaderboardSerializer, RegisterSerializer, UserSerializer
+from accounts.serializers import LeaderboardSerializer, RegisterSerializer, ReminderSettingsSerializer, UserSerializer
 
 User = get_user_model()
 
@@ -35,3 +35,10 @@ class RefillHeartsView(APIView):
 
         refill_hearts(request.user)
         return Response({"hearts": request.user.hearts})
+
+
+class ReminderSettingsView(generics.RetrieveUpdateAPIView):
+    serializer_class = ReminderSettingsSerializer
+
+    def get_object(self):
+        return self.request.user

@@ -6,10 +6,12 @@ from rest_framework.views import APIView
 from courses.models import Choice, Exercise, Lesson, Track
 from courses.serializers import (
     LessonDetailSerializer,
+    RunCodeSerializer,
     SubmitAnswerSerializer,
     TrackDetailSerializer,
     TrackListSerializer,
 )
+from courses.sandbox import SandboxError, check_code_output, run_python
 from progress.models import UserExerciseAttempt, UserLessonProgress
 from progress.services import add_xp, lose_heart, record_lesson_completion
 
@@ -35,6 +37,24 @@ class LessonDetailView(generics.RetrieveAPIView):
     serializer_class = LessonDetailSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Lesson.objects.all()
+
+
+class RunCodeView(APIView):
+    """Exécute du code Python sans le noter (mode essai)."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = RunCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            result = run_python(
+                serializer.validated_data["code"],
+                serializer.validated_data.get("stdin", ""),
+            )
+            return Response(result)
+        except SandboxError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SubmitAnswerView(APIView):
@@ -121,6 +141,14 @@ class SubmitAnswerView(APIView):
                 return False
             choice = Choice.objects.filter(pk=choice_id, exercise=exercise).first()
             return choice is not None and choice.is_correct
+
+        if exercise.exercise_type == "code_challenge":
+            code = data.get("code") or data.get("answer") or ""
+            try:
+                result = check_code_output(code, exercise.correct_answer)
+                return result["correct"]
+            except SandboxError:
+                return False
 
         answer = (data.get("answer") or "").strip().lower()
         correct = exercise.correct_answer.strip().lower()

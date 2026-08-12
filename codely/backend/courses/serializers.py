@@ -23,6 +23,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
             "hint",
             "order",
             "choices",
+            "starter_code",
         ]
 
 
@@ -108,8 +109,14 @@ class TrackDetailSerializer(serializers.ModelSerializer):
 class SubmitAnswerSerializer(serializers.Serializer):
     answer = serializers.CharField(required=False, allow_blank=True)
     choice_id = serializers.IntegerField(required=False)
+    code = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, data):
-        if not data.get("answer") and not data.get("choice_id"):
-            raise serializers.ValidationError("Fournissez answer ou choice_id.")
+        if not data.get("answer") and not data.get("choice_id") and not data.get("code"):
+            raise serializers.ValidationError("Fournissez answer, choice_id ou code.")
         return data
+
+
+class RunCodeSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=2000)
+    stdin = serializers.CharField(required=False, allow_blank=True, default="")

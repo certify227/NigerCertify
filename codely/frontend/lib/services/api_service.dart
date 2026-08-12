@@ -5,6 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
 import '../models/models.dart';
+import 'cache_service.dart';
+import 'connectivity_service.dart';
+import 'offline_queue_service.dart';
 
 class ApiException implements Exception {
   final String message;
@@ -19,11 +22,17 @@ class ApiService {
   static const _tokenKey = 'access_token';
   static const _refreshKey = 'refresh_token';
 
+  final CacheService cache = CacheService();
+  final ConnectivityService connectivity = ConnectivityService();
+  final OfflineQueueService offlineQueue = OfflineQueueService();
+
   String? _accessToken;
+  bool isOffline = false;
 
   Future<void> loadTokens() async {
     final prefs = await SharedPreferences.getInstance();
     _accessToken = prefs.getString(_tokenKey);
+    isOffline = !(await connectivity.isOnline);
   }
 
   Future<void> _saveTokens(String access, String refresh) async {
@@ -38,6 +47,7 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_refreshKey);
+    await cache.clear();
   }
 
   bool get isLoggedIn => _accessToken != null;
@@ -113,6 +123,30 @@ class ApiService {
     }
   }
 
+  Future<void> checkConnectivity() async {
+    isOffline = !(await connectivity.isOnline);
+  }
+
+  Future<void> syncOfflineQueue() async {
+    if (!await connectivity.isOnline) return;
+    final queue = await offlineQueue.getQueue();
+    for (var i = 0; i < queue.length; i++) {
+      final item = queue[i];
+      try {
+        await submitAnswer(
+          item['exercise_id'] as int,
+          choiceId: item['choice_id'] as int?,
+          answer: item['answer'] as String?,
+          code: item['code'] as String?,
+          skipQueue: true,
+        );
+        await offlineQueue.removeAt(0);
+      } catch (_) {
+        break;
+      }
+    }
+  }
+
   // --- Auth ---
 
   Future<void> login(String username, String password) async {
@@ -125,6 +159,7 @@ class ApiService {
     _checkResponse(response);
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     await _saveTokens(data['access'] as String, data['refresh'] as String);
+    await syncOfflineQueue();
   }
 
   Future<void> register(String username, String email, String password) async {
@@ -143,15 +178,38 @@ class ApiService {
   // --- Profile & Dashboard ---
 
   Future<UserProfile> getProfile() async {
-    final response = await _request('GET', '/accounts/profile/');
-    _checkResponse(response);
-    return UserProfile.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    if (await connectivity.isOnline) {
+      final response = await _request('GET', '/accounts/profile/');
+      _checkResponse(response);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      await cache.save('profile', data);
+      return UserProfile.fromJson(data);
+    }
+    final cached = await cache.load('profile');
+    if (cached != null) return UserProfile.fromJson(cached as Map<String, dynamic>);
+    throw ApiException('Hors ligne — profil non disponible');
   }
 
   Future<Dashboard> getDashboard() async {
-    final response = await _request('GET', '/progress/dashboard/');
+    if (await connectivity.isOnline) {
+      final response = await _request('GET', '/progress/dashboard/');
+      _checkResponse(response);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      await cache.save('dashboard', data);
+      return Dashboard.fromJson(data);
+    }
+    final cached = await cache.load('dashboard');
+    if (cached != null) return Dashboard.fromJson(cached as Map<String, dynamic>);
+    throw ApiException('Hors ligne — tableau de bord non disponible');
+  }
+
+  Future<UserProfile> updateReminders({required bool enabled, required int hour}) async {
+    final response = await _request('PATCH', '/accounts/reminders/', body: {
+      'reminder_enabled': enabled,
+      'reminder_hour': hour,
+    });
     _checkResponse(response);
-    return Dashboard.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    return UserProfile.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   Future<void> refillHearts() async {
@@ -162,29 +220,86 @@ class ApiService {
   // --- Courses ---
 
   Future<List<Track>> getTracks() async {
-    final response = await _request('GET', '/courses/tracks/');
-    _checkResponse(response);
-    final data = jsonDecode(response.body);
-    final results = data is List ? data : (data['results'] as List<dynamic>);
-    return results.map((t) => Track.fromJson(t as Map<String, dynamic>)).toList();
+    if (await connectivity.isOnline) {
+      final response = await _request('GET', '/courses/tracks/');
+      _checkResponse(response);
+      final data = jsonDecode(response.body);
+      final results = data is List ? data : (data['results'] as List<dynamic>);
+      await cache.save('tracks', results);
+      return results.map((t) => Track.fromJson(t as Map<String, dynamic>)).toList();
+    }
+    final cached = await cache.load('tracks') as List<dynamic>?;
+    if (cached != null) {
+      return cached.map((t) => Track.fromJson(t as Map<String, dynamic>)).toList();
+    }
+    throw ApiException('Hors ligne — parcours non disponibles');
   }
 
   Future<TrackDetail> getTrackDetail(String slug) async {
-    final response = await _request('GET', '/courses/tracks/$slug/');
-    _checkResponse(response);
-    return TrackDetail.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    final cacheKey = 'track_$slug';
+    if (await connectivity.isOnline) {
+      final response = await _request('GET', '/courses/tracks/$slug/');
+      _checkResponse(response);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      await cache.save(cacheKey, data);
+      return TrackDetail.fromJson(data);
+    }
+    final cached = await cache.load(cacheKey) as Map<String, dynamic>?;
+    if (cached != null) return TrackDetail.fromJson(cached);
+    throw ApiException('Hors ligne — parcours non disponible');
   }
 
   Future<LessonDetail> getLesson(int id) async {
-    final response = await _request('GET', '/courses/lessons/$id/');
-    _checkResponse(response);
-    return LessonDetail.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    final cacheKey = 'lesson_$id';
+    if (await connectivity.isOnline) {
+      final response = await _request('GET', '/courses/lessons/$id/');
+      _checkResponse(response);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      await cache.save(cacheKey, data);
+      return LessonDetail.fromJson(data);
+    }
+    final cached = await cache.load(cacheKey) as Map<String, dynamic>?;
+    if (cached != null) return LessonDetail.fromJson(cached);
+    throw ApiException('Hors ligne — leçon non disponible');
   }
 
-  Future<SubmitResult> submitAnswer(int exerciseId, {int? choiceId, String? answer}) async {
+  Future<RunCodeResult> runCode(String code, {String stdin = ''}) async {
+    final response = await _request('POST', '/courses/sandbox/run/', body: {
+      'code': code,
+      'stdin': stdin,
+    });
+    if (response.statusCode == 400) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      throw ApiException(data['error']?.toString() ?? 'Erreur sandbox');
+    }
+    _checkResponse(response);
+    return RunCodeResult.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  }
+
+  Future<SubmitResult> submitAnswer(
+    int exerciseId, {
+    int? choiceId,
+    String? answer,
+    String? code,
+    bool skipQueue = false,
+  }) async {
     final body = <String, dynamic>{};
     if (choiceId != null) body['choice_id'] = choiceId;
     if (answer != null) body['answer'] = answer;
+    if (code != null) body['code'] = code;
+
+    if (!skipQueue && !(await connectivity.isOnline)) {
+      await offlineQueue.enqueue({
+        'exercise_id': exerciseId,
+        'choice_id': choiceId,
+        'answer': answer,
+        'code': code,
+      });
+      return SubmitResult(
+        correct: true,
+        explanation: 'Réponse enregistrée hors ligne. Synchronisation à la reconnexion.',
+      );
+    }
 
     final response = await _request('POST', '/courses/exercises/$exerciseId/submit/', body: body);
     if (response.statusCode == 403) {
@@ -196,10 +311,18 @@ class ApiService {
   }
 
   Future<List<UserProfile>> getLeaderboard() async {
+    if (!await connectivity.isOnline) {
+      final cached = await cache.load('leaderboard') as List<dynamic>?;
+      if (cached != null) {
+        return cached.map((u) => UserProfile.fromJson(u as Map<String, dynamic>)).toList();
+      }
+      throw ApiException('Hors ligne — classement non disponible');
+    }
     final response = await _request('GET', '/accounts/leaderboard/');
     _checkResponse(response);
     final data = jsonDecode(response.body);
     final results = data is List ? data : (data['results'] as List<dynamic>);
+    await cache.save('leaderboard', results);
     return results.map((u) => UserProfile.fromJson(u as Map<String, dynamic>)).toList();
   }
 }

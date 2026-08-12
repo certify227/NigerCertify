@@ -9,4 +9,5 @@ class UserAdmin(BaseUserAdmin):
     list_display = ["username", "email", "xp", "level", "streak", "hearts"]
     fieldsets = BaseUserAdmin.fieldsets + (
         ("Gamification", {"fields": ("xp", "streak", "hearts", "last_activity_date", "avatar", "bio")}),
+        ("Notifications", {"fields": ("reminder_enabled", "reminder_hour")}),
     )

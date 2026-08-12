@@ -4,27 +4,32 @@ Application d'apprentissage de l'informatique inspirée de Duolingo.
 
 - **Frontend** : Flutter (Windows, Android, iOS)
 - **Backend** : Django + Django REST Framework + JWT
+- **Base de données** : SQLite (dev) ou PostgreSQL (production/Docker)
 
 ## Fonctionnalités
 
-- Parcours thématiques (Python, Réseaux, Cybersécurité…)
-- Leçons interactives avec exercices (QCM, vrai/faux, texte à trous)
-- Gamification : XP, niveaux, cœurs, séries quotidiennes
-- Classement des apprenants
-- Compte démo préchargé
+| Fonctionnalité | Description |
+|---|---|
+| Parcours thématiques | Python, Réseaux, Cybersécurité |
+| Exercices variés | QCM, vrai/faux, texte à trous, **défis code Python** |
+| Sandbox Python | Exécution sécurisée côté serveur avec bouton « Exécuter » |
+| Gamification | XP, niveaux, cœurs, séries, classement |
+| Mode hors ligne | Cache local des parcours/leçons + file d'attente des réponses |
+| Notifications | Rappels quotidiens pour maintenir la série |
+| Admin enrichi | Tableau de bord, actions groupées, export JSON |
+| Docker | Déploiement PostgreSQL + Gunicorn en un commande |
 
-## Structure du projet
+## Structure
 
 ```
 codely/
-├── backend/          # API Django
-│   ├── accounts/     # Utilisateurs & auth JWT
-│   ├── courses/      # Parcours, leçons, exercices
-│   └── progress/     # Progression & gamification
-└── frontend/         # App Flutter multiplateforme
+├── backend/           # API Django
+├── frontend/          # App Flutter
+├── docker-compose.yml   # PostgreSQL + backend
+└── .env.example
 ```
 
-## Démarrage rapide
+## Démarrage rapide (développement)
 
 ### Backend
 
@@ -33,10 +38,9 @@ cd codely/backend
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py seed_demo_data
+python manage.py seed_code_exercises
 python manage.py runserver
 ```
-
-L'API est disponible sur `http://127.0.0.1:8000/api/`.
 
 **Compte démo** : `demo` / `demo1234`
 
@@ -45,34 +49,45 @@ L'API est disponible sur `http://127.0.0.1:8000/api/`.
 ```bash
 cd codely/frontend
 flutter pub get
-flutter run -d windows    # Windows desktop
+flutter run -d windows    # Windows
 flutter run -d android    # Android
-flutter run -d ios        # iOS (macOS requis)
 ```
 
-Pour pointer vers un autre serveur :
+## Déploiement Docker (PostgreSQL)
 
 ```bash
-flutter run --dart-define=API_URL=http://192.168.1.10:8000/api
+cd codely
+docker compose up --build
 ```
 
-## Endpoints API principaux
+- API : http://localhost:8000/api/
+- Admin : http://localhost:8000/admin/ (admin / admin1234)
+- Tableau de bord admin : http://localhost:8000/admin/dashboard/
+
+## API principale
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| POST | `/api/auth/token/` | Connexion (JWT) |
-| POST | `/api/accounts/register/` | Inscription |
-| GET | `/api/courses/tracks/` | Liste des parcours |
-| GET | `/api/courses/tracks/{slug}/` | Détail d'un parcours |
-| GET | `/api/courses/lessons/{id}/` | Leçon avec exercices |
+| POST | `/api/auth/token/` | Connexion JWT |
+| POST | `/api/courses/sandbox/run/` | Exécuter du code Python (essai) |
 | POST | `/api/courses/exercises/{id}/submit/` | Soumettre une réponse |
-| GET | `/api/progress/dashboard/` | Tableau de bord utilisateur |
-| GET | `/api/accounts/leaderboard/` | Classement |
+| PATCH | `/api/accounts/reminders/` | Configurer les rappels |
+| GET | `/api/progress/dashboard/` | Tableau de bord |
 
-## Prochaines étapes suggérées
+## Commandes utiles
 
-- Exercices de code interactifs (sandbox Python)
-- Notifications push pour les rappels de série
-- Mode hors-ligne avec cache local
-- Panel admin enrichi pour créer du contenu
-- Déploiement (Docker, PostgreSQL, CI/CD)
+```bash
+# Ajouter les exercices de code
+python manage.py seed_code_exercises
+
+# Exporter le contenu pédagogique
+python manage.py export_content --output content_export.json
+```
+
+## Aspects implémentés
+
+1. **Sandbox Python** — exécution sécurisée avec timeout et blocage des imports dangereux
+2. **Mode hors ligne** — cache JSON local + synchronisation à la reconnexion
+3. **Notifications** — rappels quotidiens configurables dans le profil
+4. **Admin enrichi** — dashboard stats, filtres, recherche, export JSON
+5. **Docker + PostgreSQL** — production-ready avec entrypoint automatique

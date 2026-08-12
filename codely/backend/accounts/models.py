@@ -11,6 +11,11 @@ class User(AbstractUser):
     hearts = models.PositiveSmallIntegerField(default=5)
     last_activity_date = models.DateField(null=True, blank=True)
     bio = models.CharField(max_length=280, blank=True)
+    reminder_enabled = models.BooleanField(default=False)
+    reminder_hour = models.PositiveSmallIntegerField(
+        default=19,
+        help_text="Heure du rappel quotidien (0-23)",
+    )
 
     class Meta:
         ordering = ["-xp", "username"]

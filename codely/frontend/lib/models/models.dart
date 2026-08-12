@@ -8,6 +8,8 @@ class UserProfile {
   final int level;
   final int streak;
   final int hearts;
+  final bool reminderEnabled;
+  final int reminderHour;
 
   UserProfile({
     required this.id,
@@ -17,6 +19,8 @@ class UserProfile {
     required this.level,
     required this.streak,
     required this.hearts,
+    this.reminderEnabled = false,
+    this.reminderHour = 19,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -28,10 +32,19 @@ class UserProfile {
       level: json['level'] as int? ?? 1,
       streak: json['streak'] as int? ?? 0,
       hearts: json['hearts'] as int? ?? 5,
+      reminderEnabled: json['reminder_enabled'] as bool? ?? false,
+      reminderHour: json['reminder_hour'] as int? ?? 19,
     );
   }
 
-  UserProfile copyWith({int? xp, int? level, int? streak, int? hearts}) {
+  UserProfile copyWith({
+    int? xp,
+    int? level,
+    int? streak,
+    int? hearts,
+    bool? reminderEnabled,
+    int? reminderHour,
+  }) {
     return UserProfile(
       id: id,
       username: username,
@@ -40,6 +53,8 @@ class UserProfile {
       level: level ?? this.level,
       streak: streak ?? this.streak,
       hearts: hearts ?? this.hearts,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      reminderHour: reminderHour ?? this.reminderHour,
     );
   }
 }
@@ -113,6 +128,7 @@ class Exercise {
   final String question;
   final String exerciseType;
   final String hint;
+  final String starterCode;
   final List<Choice> choices;
 
   Exercise({
@@ -120,6 +136,7 @@ class Exercise {
     required this.question,
     required this.exerciseType,
     required this.hint,
+    required this.starterCode,
     required this.choices,
   });
 
@@ -129,6 +146,7 @@ class Exercise {
       question: json['question'] as String,
       exerciseType: json['exercise_type'] as String,
       hint: json['hint'] as String? ?? '',
+      starterCode: json['starter_code'] as String? ?? '',
       choices: (json['choices'] as List<dynamic>? ?? [])
           .map((c) => Choice.fromJson(c as Map<String, dynamic>))
           .toList(),
@@ -272,6 +290,37 @@ class SubmitResult {
       heartsLeft: json['hearts_left'] as int?,
       explanation: json['explanation'] as String? ?? '',
       lessonComplete: json['lesson_complete'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'correct': correct,
+        'xp_gained': xpGained,
+        'hearts_left': heartsLeft,
+        'explanation': explanation,
+        'lesson_complete': lessonComplete,
+      };
+}
+
+class RunCodeResult {
+  final String stdout;
+  final String stderr;
+  final int exitCode;
+  final bool success;
+
+  RunCodeResult({
+    required this.stdout,
+    required this.stderr,
+    required this.exitCode,
+    required this.success,
+  });
+
+  factory RunCodeResult.fromJson(Map<String, dynamic> json) {
+    return RunCodeResult(
+      stdout: json['stdout'] as String? ?? '',
+      stderr: json['stderr'] as String? ?? '',
+      exitCode: json['exit_code'] as int? ?? 1,
+      success: json['success'] as bool? ?? false,
     );
   }
 }

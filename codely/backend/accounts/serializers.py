@@ -21,9 +21,17 @@ class UserSerializer(serializers.ModelSerializer):
             "streak",
             "hearts",
             "bio",
+            "reminder_enabled",
+            "reminder_hour",
             "date_joined",
         ]
         read_only_fields = ["xp", "streak", "hearts", "date_joined"]
+
+
+class ReminderSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["reminder_enabled", "reminder_hour"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -33,12 +33,36 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 8),
             ],
           ),
-          body: IndexedStack(
-            index: _tabIndex,
+          body: Column(
             children: [
-              _TracksTab(tracks: state.tracks),
-              const LeaderboardScreen(),
-              const ProfileScreen(),
+              if (state.isOffline)
+                Container(
+                  width: double.infinity,
+                  color: AppTheme.primaryRed.withOpacity(0.1),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.cloud_off, size: 18, color: AppTheme.primaryRed),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Mode hors ligne — contenu en cache',
+                          style: TextStyle(color: AppTheme.primaryRed, fontSize: 13, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: IndexedStack(
+                  index: _tabIndex,
+                  children: [
+                    _TracksTab(tracks: state.tracks),
+                    const LeaderboardScreen(),
+                    const ProfileScreen(),
+                  ],
+                ),
+              ),
             ],
           ),
           bottomNavigationBar: NavigationBar(

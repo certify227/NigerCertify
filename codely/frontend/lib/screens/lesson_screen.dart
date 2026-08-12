@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../widgets/code_editor_widget.dart';
 
 class LessonScreen extends StatefulWidget {
   final int lessonId;
@@ -20,9 +21,13 @@ class _LessonScreenState extends State<LessonScreen> {
   int _currentIndex = 0;
   bool _loading = true;
   bool _submitting = false;
+  bool _runningCode = false;
   String? _feedback;
   bool? _lastCorrect;
   int? _selectedChoiceId;
+  String _code = '';
+  String? _codeOutput;
+  String? _codeError;
   final _textController = TextEditingController();
 
   @override
@@ -44,6 +49,9 @@ class _LessonScreenState extends State<LessonScreen> {
       setState(() {
         _lesson = lesson;
         _loading = false;
+        if (lesson.exercises.isNotEmpty) {
+          _code = lesson.exercises.first.starterCode;
+        }
       });
     }
   }
@@ -52,6 +60,39 @@ class _LessonScreenState extends State<LessonScreen> {
       _lesson != null && _currentIndex < _lesson!.exercises.length
           ? _lesson!.exercises[_currentIndex]
           : null;
+
+  void _resetExerciseState(Exercise exercise) {
+    _feedback = null;
+    _lastCorrect = null;
+    _selectedChoiceId = null;
+    _textController.clear();
+    _code = exercise.starterCode;
+    _codeOutput = null;
+    _codeError = null;
+  }
+
+  Future<void> _runCode() async {
+    setState(() {
+      _runningCode = true;
+      _codeOutput = null;
+      _codeError = null;
+    });
+    try {
+      final result = await context.read<AppState>().api.runCode(_code);
+      if (!mounted) return;
+      setState(() {
+        _codeOutput = result.stdout.isNotEmpty ? result.stdout : '(aucune sortie)';
+        if (result.stderr.isNotEmpty) _codeError = result.stderr;
+        _runningCode = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _codeError = e.toString().replaceAll('ApiException: ', '');
+        _runningCode = false;
+      });
+    }
+  }
 
   Future<void> _submit() async {
     final exercise = _currentExercise;
@@ -64,6 +105,7 @@ class _LessonScreenState extends State<LessonScreen> {
         exercise.id,
         choiceId: _selectedChoiceId,
         answer: _textController.text.isNotEmpty ? _textController.text : null,
+        code: exercise.exerciseType == 'code_challenge' ? _code : null,
       );
 
       if (!mounted) return;
@@ -81,10 +123,7 @@ class _LessonScreenState extends State<LessonScreen> {
         if (_currentIndex < _lesson!.exercises.length - 1) {
           setState(() {
             _currentIndex++;
-            _feedback = null;
-            _lastCorrect = null;
-            _selectedChoiceId = null;
-            _textController.clear();
+            _resetExerciseState(_lesson!.exercises[_currentIndex]);
           });
         } else {
           _showCompleteDialog(result.lessonComplete);
@@ -121,6 +160,16 @@ class _LessonScreenState extends State<LessonScreen> {
     );
   }
 
+  bool _canSubmit(Exercise exercise) {
+    if (exercise.exerciseType == 'code_challenge') {
+      return _code.trim().isNotEmpty;
+    }
+    if (exercise.exerciseType == 'fill_blank') {
+      return _textController.text.isNotEmpty;
+    }
+    return _selectedChoiceId != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading || _lesson == null) {
@@ -129,6 +178,7 @@ class _LessonScreenState extends State<LessonScreen> {
 
     final exercise = _currentExercise!;
     final progress = (_currentIndex + 1) / _lesson!.exercises.length;
+    final isCode = exercise.exerciseType == 'code_challenge';
 
     return Scaffold(
       appBar: AppBar(
@@ -147,7 +197,7 @@ class _LessonScreenState extends State<LessonScreen> {
             minHeight: 8,
           ),
           Expanded(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -166,7 +216,17 @@ class _LessonScreenState extends State<LessonScreen> {
                     Text('💡 ${exercise.hint}', style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 13)),
                   ],
                   const SizedBox(height: 24),
-                  if (exercise.exerciseType == 'fill_blank')
+                  if (isCode)
+                    CodeEditorWidget(
+                      key: ValueKey(exercise.id),
+                      initialCode: exercise.starterCode,
+                      onChanged: (v) => _code = v,
+                      onRun: _runCode,
+                      output: _codeOutput,
+                      error: _codeError,
+                      isRunning: _runningCode,
+                    )
+                  else if (exercise.exerciseType == 'fill_blank')
                     TextField(
                       controller: _textController,
                       decoration: const InputDecoration(hintText: 'Votre réponse'),
@@ -177,7 +237,9 @@ class _LessonScreenState extends State<LessonScreen> {
                       final selected = _selectedChoiceId == choice.id;
                       Color? bg;
                       if (_lastCorrect != null && selected) {
-                        bg = _lastCorrect! ? AppTheme.primaryGreen.withOpacity(0.15) : AppTheme.primaryRed.withOpacity(0.15);
+                        bg = _lastCorrect!
+                            ? AppTheme.primaryGreen.withOpacity(0.15)
+                            : AppTheme.primaryRed.withOpacity(0.15);
                       }
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
@@ -218,20 +280,19 @@ class _LessonScreenState extends State<LessonScreen> {
                       child: Text(_feedback!, style: const TextStyle(fontSize: 14)),
                     ),
                   ],
-                  const Spacer(),
+                  const SizedBox(height: 24),
                   ElevatedButton(
-                    onPressed: _submitting ||
-                            (_selectedChoiceId == null &&
-                                exercise.exerciseType != 'fill_blank' &&
-                                _textController.text.isEmpty)
-                        ? null
-                        : _submit,
+                    onPressed: _submitting || !_canSubmit(exercise) ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _lastCorrect == false ? AppTheme.primaryRed : AppTheme.primaryGreen,
                     ),
                     child: _submitting
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : Text(_lastCorrect == false ? 'Continuer' : 'Vérifier'),
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : Text(_lastCorrect == false ? 'Continuer' : isCode ? 'Soumettre le code' : 'Vérifier'),
                   ),
                 ],
               ),

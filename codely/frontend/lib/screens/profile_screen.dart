@@ -5,8 +5,15 @@ import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
 import 'login_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _savingReminder = false;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +46,69 @@ class ProfileScreen extends StatelessWidget {
             _StatRow(label: 'XP aujourd\'hui', value: '${dashboard.xpToday}', icon: '📈'),
             _StatRow(label: 'Leçons du jour', value: '${dashboard.lessonsCompletedToday}', icon: '📚'),
           ],
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE5E5E5)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('🔔 Rappel de série', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                const SizedBox(height: 4),
+                const Text(
+                  'Recevez une notification quotidienne pour ne pas perdre votre série.',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Activer le rappel'),
+                  value: user.reminderEnabled,
+                  activeColor: AppTheme.primaryGreen,
+                  onChanged: _savingReminder || state.isOffline
+                      ? null
+                      : (v) async {
+                          setState(() => _savingReminder = true);
+                          try {
+                            await context.read<AppState>().updateReminders(
+                                  enabled: v,
+                                  hour: user.reminderHour,
+                                );
+                          } finally {
+                            if (mounted) setState(() => _savingReminder = false);
+                          }
+                        },
+                ),
+                if (user.reminderEnabled) ...[
+                  const Text('Heure du rappel', style: TextStyle(fontWeight: FontWeight.w600)),
+                  Slider(
+                    value: user.reminderHour.toDouble(),
+                    min: 6,
+                    max: 22,
+                    divisions: 16,
+                    label: '${user.reminderHour}h00',
+                    activeColor: AppTheme.primaryGreen,
+                    onChanged: _savingReminder || state.isOffline
+                        ? null
+                        : (v) async {
+                            setState(() => _savingReminder = true);
+                            try {
+                              await context.read<AppState>().updateReminders(
+                                    enabled: true,
+                                    hour: v.round(),
+                                  );
+                            } finally {
+                              if (mounted) setState(() => _savingReminder = false);
+                            }
+                          },
+                  ),
+                ],
+              ],
+            ),
+          ),
           const SizedBox(height: 32),
           OutlinedButton.icon(
             onPressed: () async {

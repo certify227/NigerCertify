@@ -57,6 +57,7 @@ class ExerciseType(models.TextChoices):
     TRUE_FALSE = "true_false", "Vrai / Faux"
     FILL_BLANK = "fill_blank", "Texte à trous"
     CODE_ORDER = "code_order", "Ordre du code"
+    CODE_CHALLENGE = "code_challenge", "Défi code Python"
 
 
 class Exercise(models.Model):
@@ -72,8 +73,12 @@ class Exercise(models.Model):
     hint = models.CharField(max_length=255, blank=True)
     explanation = models.TextField(blank=True, help_text="Explication après réponse")
     order = models.PositiveSmallIntegerField(default=0)
-    # Pour fill_blank et code_order : réponse attendue (JSON ou texte)
+    # Pour fill_blank, code_order, code_challenge
     correct_answer = models.TextField(blank=True)
+    starter_code = models.TextField(
+        blank=True,
+        help_text="Code de départ pour les exercices code_challenge",
+    )
 
     class Meta:
         ordering = ["order"]

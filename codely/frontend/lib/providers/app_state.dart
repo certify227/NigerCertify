@@ -2,12 +2,15 @@ import 'package:flutter/foundation.dart';
 
 import '../models/models.dart';
 import '../services/api_service.dart';
+import '../services/notification_service.dart';
 
 class AppState extends ChangeNotifier {
   final ApiService api = ApiService();
+  final NotificationService notifications = NotificationService();
 
   bool isLoading = true;
   bool isAuthenticated = false;
+  bool isOffline = false;
   UserProfile? user;
   Dashboard? dashboard;
   List<Track> tracks = [];
@@ -17,10 +20,22 @@ class AppState extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
+      await notifications.init();
       await api.loadTokens();
+      isOffline = api.isOffline;
+      api.connectivity.onStatusChanged.listen((online) async {
+        isOffline = !online;
+        api.isOffline = !online;
+        if (online && isAuthenticated) {
+          await api.syncOfflineQueue();
+          await refresh();
+        }
+        notifyListeners();
+      });
       if (api.isLoggedIn) {
         await _loadUserData();
         isAuthenticated = true;
+        await _syncNotifications();
       }
     } catch (e) {
       error = e.toString();
@@ -38,6 +53,7 @@ class AppState extends ChangeNotifier {
       await api.login(username, password);
       await _loadUserData();
       isAuthenticated = true;
+      await _syncNotifications();
     } catch (e) {
       error = e.toString();
       rethrow;
@@ -56,6 +72,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    await notifications.cancelReminders();
     await api.logout();
     isAuthenticated = false;
     user = null;
@@ -65,6 +82,8 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _loadUserData() async {
+    await api.checkConnectivity();
+    isOffline = api.isOffline;
     user = await api.getProfile();
     dashboard = await api.getDashboard();
     tracks = await api.getTracks();
@@ -73,6 +92,25 @@ class AppState extends ChangeNotifier {
   Future<void> refresh() async {
     await _loadUserData();
     notifyListeners();
+  }
+
+  Future<void> updateReminders({required bool enabled, required int hour}) async {
+    user = await api.updateReminders(enabled: enabled, hour: hour);
+    if (enabled) {
+      await notifications.scheduleStreakReminder(hour: hour, streak: user?.streak ?? 0);
+    } else {
+      await notifications.cancelReminders();
+    }
+    notifyListeners();
+  }
+
+  Future<void> _syncNotifications() async {
+    if (user?.reminderEnabled == true) {
+      await notifications.scheduleStreakReminder(
+        hour: user!.reminderHour,
+        streak: user!.streak,
+      );
+    }
   }
 
   void updateFromSubmit(SubmitResult result) {
