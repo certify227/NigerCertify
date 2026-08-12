@@ -68,6 +68,25 @@ Pour mobile:
 flutter run -d android
 ```
 
+## Generer l'APK Android
+
+```bash
+cd /workspace/it_lingo/frontend
+flutter build apk --release
+```
+
+L'APK est produit ici:
+
+```text
+frontend/build/app/outputs/flutter-apk/app-release.apk
+```
+
+Package: `com.itlingo.app`  
+Label: `ItLingo`  
+Version: `0.1.0`
+
+Note: l'APK release est actuellement signe avec la cle debug Flutter (pratique pour tester). Pour une publication Play Store, il faudra une cle de signature de production.
+
 ## Prochaines etapes recommandees
 
 1. Ajouter l'authentification et la progression utilisateur.

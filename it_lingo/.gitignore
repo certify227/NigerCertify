@@ -8,3 +8,5 @@ frontend/.packages
 frontend/.flutter-plugins
 frontend/.flutter-plugins-dependencies
 frontend/.metadata
+releases/*.apk
+!releases/README.md
