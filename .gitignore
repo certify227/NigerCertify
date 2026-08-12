@@ -1,0 +1,6 @@
+.tooling/
+.venv/
+devlingo/.venv/
+devlingo/backend/db.sqlite3
+devlingo/backend/__pycache__/
+devlingo/backend/**/__pycache__/
