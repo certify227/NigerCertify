@@ -11,7 +11,7 @@ Application d'apprentissage de l'informatique inspirée de Duolingo.
 | Fonctionnalité | Description |
 |---|---|
 | Parcours thématiques | Python, Réseaux, Cybersécurité, Web, Linux, SQL, Git |
-| Contenu | **10 parcours**, **50 leçons**, **197 exercices** (progression pédagogique) |
+| Contenu | **10 parcours**, **53 leçons**, **243 exercices** (pédagogie enrichie : indices, analogies) |
 | Exercices variés | QCM, vrai/faux, texte à trous, **défis code Python** |
 | Sandbox Python | Exécution sécurisée côté serveur avec bouton « Exécuter » |
 | Gamification | XP, niveaux, cœurs, séries, classement |
@@ -89,11 +89,11 @@ python manage.py export_content --output content_export.json
 
 | Parcours | Unités | Thèmes |
 |----------|--------|--------|
-| 🐍 Python Fondamentaux | 3 | Variables, boucles, listes, dicts, code |
-| 🌐 Réseaux & TCP/IP | 2 | IPv4/IPv6, TCP/UDP, OSI |
-| 🔒 Cybersécurité | 2 | OWASP, XSS, CSRF, crypto TLS |
-| 🌍 Développement Web | 2 | HTML, CSS, JavaScript, DOM |
-| 🐧 Linux & Systèmes | 2 | Commandes, permissions chmod |
+| 🐍 Python Fondamentaux | 3 | Variables, boucles, listes — **39 exercices avec indices** |
+| 🌐 Réseaux & TCP/IP | 2 | IPv4/IPv6, TCP/UDP, OSI — explications pas à pas |
+| 🔒 Cybersécurité | 2 | OWASP, XSS, CSRF, crypto — analogies et bonnes pratiques |
+| 🌍 Développement Web | 2 | HTML, CSS, JS, DOM — structure → style → interactivité |
+| 🐧 Linux & Systèmes | 2 | Terminal, fichiers, permissions rwx |
 | 🗄️ Bases de données SQL | 1 | SELECT, JOIN, relations |
 | 📦 Git & Collaboration | 1 | init, commit, branches, merge |
 | 🧠 Algorithmique & Logique | 3 | Algorithmes, recherche, tri, récursion |
