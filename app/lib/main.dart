@@ -8,7 +8,9 @@ void main() {
 }
 
 class ItLingoApp extends StatelessWidget {
-  const ItLingoApp({super.key});
+  const ItLingoApp({super.key, this.api});
+
+  final ItLingoApi? api;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class ItLingoApp extends StatelessWidget {
           ),
         ),
       ),
-      home: HomeScreen(api: ItLingoApi()),
+      home: HomeScreen(api: api ?? ItLingoApi()),
     );
   }
 }
