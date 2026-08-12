@@ -1,0 +1,22 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+.venv/
+venv/
+*.log
+
+# Flutter / Dart
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/build/
+frontend/.pub-cache/
+frontend/.pub/
+frontend/ios/Pods/
+frontend/**/GeneratedPluginRegistrant.*
+*.iml
+
+# Env
+.env
