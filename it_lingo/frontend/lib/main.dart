@@ -64,6 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           bottomNavigationBar: isDesktop
               ? null
               : NavigationBar(
+                  height: 72,
                   selectedIndex: 0,
                   destinations: const [
                     NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Accueil'),
@@ -113,7 +114,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     }
                     final data = snapshot.data ?? DashboardData.fallback();
                     return SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, isDesktop ? 16 : 160),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -154,6 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           const SizedBox(height: 12),
                           ...data.tracks.map((track) => _TrackCard(track: track, isDesktop: isDesktop)),
+                          if (!isDesktop) const SizedBox(height: 96),
                         ],
                       ),
                     );
@@ -220,15 +222,14 @@ class _DailyChallengeCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(challenge.prompt),
             const SizedBox(height: 12),
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 Chip(label: Text(challenge.difficulty)),
-                const SizedBox(width: 8),
                 Chip(label: Text('${challenge.estimatedMinutes} min')),
-                if (challenge.trackSlug != null) ...[
-                  const SizedBox(width: 8),
-                  Chip(label: Text(challenge.trackSlug!)),
-                ],
+                if (challenge.trackSlug != null)
+                  Chip(label: Text(_compactTrackLabel(challenge.trackSlug!))),
               ],
             ),
             const SizedBox(height: 12),
@@ -271,13 +272,9 @@ class _TrackCard extends StatelessWidget {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      _TrackAvatar(color: track.colorTheme),
-                      const SizedBox(width: 12),
-                      Expanded(child: _TrackContent(track: track)),
-                    ],
-                  ),
+                  _TrackAvatar(color: track.colorTheme),
+                  const SizedBox(height: 12),
+                  _TrackContent(track: track),
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: () {},
@@ -392,11 +389,12 @@ class FallbackDashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('ItLingo - maquette locale')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
         children: [
           if (data.dailyChallenge != null) _DailyChallengeCard(challenge: data.dailyChallenge!),
           const SizedBox(height: 16),
           ...data.tracks.map((track) => _TrackCard(track: track, isDesktop: false)),
+          const SizedBox(height: 96),
         ],
       ),
     );
@@ -554,4 +552,20 @@ Color _colorFromHex(String hexColor) {
   }
   buffer.write(hexColor.replaceFirst('#', ''));
   return Color(int.parse(buffer.toString(), radix: 16));
+}
+
+String _compactTrackLabel(String slug) {
+  final parts = slug
+      .split('-')
+      .where((part) => part.isNotEmpty)
+      .map((part) => '${part[0].toUpperCase()}${part.substring(1)}')
+      .toList();
+
+  if (parts.isEmpty) {
+    return slug;
+  }
+  if (parts.length == 1) {
+    return parts.first;
+  }
+  return parts.first;
 }
