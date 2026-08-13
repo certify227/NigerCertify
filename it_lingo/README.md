@@ -49,8 +49,11 @@ cd /workspace/it_lingo
 cd backend
 python manage.py migrate
 python manage.py seed_demo_data
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000
 ```
+
+Le client mobile pointe vers `http://192.168.137.135:8000/api/v1`.
+Sur Windows, lance le backend en ecoute LAN pour que le telephone puisse joindre l'API.
 
 ## Lancer le frontend
 

@@ -19,7 +19,7 @@ Ce dossier contient un squelette Flutter concu pour:
 
 ## API attendue
 
-Le frontend consomme `http://127.0.0.1:8000/api/v1/dashboard/`.
+Le frontend consomme `http://192.168.137.135:8000/api/v1/dashboard/`.
 
 ## Commandes utiles
 

@@ -404,7 +404,7 @@ class FallbackDashboardScreen extends StatelessWidget {
 class ItLingoApi {
   ItLingoApi({
     http.Client? client,
-    this.baseUrl = 'http://127.0.0.1:8000/api/v1',
+    this.baseUrl = 'http://192.168.137.135:8000/api/v1',
   }) : _client = client ?? http.Client();
 
   final http.Client _client;
