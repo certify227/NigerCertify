@@ -25,17 +25,17 @@ Stack technique : **Django** (application web sur mesure).
 | Conception & réalisation application web Django type Bioforce (design + développement + optimisation) | 2 800 000 |
 | Modules métier Django (catalogue filtrable, actualités, pré-inscriptions, back-office) | 750 000 |
 | Création et configuration des e-mails professionnels | 100 000 |
-| Maintenance 1 an (sécurité, mises à jour, support Django) | 350 000 |
-| Hébergement & déploiement Django (VPS) 1 an | 150 000 |
-| **TOTAL** | **4 150 000** |
+| **Hébergement et accompagnement deux ans** (VPS, sécurité, mises à jour, support) | **2 000 000** |
+| **TOTAL TTC** | **5 650 000** |
 
 | | |
 |---|---|
-| Montant HT | 4 150 000 |
-| ISB (2%) | 83 000 |
-| **Net à payer** | **4 150 000** |
+| Montant HT | 5 650 000 |
+| ISB (2%) | 113 000 |
+| **Net à payer TTC** | **5 650 000** |
 
-Arrêtée la présente facture proforma à la somme de **quatre millions cent cinquante mille (4 150 000) francs CFA**, ce prix inclut l’ISB (2%) qui sera prélevé à la source.
+Arrêtée la présente facture proforma à la somme de **cinq millions six cent cinquante mille (5 650 000) francs CFA TTC**, ce prix inclut l’ISB (2%) qui sera prélevé à la source.  
+Dont **hébergement et accompagnement deux ans : 2 000 000 FCFA TTC**.
 
 ## Compte : SONIBANK
 
