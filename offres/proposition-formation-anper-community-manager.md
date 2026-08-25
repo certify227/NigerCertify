@@ -3,7 +3,8 @@
 **Émetteur :** Niger Certify (Niamey)  
 **Client :** ANPER NIGER  
 **Proforma N° :** 00006  
-**Date :** 25/08/2026
+**Date :** 25/08/2026  
+**Contacts client :** +227 20 35 01 73 · info@anperniger.org · https://anperniger.org
 
 ## Paramètres
 
@@ -11,42 +12,44 @@
 |---------|--------|
 | Profil | Community Manager |
 | Effectif | 1 personne |
-| Durée | 2 semaines (10 jours ouvrés / 70 h) |
-| Lieu | Lomé, Togo |
+| Durée | 2 semaines (10 jours / 70 h) |
+| Modalité | **Mixte** (présentiel Lomé + visio) |
+| Lieu présentiel | Lomé, Togo |
 | Date de début | 15/09/2026 |
 | Date de fin prévue | 26/09/2026 |
-| Hébergement | Inclus — 14 nuits, petit-déjeuner inclus |
+| Hébergement | Inclus — 14 nuits + petit-déjeuner |
+| Restauration | Inclus — déjeuner + dîner (14 jours) |
+| Vols A/R | **Non inclus** |
 
 ## Prestations & montants (FCFA)
 
 | Prestations | Montant |
 |-------------|---------|
-| Formation Community Manager — 10 jours / 70 h | 950 000 |
-| Supports pédagogiques, ateliers & attestation | 100 000 |
+| Formation Community Manager mixte — 10 jours / 70 h | 1 500 000 |
+| Supports, plateforme virtuelle, ateliers & attestation | 250 000 |
 | Hébergement 14 nuits à Lomé (petit-déj. inclus) | 700 000 |
-| Coordination, logistique locale & suivi 30 jours | 100 000 |
-| **TOTAL TTC** | **1 850 000** |
+| Restauration complète (déj. + dîner) — 14 jours | 560 000 |
+| Coordination, logistique locale & suivi 30 jours | 490 000 |
+| **TOTAL TTC** | **3 500 000** |
 
 | | |
 |---|---|
-| Montant HT | 1 850 000 |
-| ISB (2%) | 37 000 |
-| **Net à payer TTC** | **1 850 000** |
+| Montant HT | 3 500 000 |
+| ISB (2%) | 70 000 |
+| **Net à payer TTC** | **3 500 000** |
 
-## Programme indicatif
+## Programme indicatif (mixte)
 
-1. **Semaine 1 — Fondations & production :** rôle du CM, persona, calendrier éditorial, création de contenus, Canva, planification.
-2. **Semaine 1 — Diffusion :** Facebook, Instagram, LinkedIn, TikTok, WhatsApp Business.
-3. **Semaine 2 — Animation & performance :** community care, crise, intro pubs sociales, KPIs & reporting.
-4. **Semaine 2 — Mise en situation ANPER :** plan 30/60/90 jours, kit de publication, restitution.
+1. **S1 présentiel Lomé — Fondations & production :** rôle du CM, persona ANPER, calendrier éditorial, contenus, Canva.
+2. **S1 visio — Diffusion :** Facebook, Instagram, LinkedIn, TikTok, WhatsApp Business.
+3. **S2 présentiel — Animation & performance :** community care, crise, pubs sociales, KPIs.
+4. **S2 mixte — Mise en situation ANPER :** plan 30/60/90, kit de publication, restitution + coaching visio.
 
-## Hypothèses (à confirmer)
+## Inclus / Non inclus
 
-- Billets d’avion A/R **non inclus**
-- Déjeuners / dîners **non inclus** (petit-déjeuner oui)
-- Formation présentielle à Lomé
-- 1 participant
-- Offre valable 30 jours
+- **Inclus :** formation mixte, supports, plateforme, hébergement, petit-déj., déjeuners & dîners, suivi 30 j.
+- **Non inclus :** billets d’avion A/R, frais personnels hors forfait.
+- Offre valable 30 jours.
 
 ## Compte SONIBANK
 
