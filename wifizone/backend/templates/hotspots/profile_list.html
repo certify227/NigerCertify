@@ -1,0 +1,38 @@
+{% extends "base_app.html" %}
+{% block page_title %}Profils hotspot{% endblock %}
+{% block app_content %}
+<div class="d-flex justify-content-between mb-3">
+  <span class="text-muted">{{ profiles.count }} profil(s)</span>
+  <a href="{% url 'hotspots:profile_create' %}" class="btn btn-primary">+ Nouveau profil</a>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Nom</th>
+          <th>Routeur</th>
+          <th>Profil MT</th>
+          <th>Validité</th>
+          <th>Prix</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in profiles %}
+        <tr>
+          <td>{{ p.name }}</td>
+          <td>{{ p.router.name }}</td>
+          <td><code>{{ p.mikrotik_profile }}</code></td>
+          <td>{{ p.validity_display }}</td>
+          <td>{{ p.price|floatformat:0 }} FCFA</td>
+          <td><a href="{% url 'hotspots:profile_edit' p.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="p-4 text-muted">Aucun profil. Créez un profil après avoir ajouté un routeur.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

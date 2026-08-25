@@ -1,0 +1,157 @@
+{% extends "base_app.html" %}
+
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block app_content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card stat-card p-3">
+      <div class="text-muted small">Routeurs</div>
+      <div class="stat-value">{{ router_count }}</div>
+      <small class="text-success">{{ online_count }} en ligne</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card p-3">
+      <div class="text-muted small">Vouchers ce mois</div>
+      <div class="stat-value">{{ vouchers_month }}</div>
+      {% if subscription %}
+      <small class="text-muted">/ {{ subscription.plan.max_vouchers_month }}</small>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card p-3">
+      <div class="text-muted small">Total vouchers</div>
+      <div class="stat-value">{{ total_vouchers }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card p-3">
+      <div class="text-muted small">Revenus estimés</div>
+      <div class="stat-value">{{ revenue|floatformat:0 }}</div>
+      <small class="text-muted">FCFA</small>
+    </div>
+  </div>
+</div>
+
+{% if subscription and not subscription.is_valid %}
+<div class="alert alert-warning">
+  Votre abonnement a expiré. <a href="{% url 'billing:pricing' %}">Renouveler</a>
+</div>
+{% elif subscription and subscription_days_left is not None and subscription_days_left <= 7 %}
+<div class="alert alert-warning py-2">
+  Forfait <strong>{{ subscription.plan.name }}</strong> —
+  expire dans <strong>{{ subscription_days_left }}</strong> jour(s).
+  <a href="{% url 'billing:pricing' %}">Renouveler</a>
+</div>
+{% elif subscription %}
+<div class="alert alert-info py-2">
+  Forfait <strong>{{ subscription.plan.name }}</strong> —
+  expire le {{ subscription.expires_at|date:"d/m/Y" }}
+</div>
+{% endif %}
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h6 class="text-muted mb-3">Vouchers générés (7 derniers jours)</h6>
+      <canvas id="voucherChart" height="120"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h6 class="text-muted mb-3">Actions rapides</h6>
+      <div class="d-grid gap-2">
+        <a href="{% url 'hotspots:voucher_generate' %}" class="btn btn-primary"><i class="bi bi-ticket-perforated"></i> Générer vouchers</a>
+        <a href="{% url 'dashboard:active_users' %}" class="btn btn-outline-primary"><i class="bi bi-people"></i> Utilisateurs actifs</a>
+        <a href="{% url 'routers:create' %}" class="btn btn-outline-secondary"><i class="bi bi-router"></i> Ajouter routeur</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Routeurs</span>
+        <a href="{% url 'routers:create' %}" class="btn btn-sm btn-primary">+ Ajouter</a>
+      </div>
+      <div class="card-body p-0">
+        {% if routers %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <tbody>
+              {% for r in routers %}
+              <tr>
+                <td><a href="{% url 'routers:detail' r.pk %}">{{ r.name }}</a></td>
+                <td><span class="badge bg-{% if r.connection_status == 'online' %}success{% else %}secondary{% endif %}">{{ r.get_connection_status_display }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="p-3 text-muted">Aucun routeur. <a href="{% url 'routers:create' %}">Ajouter un MikroTik</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Derniers lots de vouchers</span>
+        <a href="{% url 'hotspots:voucher_generate' %}" class="btn btn-sm btn-primary">Générer</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_batches %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <tbody>
+              {% for b in recent_batches %}
+              <tr>
+                <td><a href="{% url 'hotspots:batch_detail' b.pk %}">Lot #{{ b.pk }}</a></td>
+                <td>{{ b.quantity }} × {{ b.profile.name }}</td>
+                <td>{{ b.created_at|date:"d/m/Y H:i" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="p-3 text-muted">Aucun lot généré.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{{ chart_labels|json_script:"chart-labels" }}
+{{ chart_counts|json_script:"chart-counts" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const ctx = document.getElementById('voucherChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: JSON.parse(document.getElementById('chart-labels').textContent),
+        datasets: [{
+          label: 'Vouchers',
+          data: JSON.parse(document.getElementById('chart-counts').textContent),
+          backgroundColor: 'rgba(13, 110, 253, 0.7)',
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+  }
+</script>
+{% endblock %}

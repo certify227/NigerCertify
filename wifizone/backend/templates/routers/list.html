@@ -1,0 +1,38 @@
+{% extends "base_app.html" %}
+{% block page_title %}Routeurs MikroTik{% endblock %}
+{% block app_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <span class="text-muted">{{ routers.count }} routeur(s)</span>
+  {% if can_add %}
+  <a href="{% url 'routers:create' %}" class="btn btn-primary"><i class="bi bi-plus"></i> Ajouter</a>
+  {% endif %}
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Nom</th>
+          <th>Adresse</th>
+          <th>Statut</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in routers %}
+        <tr>
+          <td><a href="{% url 'routers:detail' r.pk %}">{{ r.name }}</a></td>
+          <td>{{ r.host }}:{{ r.port }}</td>
+          <td><span class="badge bg-{% if r.connection_status == 'online' %}success{% elif r.connection_status == 'error' %}danger{% else %}secondary{% endif %}">{{ r.get_connection_status_display }}</span></td>
+          <td>
+            <a href="{% url 'routers:edit' r.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-muted p-4">Aucun routeur configuré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base_app.html" %}
+{% block page_title %}Vouchers{% endblock %}
+{% block app_content %}
+<div class="card p-3 mb-3 no-print">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label small">{{ filter_form.q.label }}</label>
+      {{ filter_form.q }}
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small">{{ filter_form.status.label }}</label>
+      {{ filter_form.status }}
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small">{{ filter_form.router.label }}</label>
+      {{ filter_form.router }}
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Filtrer</button>
+      <a href="{% url 'hotspots:voucher_export_csv' %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary">CSV</a>
+    </div>
+  </form>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th>Code</th>
+          <th>Routeur</th>
+          <th>Profil</th>
+          <th>Statut</th>
+          <th>Prix</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vouchers %}
+        <tr>
+          <td class="voucher-code">{{ v.code }}</td>
+          <td>{{ v.router.name }}</td>
+          <td>{{ v.profile.name }}</td>
+          <td><span class="badge bg-secondary">{{ v.get_status_display }}</span></td>
+          <td>{{ v.sold_price|floatformat:0 }}</td>
+          <td>{{ v.created_at|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="p-4 text-muted">Aucun voucher.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

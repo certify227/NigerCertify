@@ -1,0 +1,146 @@
+from decimal import Decimal
+
+from django.conf import settings
+from django.db import models
+
+
+class HotspotProfile(models.Model):
+    """Profil utilisateur hotspot (durée, limite data, prix)."""
+
+    router = models.ForeignKey(
+        "routers.Router",
+        on_delete=models.CASCADE,
+        related_name="profiles",
+    )
+    name = models.CharField("nom affiché", max_length=100)
+    mikrotik_profile = models.CharField(
+        "profil MikroTik",
+        max_length=100,
+        help_text="Nom du profil sur le routeur (ex: 1hour, 1day)",
+    )
+    validity_seconds = models.PositiveIntegerField(
+        "validité (secondes)",
+        default=3600,
+        help_text="Durée de validité en secondes (3600 = 1h)",
+    )
+    data_limit_bytes = models.BigIntegerField(
+        "limite data (octets)",
+        null=True,
+        blank=True,
+        help_text="0 ou vide = illimité",
+    )
+    shared_users = models.PositiveIntegerField("utilisateurs partagés", default=1)
+    price = models.DecimalField(
+        "prix vente (FCFA)",
+        max_digits=12,
+        decimal_places=0,
+        default=Decimal("0"),
+    )
+    is_active = models.BooleanField("actif", default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "profil hotspot"
+        verbose_name_plural = "profils hotspot"
+
+    def __str__(self):
+        return f"{self.name} ({self.router.name})"
+
+    @property
+    def validity_display(self):
+        secs = self.validity_seconds
+        if secs >= 86400:
+            days = secs // 86400
+            return f"{days} jour(s)"
+        if secs >= 3600:
+            hours = secs // 3600
+            return f"{hours} h"
+        minutes = secs // 60
+        return f"{minutes} min"
+
+
+class VoucherBatch(models.Model):
+    """Lot de vouchers générés."""
+
+    router = models.ForeignKey(
+        "routers.Router",
+        on_delete=models.CASCADE,
+        related_name="voucher_batches",
+    )
+    profile = models.ForeignKey(
+        HotspotProfile,
+        on_delete=models.CASCADE,
+        related_name="batches",
+    )
+    quantity = models.PositiveIntegerField()
+    prefix = models.CharField(max_length=20, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="voucher_batches",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=14, decimal_places=0, default=Decimal("0"))
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "lot de vouchers"
+        verbose_name_plural = "lots de vouchers"
+
+    def __str__(self):
+        return f"Lot {self.pk} — {self.quantity} vouchers"
+
+
+class Voucher(models.Model):
+    """Voucher / code d'accès WiFi."""
+
+    class Status(models.TextChoices):
+        UNUSED = "unused", "Non utilisé"
+        ACTIVE = "active", "Actif"
+        EXPIRED = "expired", "Expiré"
+        DISABLED = "disabled", "Désactivé"
+
+    batch = models.ForeignKey(
+        VoucherBatch,
+        on_delete=models.CASCADE,
+        related_name="vouchers",
+        null=True,
+        blank=True,
+    )
+    router = models.ForeignKey(
+        "routers.Router",
+        on_delete=models.CASCADE,
+        related_name="vouchers",
+    )
+    profile = models.ForeignKey(
+        HotspotProfile,
+        on_delete=models.CASCADE,
+        related_name="vouchers",
+    )
+    code = models.CharField("code voucher", max_length=50, unique=True)
+    username = models.CharField(max_length=50)
+    password = models.CharField(max_length=50)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.UNUSED,
+    )
+    sold_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=0,
+        default=Decimal("0"),
+    )
+    synced_to_mikrotik = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    activated_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "voucher"
+        verbose_name_plural = "vouchers"
+
+    def __str__(self):
+        return self.code

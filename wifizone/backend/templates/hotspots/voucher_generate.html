@@ -1,0 +1,21 @@
+{% extends "base_app.html" %}
+{% block page_title %}Générer des vouchers{% endblock %}
+{% block app_content %}
+{% if subscription %}
+<p class="text-muted small mb-3">
+  Utilisation ce mois : {{ subscription.vouchers_used_this_month }} / {{ subscription.plan.max_vouchers_month }}
+</p>
+{% endif %}
+<div class="card p-4">
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="mb-3">
+      <label class="form-label">{{ field.label }}</label>
+      {{ field }}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary"><i class="bi bi-ticket-perforated"></i> Générer</button>
+  </form>
+</div>
+{% endblock %}

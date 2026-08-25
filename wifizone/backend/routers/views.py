@@ -1,0 +1,147 @@
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+
+from billing.decorators import subscription_required
+from billing.services import get_user_subscription
+from hotspots.services.profile_sync import sync_profiles_from_router
+
+from .forms import RouterForm
+from .models import Router
+from .services.mikrotik import get_service_for_router, test_router_connection
+
+
+def _router_limit_ok(user):
+    sub = get_user_subscription(user)
+    if not sub or not sub.is_valid:
+        return False, "Abonnement invalide ou expiré."
+    count = Router.objects.filter(owner=user).count()
+    if count >= sub.plan.max_routers:
+        return False, f"Limite atteinte : {sub.plan.max_routers} routeur(s) max."
+    return True, ""
+
+
+@login_required
+def router_list(request):
+    routers = Router.objects.filter(owner=request.user)
+    sub = get_user_subscription(request.user)
+    return render(
+        request,
+        "routers/list.html",
+        {
+            "routers": routers,
+            "subscription": sub,
+            "can_add": sub and sub.is_valid and routers.count() < sub.plan.max_routers,
+        },
+    )
+
+
+@login_required
+def router_create(request):
+    ok, msg = _router_limit_ok(request.user)
+    if not ok:
+        messages.error(request, msg)
+        return redirect("routers:list")
+
+    if request.method == "POST":
+        form = RouterForm(request.POST)
+        if form.is_valid():
+            router = form.save(commit=False)
+            router.owner = request.user
+            router.save()
+            messages.success(request, f"Routeur « {router.name} » ajouté.")
+            return redirect("routers:detail", pk=router.pk)
+    else:
+        form = RouterForm()
+
+    return render(request, "routers/form.html", {"form": form, "title": "Ajouter un routeur"})
+
+
+@login_required
+def router_detail(request, pk):
+    router = get_object_or_404(Router, pk=pk, owner=request.user)
+    info = None
+    active_users = []
+    if router.connection_status == Router.ConnectionStatus.ONLINE or settings.MIKROTIK_MOCK_MODE:
+        try:
+            service = get_service_for_router(router)
+            info = service.get_system_info()
+            raw_active = service.list_active_users()
+            for u in raw_active:
+                active_users.append(
+                    {
+                        "user": u.get("user") or u.get("name", "—"),
+                        "address": u.get("address", "—"),
+                        "uptime": u.get("uptime", "—"),
+                    }
+                )
+        except Exception:
+            pass
+
+    return render(
+        request,
+        "routers/detail.html",
+        {"router": router, "system_info": info, "active_users": active_users},
+    )
+
+
+@login_required
+def router_edit(request, pk):
+    router = get_object_or_404(Router, pk=pk, owner=request.user)
+    if request.method == "POST":
+        form = RouterForm(request.POST, instance=router)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Routeur mis à jour.")
+            return redirect("routers:detail", pk=router.pk)
+    else:
+        form = RouterForm(instance=router)
+
+    return render(
+        request,
+        "routers/form.html",
+        {"form": form, "title": f"Modifier {router.name}", "router": router},
+    )
+
+
+@login_required
+def router_delete(request, pk):
+    router = get_object_or_404(Router, pk=pk, owner=request.user)
+    if request.method == "POST":
+        name = router.name
+        router.delete()
+        messages.success(request, f"Routeur « {name} » supprimé.")
+        return redirect("routers:list")
+    return render(request, "routers/delete.html", {"router": router})
+
+
+@login_required
+def router_test(request, pk):
+    router = get_object_or_404(Router, pk=pk, owner=request.user)
+    ok, message = test_router_connection(router)
+    router.connection_status = (
+        Router.ConnectionStatus.ONLINE if ok else Router.ConnectionStatus.ERROR
+    )
+    router.last_error = "" if ok else message
+    if ok:
+        router.last_connected_at = timezone.now()
+    router.save()
+    if ok:
+        messages.success(request, message)
+    else:
+        messages.error(request, f"Échec : {message}")
+    return redirect("routers:detail", pk=router.pk)
+
+
+@login_required
+@subscription_required
+def router_sync_profiles(request, pk):
+    router = get_object_or_404(Router, pk=pk, owner=request.user)
+    created, skipped, msgs = sync_profiles_from_router(router, request.user)
+    if created:
+        messages.success(request, f"{created} profil(s) importé(s) depuis MikroTik.")
+    else:
+        messages.info(request, msgs[0] if msgs else "Aucun nouveau profil.")
+    return redirect("hotspots:profile_list")

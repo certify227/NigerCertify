@@ -1,0 +1,50 @@
+{% extends "base_app.html" %}
+{% block page_title %}Lot #{{ batch.pk }}{% endblock %}
+{% block app_content %}
+<div class="d-flex flex-wrap gap-2 mb-4 no-print">
+  <button onclick="window.print()" class="btn btn-outline-primary"><i class="bi bi-printer"></i> Imprimer</button>
+  <a href="{% url 'hotspots:batch_export_csv' batch.pk %}" class="btn btn-outline-secondary"><i class="bi bi-download"></i> Export CSV</a>
+  <a href="{% url 'hotspots:batch_list' %}" class="btn btn-link">Retour</a>
+</div>
+
+<div class="card p-3 mb-4 no-print">
+  <strong>{{ batch.quantity }}</strong> vouchers —
+  {{ batch.profile.name }} —
+  {{ batch.router.name }} —
+  {{ batch.total_price|floatformat:0 }} FCFA
+</div>
+
+<div class="row g-3 print-vouchers">
+  {% for row in voucher_rows %}
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="voucher-print-item card h-100 text-center p-3">
+      <div class="small text-muted">WiFiZone</div>
+      <img src="data:image/png;base64,{{ row.qr_base64 }}" alt="QR {{ row.voucher.code }}" class="qr-voucher mx-auto my-2" width="100" height="100">
+      <div class="voucher-code">{{ row.voucher.code }}</div>
+      <div class="small">User: {{ row.voucher.username }}</div>
+      <div class="small">Pass: {{ row.voucher.password }}</div>
+      <div class="small mt-1 text-muted">{{ batch.profile.name }} — {{ batch.profile.price|floatformat:0 }} FCFA</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card mt-4 no-print">
+  <div class="card-header">Liste détaillée</div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead><tr><th>Code</th><th>Username</th><th>Password</th><th>Sync MT</th></tr></thead>
+      <tbody>
+        {% for v in vouchers %}
+        <tr>
+          <td class="voucher-code">{{ v.code }}</td>
+          <td>{{ v.username }}</td>
+          <td>{{ v.password }}</td>
+          <td>{% if v.synced_to_mikrotik %}<i class="bi bi-check text-success"></i>{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Tarifs — WiFiZone Pro{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-5">Forfaits pour opérateurs WiFi</h1>
+  <div class="row g-4 justify-content-center">
+    {% for plan in plans %}
+    <div class="col-md-4">
+      <div class="pricing-card card h-100 p-4 {% if plan.is_highlighted %}highlighted{% endif %}">
+        {% if plan.is_highlighted %}<span class="badge bg-primary mb-2">Populaire</span>{% endif %}
+        <h4>{{ plan.name }}</h4>
+        <p class="text-muted small">{{ plan.description }}</p>
+        <div class="my-3">
+          <span class="h3">{{ plan.price_monthly|floatformat:0 }}</span>
+          <span class="text-muted"> FCFA/mois</span>
+        </div>
+        <ul class="list-unstyled small mb-4">
+          {% for feat in plan.features %}
+          <li><i class="bi bi-check text-success"></i> {{ feat }}</li>
+          {% endfor %}
+        </ul>
+        {% if user.is_authenticated %}
+          {% if subscription and subscription.plan.slug == plan.slug %}
+          <button class="btn btn-outline-secondary w-100" disabled>Forfait actuel</button>
+          {% else %}
+          <a href="{% url 'billing:subscribe' plan.slug %}" class="btn btn-primary w-100">Choisir</a>
+          {% endif %}
+        {% else %}
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary w-100">Commencer</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

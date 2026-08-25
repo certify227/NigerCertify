@@ -1,0 +1,58 @@
+{% extends "base_app.html" %}
+{% block page_title %}Rapports{% endblock %}
+{% block app_content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card p-3">
+      <div class="text-muted small">Total vouchers</div>
+      <div class="stat-value">{{ total_vouchers }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card p-3">
+      <div class="text-muted small">Revenus estimés</div>
+      <div class="stat-value">{{ total_revenue|floatformat:0 }}</div>
+      <small class="text-muted">FCFA</small>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">Par profil</div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Profil</th><th>Vouchers</th><th>Revenus</th></tr></thead>
+      <tbody>
+        {% for row in by_profile %}
+        <tr>
+          <td>{{ row.profile__name }}</td>
+          <td>{{ row.count }}</td>
+          <td>{{ row.revenue|floatformat:0 }} FCFA</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="text-muted p-3">Aucune donnée.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Lots récents</div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Lot</th><th>Profil</th><th>Qté</th><th>Date</th></tr></thead>
+      <tbody>
+        {% for b in recent_batches %}
+        <tr>
+          <td><a href="{% url 'hotspots:batch_detail' b.pk %}">#{{ b.pk }}</a></td>
+          <td>{{ b.profile.name }}</td>
+          <td>{{ b.quantity }}</td>
+          <td>{{ b.created_at|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

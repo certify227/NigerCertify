@@ -1,0 +1,139 @@
+:root {
+  --wz-primary: #0d6efd;
+  --wz-dark: #1a1d23;
+  --wz-sidebar: #212529;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background-color: #f4f6f9;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #1a1d23 0%, #2c3e50 50%, #0d6efd 100%);
+  color: #fff;
+  padding: 5rem 0;
+}
+
+.hero-section h1 {
+  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 110, 253, 0.1);
+  color: var(--wz-primary);
+  font-size: 1.25rem;
+}
+
+.pricing-card {
+  border: 1px solid #dee2e6;
+  border-radius: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-card.highlighted {
+  border-color: var(--wz-primary);
+  box-shadow: 0 8px 30px rgba(13, 110, 253, 0.15);
+}
+
+.stat-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--wz-dark);
+}
+
+.sidebar-app {
+  background: var(--wz-sidebar);
+  min-height: calc(100vh - 56px);
+}
+
+.sidebar-app .nav-link {
+  color: rgba(255, 255, 255, 0.75);
+  border-radius: 8px;
+  margin-bottom: 2px;
+  padding: 0.6rem 1rem;
+}
+
+.sidebar-app .nav-link:hover,
+.sidebar-app .nav-link.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.voucher-code {
+  font-family: "Courier New", monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+}
+
+.table-responsive {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.btn {
+  border-radius: 8px;
+}
+
+@media (max-width: 767.98px) {
+  .hero-section {
+    padding: 3rem 0;
+  }
+
+  .sidebar-app {
+    min-height: auto;
+  }
+}
+
+.print-vouchers .voucher-print-item {
+  border: 2px dashed #333;
+  padding: 1rem;
+  margin: 0.5rem;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+.qr-voucher {
+  max-width: 100px;
+  height: auto;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-vouchers .col-6 {
+    width: 50%;
+  }
+}

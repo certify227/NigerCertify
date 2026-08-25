@@ -1,0 +1,12 @@
+{% extends "base_app.html" %}
+{% block page_title %}Supprimer {{ router.name }}{% endblock %}
+{% block app_content %}
+<div class="card p-4">
+  <p>Confirmer la suppression du routeur <strong>{{ router.name }}</strong> ?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Supprimer</button>
+    <a href="{% url 'routers:detail' router.pk %}" class="btn btn-link">Annuler</a>
+  </form>
+</div>
+{% endblock %}
