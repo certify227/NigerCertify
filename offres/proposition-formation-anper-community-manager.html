@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Proforma 00006 — Formation Community Manager — ANPER NIGER</title>
+  <style>
+    :root {
+      --orange: #ff7900;
+      --orange-title: #e36c09;
+      --orange-bar: #e46c0a;
+      --blue: #0055d2;
+      --navy: #00224b;
+      --ink: #111;
+      --muted: #555;
+    }
+    * { box-sizing: border-box; }
+    @page { size: A4; margin: 0; }
+    body {
+      margin: 0;
+      background: #d5dbe2;
+      font-family: Calibri, "Carlito", Arial, sans-serif;
+      color: var(--ink);
+    }
+    .toolbar {
+      max-width: 210mm;
+      margin: 12px auto;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .toolbar button {
+      background: var(--navy);
+      color: #fff;
+      border: 0;
+      padding: 10px 16px;
+      font: 700 13px/1 Arial, sans-serif;
+      cursor: pointer;
+    }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 24px;
+      background: #fff;
+      position: relative;
+      padding: 16mm 15mm 26mm;
+      box-shadow: 0 8px 28px rgba(0,0,0,.16);
+    }
+    header.top {
+      display: grid;
+      grid-template-columns: 72px 1fr 230px;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .logo { width: 68px; height: auto; }
+    .brand-name { margin: 0 0 4px; font-size: 13pt; font-weight: 700; }
+    .brand-name .o { color: var(--orange); }
+    .brand-name .b { color: var(--blue); }
+    .addr { margin: 0; color: var(--navy); font-size: 10.5pt; line-height: 1.35; }
+    .field {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .field label { font-weight: 700; color: var(--navy); font-size: 10.5pt; }
+    .field .box {
+      border: 1px solid var(--navy);
+      min-height: 22px;
+      padding: 2px 8px;
+      font-size: 10pt;
+    }
+    .id-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 420px;
+      margin: 10px 0 12px;
+    }
+    h1.title {
+      margin: 8px 0 6px;
+      text-align: center;
+      color: var(--orange-title);
+      font-size: 18pt;
+      line-height: 1.2;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--navy);
+      font-size: 11pt;
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 18px;
+      background: #f7f8fa;
+      border: 1px solid #dde2e8;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: 10.5pt;
+    }
+    .meta-grid strong { color: var(--navy); }
+    table.prestations {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      font-size: 10.5pt;
+    }
+    table.prestations th {
+      background: var(--orange-bar);
+      color: #fff;
+      padding: 8px 10px;
+      border: 1px solid #000;
+      text-align: left;
+      font-size: 12pt;
+    }
+    table.prestations th.amt { text-align: center; width: 28%; }
+    table.prestations td {
+      border: 1px solid #000;
+      padding: 8px 10px;
+      vertical-align: top;
+    }
+    table.prestations td.amt {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .summary {
+      width: 70%;
+      border-collapse: collapse;
+      margin: 8px 0 12px;
+      font-size: 11pt;
+    }
+    .summary td {
+      border-bottom: 1px solid #000;
+      padding: 6px 8px;
+    }
+    .summary td:first-child {
+      font-weight: 700;
+      width: 42%;
+      border-right: 1px solid #000;
+    }
+    .program {
+      margin: 8px 0 12px;
+      font-size: 10pt;
+      color: var(--ink);
+    }
+    .program h2 {
+      margin: 0 0 6px;
+      font-size: 12pt;
+      color: var(--navy);
+    }
+    .program ol { margin: 0; padding-left: 18px; }
+    .program li { margin-bottom: 3px; }
+    .assumptions {
+      font-size: 9.5pt;
+      color: var(--muted);
+      border-left: 3px solid var(--orange);
+      padding: 6px 10px;
+      margin: 10px 0;
+      background: #fff8f2;
+    }
+    .amount-words { font-size: 10pt; margin: 10px 0 12px; line-height: 1.35; }
+    .bank-title { font-size: 14pt; font-weight: 700; margin: 0 0 8px; }
+    table.rib { width: 100%; border-collapse: collapse; text-align: center; font-size: 12pt; margin-bottom: 8px; }
+    table.rib th, table.rib td { padding: 4px; font-weight: 400; }
+    .signs {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+      min-height: 96px;
+    }
+    .signs .cachet { width: 96px; }
+    .signs .signature { width: 62px; margin-bottom: 6px; }
+    footer.legal {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 46px;
+      background: var(--orange);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+      font-size: 9.5pt;
+      font-family: Arial, sans-serif;
+    }
+    footer.legal::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 32%;
+      background: var(--blue);
+      clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%);
+    }
+    footer.legal span { position: relative; z-index: 1; }
+    .note { font-size: 9pt; color: #555; margin-top: 4px; }
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none !important; }
+      .page { margin: 0; box-shadow: none; width: auto; min-height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" onclick="window.print()">Imprimer / PDF</button>
+  </div>
+
+  <article class="page">
+    <header class="top">
+      <img class="logo" src="assets/logo-niger-certify.png" alt="Logo Niger Certify" />
+      <div>
+        <p class="brand-name"><span class="o">NIGER</span><span class="b"> CERTIFY</span></p>
+        <p class="addr">Niger, Niamey SONUCI</p>
+        <p class="addr">Tel: 94107074</p>
+      </div>
+      <div>
+        <div class="field"><label>Date:</label><div class="box">25/08/2026</div></div>
+        <div class="field"><label>Téléphone</label><div class="box">À compléter</div></div>
+        <div class="field"><label>Email:</label><div class="box">À compléter</div></div>
+      </div>
+    </header>
+
+    <div class="id-row">
+      <div class="field"><label>Proforma:</label><div class="box">00006</div></div>
+      <div class="field"><label>Client:</label><div class="box">ANPER NIGER</div></div>
+    </div>
+
+    <h1 class="title">Proposition de formation — Community Manager</h1>
+    <p class="subtitle">1 participant · Présentiel · Lomé (Togo) · Hébergement inclus</p>
+
+    <div class="meta-grid">
+      <div><strong>Profil :</strong> Community Manager</div>
+      <div><strong>Effectif :</strong> 1 personne</div>
+      <div><strong>Durée :</strong> 2 semaines (10 jours ouvrés)</div>
+      <div><strong>Volume :</strong> 70 heures</div>
+      <div><strong>Lieu :</strong> Lomé, Togo</div>
+      <div><strong>Début :</strong> 15/09/2026</div>
+      <div><strong>Fin prévue :</strong> 26/09/2026</div>
+      <div><strong>Hébergement :</strong> Inclus (14 nuits)</div>
+    </div>
+
+    <table class="prestations">
+      <thead>
+        <tr>
+          <th>Prestations</th>
+          <th class="amt">Montant (FCFA)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Formation Community Manager — 10 jours / 70 h (stratégie réseaux, contenus, community care, reporting, crise)</td>
+          <td class="amt">950 000</td>
+        </tr>
+        <tr>
+          <td>Supports pédagogiques, ateliers pratiques &amp; attestation de formation</td>
+          <td class="amt">100 000</td>
+        </tr>
+        <tr>
+          <td>Hébergement 14 nuits à Lomé (hôtel catégorie affaires, petit-déjeuner inclus)</td>
+          <td class="amt">700 000</td>
+        </tr>
+        <tr>
+          <td>Coordination pédagogique, logistique locale &amp; suivi post-formation (30 jours)</td>
+          <td class="amt">100 000</td>
+        </tr>
+        <tr>
+          <td><strong>TOTAL TTC</strong></td>
+          <td class="amt"><strong>1 850 000</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="summary">
+      <tr><td>Montant HT</td><td>1 850 000</td></tr>
+      <tr><td>ISB (2%)</td><td>37 000</td></tr>
+      <tr><td>Net à payer TTC :</td><td><strong>1 850 000</strong></td></tr>
+    </table>
+
+    <div class="program">
+      <h2>Programme indicatif (2 semaines)</h2>
+      <ol>
+        <li><strong>S1 — Fondations &amp; production :</strong> rôle du CM, persona &amp; tonalité de marque, calendrier éditorial, création de contenus (visuels, copies, Reels/Shorts), outils Canva &amp; planification.</li>
+        <li><strong>S1 — Diffusion :</strong> Facebook, Instagram, LinkedIn, TikTok, WhatsApp Business ; bonnes pratiques SEO social.</li>
+        <li><strong>S2 — Animation &amp; performance :</strong> community care, modération, gestion de crise, publicités sociales (intro), KPIs &amp; reporting.</li>
+        <li><strong>S2 — Mise en situation ANPER :</strong> plan 30/60/90 jours, kit de publication, restitution devant jury pédagogique.</li>
+      </ol>
+    </div>
+
+    <div class="assumptions">
+      <strong>Hypothèses de chiffrage (à confirmer) :</strong>
+      billets d’avion A/R non inclus · déjeuners/dîners non inclus (petit-déjeuner oui) ·
+      formation en présentiel à Lomé · 1 participant · salle de formation prise en charge par Niger Certify ou partenaire local ·
+      validité de l’offre : 30 jours.
+    </div>
+
+    <p class="amount-words">
+      Arrêtée la présente proposition / facture proforma à la somme de un million huit cent cinquante mille
+      (1 850 000) francs CFA TTC. Ce prix inclut l’ISB (2%) qui sera prélevé à la source.
+    </p>
+
+    <p class="bank-title">Compte: SONIBANK</p>
+    <table class="rib">
+      <thead>
+        <tr><th>Code banque</th><th>Code guichet</th><th>N° Compte</th><th>Clé RIB</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>NE064</td><td>01001</td><td>25112911331</td><td>35</td></tr>
+      </tbody>
+    </table>
+
+    <p class="note">Document proforma N° 00006 — Formation Community Manager · ANPER NIGER · Lomé · 15–26/09/2026</p>
+
+    <div class="signs">
+      <img class="cachet" src="assets/cachet-niger-certify.png" alt="Cachet Niger Certify" />
+      <img class="signature" src="assets/signature-dg.png" alt="Signature" />
+    </div>
+
+    <footer class="legal">
+      <span>« Montant soumis à ISB au taux de 2% conformément à la réglementation fiscale en vigueur. »</span>
+    </footer>
+  </article>
+</body>
+</html>
