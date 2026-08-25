@@ -20,6 +20,11 @@ class Plan(models.Model):
     max_routers = models.PositiveIntegerField("routeurs max", default=1)
     max_vouchers_month = models.PositiveIntegerField("vouchers / mois", default=100)
     max_profiles = models.PositiveIntegerField("profils max", default=5)
+    max_staff = models.PositiveIntegerField(
+        "employés max",
+        default=0,
+        help_text="0 = pas de multi-utilisateurs",
+    )
     features = models.JSONField("fonctionnalités", default=list, blank=True)
     is_active = models.BooleanField("actif", default=True)
     is_highlighted = models.BooleanField("mis en avant", default=False)

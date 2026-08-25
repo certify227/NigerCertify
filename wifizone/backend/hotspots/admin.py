@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import HotspotProfile, Voucher, VoucherBatch
+from .models import HotspotLoginTemplate, HotspotProfile, Voucher, VoucherBatch
+
+
+@admin.register(HotspotLoginTemplate)
+class HotspotLoginTemplateAdmin(admin.ModelAdmin):
+    list_display = ("name", "owner", "is_system", "is_active")
+    list_filter = ("is_system", "is_active")
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(HotspotProfile)

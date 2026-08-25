@@ -1,7 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User
+from .models import TeamMembership, User
+
+
+@admin.register(TeamMembership)
+class TeamMembershipAdmin(admin.ModelAdmin):
+    list_display = ("member", "owner", "role", "is_active")
+    list_filter = ("role", "is_active")
 
 
 @admin.register(User)

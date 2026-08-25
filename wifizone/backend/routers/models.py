@@ -39,6 +39,14 @@ class Router(models.Model):
         blank=True,
         default="hotspot1",
     )
+    login_template = models.ForeignKey(
+        "hotspots.HotspotLoginTemplate",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="routers",
+        verbose_name="template login",
+    )
     is_active = models.BooleanField("actif", default=True)
     connection_status = models.CharField(
         max_length=20,

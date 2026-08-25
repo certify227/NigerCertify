@@ -4,6 +4,45 @@ from django.conf import settings
 from django.db import models
 
 
+class HotspotLoginTemplate(models.Model):
+    """Template HTML page de login hotspot MikroTik personnalisable."""
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="login_templates",
+        null=True,
+        blank=True,
+        help_text="Null = template système partagé",
+    )
+    name = models.CharField("nom", max_length=120)
+    slug = models.SlugField(max_length=120)
+    description = models.TextField(blank=True)
+    html_body = models.TextField("HTML")
+    is_system = models.BooleanField("template système", default=False)
+    is_active = models.BooleanField(default=True)
+    primary_color = models.CharField(max_length=20, default="#0d6efd")
+    background_color = models.CharField(max_length=20, default="#1a1d23")
+    wifi_name = models.CharField(max_length=120, blank=True, default="WiFiZone")
+    logo_url = models.URLField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "template login hotspot"
+        verbose_name_plural = "templates login hotspot"
+        unique_together = ("owner", "slug")
+
+    def __str__(self):
+        return self.name
+
+    def render_html(self, operator=None, router=None):
+        from hotspots.services.login_template import render_login_template
+
+        return render_login_template(self, operator=operator, router=router)
+
+
 class HotspotProfile(models.Model):
     """Profil utilisateur hotspot (durée, limite data, prix)."""
 

@@ -1,5 +1,7 @@
 from django import forms
 
+from hotspots.models import HotspotLoginTemplate
+
 from .models import Router
 
 
@@ -12,13 +14,14 @@ class RouterForm(forms.ModelForm):
 
     class Meta:
         model = Router
-        fields = ("name", "host", "port", "username", "hotspot_server", "is_active")
+        fields = ("name", "host", "port", "username", "hotspot_server", "login_template", "is_active")
         labels = {
             "name": "Nom du routeur",
             "host": "Adresse IP / hostname",
             "port": "Port API",
             "username": "Utilisateur API",
             "hotspot_server": "Serveur hotspot",
+            "login_template": "Template login hotspot",
             "is_active": "Actif",
         }
         widgets = {
@@ -27,8 +30,16 @@ class RouterForm(forms.ModelForm):
             "username": forms.TextInput(attrs={"placeholder": "admin"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, owner=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if owner:
+            from django.db.models import Q
+
+            self.fields["login_template"].queryset = HotspotLoginTemplate.objects.filter(
+                Q(owner=owner) | Q(is_system=True),
+                is_active=True,
+            )
+            self.fields["login_template"].required = False
         if self.instance and self.instance.pk:
             self.fields["password"].required = False
             self.fields["password"].help_text = "Laisser vide pour ne pas changer"

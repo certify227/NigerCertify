@@ -18,6 +18,7 @@ class Command(BaseCommand):
                 "max_routers": 1,
                 "max_vouchers_month": 200,
                 "max_profiles": 5,
+                "max_staff": 0,
                 "features": [
                     "1 routeur MikroTik",
                     "200 vouchers / mois",
@@ -35,6 +36,7 @@ class Command(BaseCommand):
                 "max_routers": 5,
                 "max_vouchers_month": 2000,
                 "max_profiles": 20,
+                "max_staff": 0,
                 "features": [
                     "5 routeurs MikroTik",
                     "2 000 vouchers / mois",
@@ -54,12 +56,14 @@ class Command(BaseCommand):
                 "max_routers": 50,
                 "max_vouchers_month": 50000,
                 "max_profiles": 100,
+                "max_staff": 10,
                 "features": [
                     "50 routeurs MikroTik",
                     "50 000 vouchers / mois",
                     "100 profils utilisateurs",
-                    "API & exports",
-                    "Multi-utilisateurs",
+                    "10 employés",
+                    "API REST mobile",
+                    "Templates login MikroTik",
                     "Support dédié",
                 ],
                 "sort_order": 3,

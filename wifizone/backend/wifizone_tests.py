@@ -153,3 +153,33 @@ class WiFiZoneTests(TestCase):
         response = self.client.get(f"/hotspots/batches/{batch_pk}/export/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/csv", response["Content-Type"])
+
+    def test_api_jwt_dashboard(self):
+        from rest_framework.test import APIClient
+
+        api = APIClient()
+        token_resp = api.post(
+            "/api/v1/auth/token/",
+            {"username": "testop", "password": "TestPass123!"},
+            format="json",
+        )
+        self.assertEqual(token_resp.status_code, 200)
+        token = token_resp.data["access"]
+        api.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        dash = api.get("/api/v1/dashboard/")
+        self.assertEqual(dash.status_code, 200)
+        self.assertIn("router_count", dash.data)
+
+    def test_login_templates_page(self):
+        self.client.login(username="testop", password="TestPass123!")
+        response = self.client.get("/hotspots/login-templates/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_team_enterprise(self):
+        from billing.models import Plan
+        from billing.services import activate_plan
+
+        activate_plan(self.user, "enterprise")
+        self.client.login(username="testop", password="TestPass123!")
+        response = self.client.get("/accounts/team/")
+        self.assertEqual(response.status_code, 200)

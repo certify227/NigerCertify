@@ -10,6 +10,7 @@ urlpatterns = [
     path("billing/", include("billing.urls")),
     path("routers/", include("routers.urls")),
     path("hotspots/", include("hotspots.urls")),
+    path("api/v1/", include("api.urls")),
 ]
 
 if settings.DEBUG:

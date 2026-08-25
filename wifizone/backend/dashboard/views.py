@@ -2,6 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import render
 
+from accounts.tenant import get_operator
+
 from billing.models import Plan
 from billing.services import get_user_subscription
 from dashboard.services.analytics import get_dashboard_chart_data, get_subscription_days_left
@@ -18,19 +20,20 @@ def landing(request):
 @login_required
 def home(request):
     user = request.user
-    sub = get_user_subscription(user)
-    routers = Router.objects.filter(owner=user)
+    operator = get_operator(user)
+    sub = get_user_subscription(operator)
+    routers = Router.objects.filter(owner=operator)
     router_count = routers.count()
     online_count = routers.filter(connection_status=Router.ConnectionStatus.ONLINE).count()
 
     vouchers_month = sub.vouchers_used_this_month if sub else 0
-    total_vouchers = Voucher.objects.filter(router__owner=user).count()
-    revenue = Voucher.objects.filter(router__owner=user).aggregate(s=Sum("sold_price"))["s"] or 0
-    recent_batches = VoucherBatch.objects.filter(router__owner=user).select_related(
+    total_vouchers = Voucher.objects.filter(router__owner=operator).count()
+    revenue = Voucher.objects.filter(router__owner=operator).aggregate(s=Sum("sold_price"))["s"] or 0
+    recent_batches = VoucherBatch.objects.filter(router__owner=operator).select_related(
         "profile", "router"
     )[:5]
 
-    chart = get_dashboard_chart_data(user)
+    chart = get_dashboard_chart_data(operator)
     days_left = get_subscription_days_left(sub)
 
     return render(
@@ -56,7 +59,8 @@ def home(request):
 @login_required
 def active_users(request):
     """Utilisateurs hotspot actifs sur tous les routeurs de l'opérateur."""
-    routers = Router.objects.filter(owner=request.user, is_active=True)
+    operator = get_operator(request.user)
+    routers = Router.objects.filter(owner=operator, is_active=True)
     all_active = []
     errors = []
 

@@ -1,0 +1,12 @@
+{% extends "base_app.html" %}
+{% block page_title %}Retirer employé{% endblock %}
+{% block app_content %}
+<div class="card p-4">
+  <p>Retirer <strong>{{ membership.member.username }}</strong> de l'équipe ?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Confirmer</button>
+    <a href="{% url 'accounts:team_list' %}" class="btn btn-link">Annuler</a>
+  </form>
+</div>
+{% endblock %}

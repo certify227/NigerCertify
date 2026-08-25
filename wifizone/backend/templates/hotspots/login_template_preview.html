@@ -1,0 +1,11 @@
+{% extends "base_app.html" %}
+{% block page_title %}Aperçu — {{ template.name }}{% endblock %}
+{% block app_content %}
+<div class="d-flex gap-2 mb-3 no-print">
+  <a href="{% url 'hotspots:login_template_download' template.pk %}" class="btn btn-primary">Télécharger login.html</a>
+  <a href="{% url 'hotspots:login_template_list' %}" class="btn btn-link">Retour</a>
+</div>
+<div class="card p-2">
+  <iframe srcdoc="{{ preview_html|escape }}" class="w-100 border-0" style="min-height: 500px; border-radius: 12px;"></iframe>
+</div>
+{% endblock %}

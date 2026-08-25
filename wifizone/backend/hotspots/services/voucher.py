@@ -4,6 +4,7 @@ import string
 from django.db import transaction
 from django.utils import timezone
 
+from accounts.tenant import get_operator
 from billing.services import get_user_subscription
 from routers.services.mikrotik import MikroTikUser, get_service_for_router
 
@@ -26,7 +27,8 @@ def generate_vouchers(
     sync_mikrotik: bool = True,
 ) -> tuple[VoucherBatch | None, str]:
     """Génère un lot de vouchers et pousse sur MikroTik si demandé."""
-    sub = get_user_subscription(user)
+    operator = get_operator(user)
+    sub = get_user_subscription(operator)
     if not sub or not sub.is_valid:
         return None, "Abonnement invalide ou expiré."
 
@@ -34,7 +36,7 @@ def generate_vouchers(
         remaining = sub.plan.max_vouchers_month - sub.vouchers_used_this_month
         return None, f"Limite mensuelle atteinte. Restant : {remaining} voucher(s)."
 
-    profile_count = HotspotProfile.objects.filter(router__owner=user).count()
+    profile_count = HotspotProfile.objects.filter(router__owner=operator).count()
     if profile_count > sub.plan.max_profiles:
         return None, f"Limite de profils atteinte ({sub.plan.max_profiles} max)."
 

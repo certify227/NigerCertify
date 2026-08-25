@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import User
+from .models import TeamMembership, User
 
 
 class RegisterForm(UserCreationForm):
@@ -46,3 +46,39 @@ class ProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.setdefault("class", "form-control")
+
+
+class TeamMemberForm(forms.ModelForm):
+    username = forms.CharField(label="Identifiant employé", max_length=150)
+    email = forms.EmailField(label="Email", required=False)
+    password = forms.CharField(
+        label="Mot de passe",
+        widget=forms.PasswordInput,
+        help_text="Mot de passe initial de l'employé",
+    )
+
+    class Meta:
+        model = TeamMembership
+        fields = ("role",)
+        labels = {"role": "Rôle"}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", "form-control")
+
+    def save(self, owner, commit=True):
+        user = User.objects.create_user(
+            username=self.cleaned_data["username"],
+            password=self.cleaned_data["password"],
+            email=self.cleaned_data.get("email", ""),
+        )
+        membership = TeamMembership(
+            owner=owner,
+            member=user,
+            role=self.cleaned_data["role"],
+            is_active=True,
+        )
+        if commit:
+            membership.save()
+        return membership

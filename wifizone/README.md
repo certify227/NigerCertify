@@ -69,6 +69,57 @@ wifizone/backend/
   dashboard/   — landing + tableau de bord
 ```
 
-## Licence
+## API REST (app mobile)
+
+Base URL : `/api/v1/`
+
+### Authentification JWT
+
+```bash
+# Obtenir un token
+curl -X POST http://localhost:8080/api/v1/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin1234"}'
+
+# Utiliser le token
+curl http://localhost:8080/api/v1/dashboard/ \
+  -H "Authorization: Bearer <access_token>"
+```
+
+### Endpoints principaux
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/v1/auth/token/` | Login JWT |
+| `POST /api/v1/auth/token/refresh/` | Refresh token |
+| `GET /api/v1/me/` | Profil + abonnement |
+| `GET /api/v1/dashboard/` | Stats tableau de bord |
+| `GET/POST /api/v1/routers/` | Routeurs MikroTik |
+| `POST /api/v1/routers/{id}/test_connection/` | Test API |
+| `GET/POST /api/v1/profiles/` | Profils hotspot |
+| `GET /api/v1/vouchers/` | Liste vouchers |
+| `POST /api/v1/vouchers/generate/` | Générer vouchers |
+| `GET /api/v1/batches/` | Lots de vouchers |
+| `GET /api/v1/batches/{id}/qr_codes/` | QR codes base64 |
+| `GET /api/v1/active-users/` | Connexions actives |
+| `GET/POST /api/v1/login-templates/` | Templates login |
+| `GET /api/v1/login-templates/{id}/download/` | Télécharger login.html |
+| `GET/POST /api/v1/team/` | Employés (Enterprise) |
+
+Les employés Enterprise accèdent aux données de leur opérateur via le même token JWT.
+
+## Multi-utilisateurs (Enterprise)
+
+- Forfait **Enterprise** : jusqu'à 10 employés
+- Rôles : **Gérant** (routeurs + vouchers) ou **Employé** (vente vouchers)
+- Gestion : `/accounts/team/`
+
+## Templates login MikroTik
+
+- 3 templates système + création personnalisée
+- Variables : `{{wifi_name}}`, `{{company_name}}`, `{{primary_color}}`, `{{background_color}}`
+- Aperçu web + téléchargement `login.html` pour le routeur
+- Assignation par routeur dans les paramètres du MikroTik
+
 
 Projet développé pour Niger Certify — usage commercial selon votre déploiement.

@@ -2,7 +2,7 @@ from django import forms
 
 from routers.models import Router
 
-from .models import HotspotProfile, Voucher
+from .models import HotspotLoginTemplate, HotspotProfile, Voucher
 
 
 class HotspotProfileForm(forms.ModelForm):
@@ -42,6 +42,45 @@ class HotspotProfileForm(forms.ModelForm):
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs.setdefault("class", "form-check-input")
             else:
+                field.widget.attrs.setdefault("class", "form-control")
+
+
+class HotspotLoginTemplateForm(forms.ModelForm):
+    class Meta:
+        model = HotspotLoginTemplate
+        fields = (
+            "name",
+            "slug",
+            "description",
+            "html_body",
+            "primary_color",
+            "background_color",
+            "wifi_name",
+            "logo_url",
+            "is_active",
+        )
+        labels = {
+            "name": "Nom",
+            "slug": "Identifiant (slug)",
+            "description": "Description",
+            "html_body": "HTML (variables: {{wifi_name}}, {{company_name}}, {{primary_color}})",
+            "primary_color": "Couleur principale",
+            "background_color": "Couleur de fond",
+            "wifi_name": "Nom du WiFi affiché",
+            "logo_url": "URL du logo",
+            "is_active": "Actif",
+        }
+        widgets = {
+            "html_body": forms.Textarea(attrs={"rows": 12, "class": "form-control font-monospace"}),
+            "description": forms.Textarea(attrs={"rows": 2}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.setdefault("class", "form-check-input")
+            elif field.name != "html_body":
                 field.widget.attrs.setdefault("class", "form-control")
 
 
