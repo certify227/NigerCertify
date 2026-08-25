@@ -22,20 +22,20 @@ Stack technique : **Django** (application web sur mesure).
 
 | Prestations | Montant (FCFA) |
 |-------------|----------------|
-| Conception & réalisation application web Django type Bioforce (design + développement + optimisation) | 2 800 000 |
-| Modules métier Django (catalogue filtrable, actualités, pré-inscriptions, back-office) | 750 000 |
-| Création et configuration des e-mails professionnels | 100 000 |
-| **Hébergement et accompagnement deux ans** (VPS, sécurité, mises à jour, support) | **2 000 000** |
-| **TOTAL TTC** | **5 650 000** |
+| Conception & réalisation application web Django type Bioforce (design + développement + optimisation) | 1 100 000 |
+| Modules métier Django (catalogue filtrable, actualités, pré-inscriptions, back-office) | 350 000 |
+| Création et configuration des e-mails professionnels | 50 000 |
+| Hébergement et accompagnement deux ans (VPS, sécurité, mises à jour, support) | 500 000 |
+| **TOTAL TTC** | **2 000 000** |
 
 | | |
 |---|---|
-| Montant HT | 5 650 000 |
-| ISB (2%) | 113 000 |
-| **Net à payer TTC** | **5 650 000** |
+| Montant HT | 2 000 000 |
+| ISB (2%) | 40 000 |
+| **Net à payer TTC** | **2 000 000** |
 
-Arrêtée la présente facture proforma à la somme de **cinq millions six cent cinquante mille (5 650 000) francs CFA TTC**, ce prix inclut l’ISB (2%) qui sera prélevé à la source.  
-Dont **hébergement et accompagnement deux ans : 2 000 000 FCFA TTC**.
+Arrêtée la présente facture proforma à la somme de **deux millions (2 000 000) francs CFA TTC**, ce prix inclut l’ISB (2%) qui sera prélevé à la source.  
+Dont hébergement et accompagnement deux ans : **500 000 FCFA TTC**.
 
 ## Compte : SONIBANK
 
