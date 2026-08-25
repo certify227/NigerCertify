@@ -15,41 +15,34 @@
 | Durée | 2 semaines (10 jours / 70 h) |
 | Modalité | **Mixte** (présentiel Lomé + visio) |
 | Lieu présentiel | Lomé, Togo |
-| Date de début | 15/09/2026 |
-| Date de fin prévue | 26/09/2026 |
-| Hébergement | Inclus — 14 nuits + petit-déjeuner |
-| Restauration | Inclus — déjeuner + dîner (14 jours) |
-| Vols A/R | **Non inclus** |
+| Dates | 15/09/2026 → 26/09/2026 |
 
-## Prestations & montants (FCFA)
+## Périmètre de la formation (forfait)
 
-| Prestations | Montant |
-|-------------|---------|
-| Formation Community Manager mixte — 10 jours / 70 h | 1 500 000 |
-| Supports, plateforme virtuelle, ateliers & attestation | 250 000 |
-| Hébergement 14 nuits à Lomé (petit-déj. inclus) | 700 000 |
-| Restauration complète (déj. + dîner) — 14 jours | 560 000 |
-| Coordination, logistique locale & suivi 30 jours | 490 000 |
-| **TOTAL TTC** | **3 500 000** |
+- Stratégie & animation Community Management (réseaux sociaux, community care, crise, reporting)
+- **Maîtrise des outils d’intelligence artificielle** appliqués au CM (idéation, rédaction assistée, optimisation, automatisation)
+- **Infographie & création visuelle** (Canva / outils graphiques, templates, identité visuelle)
+- **Gestion du contenu** (calendrier éditorial, workflow, bibliothèque, planification & publication)
+- Supports pédagogiques, plateforme virtuelle, ateliers pratiques & attestation
+- Coordination pédagogique & suivi post-formation (30 jours)
 
-| | |
-|---|---|
-| Montant HT | 3 500 000 |
-| ISB (2%) | 70 000 |
-| **Net à payer TTC** | **3 500 000** |
+## Montant
+
+**Forfait TTC : 3 500 000 FCFA**  
+(ISB 2 % inclus / prélevé à la source — pas de détail de postes)
 
 ## Programme indicatif (mixte)
 
-1. **S1 présentiel Lomé — Fondations & production :** rôle du CM, persona ANPER, calendrier éditorial, contenus, Canva.
-2. **S1 visio — Diffusion :** Facebook, Instagram, LinkedIn, TikTok, WhatsApp Business.
-3. **S2 présentiel — Animation & performance :** community care, crise, pubs sociales, KPIs.
-4. **S2 mixte — Mise en situation ANPER :** plan 30/60/90, kit de publication, restitution + coaching visio.
+1. **S1 présentiel — Fondations :** rôle du CM, persona ANPER, bases de la gestion de contenu  
+2. **S1 mixte — Production & IA :** outils IA, prompts, contrôle qualité, calendrier éditorial  
+3. **S2 présentiel — Infographie & diffusion :** création visuelle, templates, multi-plateformes  
+4. **S2 mixte — Pilotage :** community care, crise, KPIs, plan 30/60/90 ANPER, restitution  
 
 ## Inclus / Non inclus
 
-- **Inclus :** formation mixte, supports, plateforme, hébergement, petit-déj., déjeuners & dîners, suivi 30 j.
-- **Non inclus :** billets d’avion A/R, frais personnels hors forfait.
-- Offre valable 30 jours.
+- **Inclus :** formation mixte, IA, infographie, gestion de contenu, supports, plateforme, attestation, suivi 30 j  
+- **Non inclus :** hébergement, restauration, billets d’avion A/R  
+- Offre valable 30 jours  
 
 ## Compte SONIBANK
 

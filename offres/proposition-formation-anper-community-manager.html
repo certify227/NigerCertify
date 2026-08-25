@@ -42,7 +42,7 @@
       margin: 0 auto 24px;
       background: #fff;
       position: relative;
-      padding: 15mm 14mm 26mm;
+      padding: 16mm 15mm 26mm;
       box-shadow: 0 8px 28px rgba(0,0,0,.16);
     }
     header.top {
@@ -76,10 +76,10 @@
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       max-width: 420px;
-      margin: 8px 0 10px;
+      margin: 10px 0 12px;
     }
     h1.title {
-      margin: 6px 0 4px;
+      margin: 8px 0 4px;
       text-align: center;
       color: var(--orange-title);
       font-size: 17pt;
@@ -89,7 +89,7 @@
       text-align: center;
       color: var(--navy);
       font-size: 10.5pt;
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       font-weight: 700;
     }
     .meta-grid {
@@ -98,95 +98,91 @@
       gap: 5px 16px;
       background: #f7f8fa;
       border: 1px solid #dde2e8;
-      padding: 9px 12px;
-      margin-bottom: 12px;
-      font-size: 10pt;
-    }
-    .meta-grid strong { color: var(--navy); }
-    table.prestations {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 10px;
-      font-size: 10pt;
-    }
-    table.prestations th {
-      background: var(--orange-bar);
-      color: #fff;
-      padding: 7px 10px;
-      border: 1px solid #000;
-      text-align: left;
-      font-size: 11.5pt;
-    }
-    table.prestations th.amt { text-align: center; width: 28%; }
-    table.prestations td {
-      border: 1px solid #000;
-      padding: 7px 10px;
-      vertical-align: top;
-    }
-    table.prestations td.amt {
-      text-align: right;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-    .summary {
-      width: 70%;
-      border-collapse: collapse;
-      margin: 6px 0 10px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
       font-size: 10.5pt;
     }
-    .summary td {
-      border-bottom: 1px solid #000;
-      padding: 5px 8px;
+    .meta-grid strong { color: var(--navy); }
+    .scope {
+      border: 1px solid #000;
+      margin-bottom: 14px;
     }
-    .summary td:first-child {
+    .scope h2 {
+      margin: 0;
+      background: var(--orange-bar);
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 12pt;
+    }
+    .scope ul {
+      margin: 0;
+      padding: 10px 14px 10px 28px;
+      font-size: 10.5pt;
+    }
+    .scope li { margin-bottom: 4px; }
+    .total-box {
+      border: 2px solid var(--navy);
+      padding: 12px 14px;
+      margin: 8px 0 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f4f7fb;
+    }
+    .total-box .label {
       font-weight: 700;
-      width: 42%;
-      border-right: 1px solid #000;
+      color: var(--navy);
+      font-size: 12pt;
+    }
+    .total-box .value {
+      font-weight: 700;
+      color: var(--orange-title);
+      font-size: 16pt;
     }
     .program {
-      margin: 6px 0 8px;
-      font-size: 9.5pt;
+      margin: 8px 0 12px;
+      font-size: 10pt;
     }
     .program h2 {
-      margin: 0 0 4px;
-      font-size: 11pt;
+      margin: 0 0 6px;
+      font-size: 11.5pt;
       color: var(--navy);
     }
     .program ol { margin: 0; padding-left: 18px; }
-    .program li { margin-bottom: 2px; }
+    .program li { margin-bottom: 3px; }
     .assumptions {
-      font-size: 9pt;
+      font-size: 9.5pt;
       color: var(--muted);
       border-left: 3px solid var(--orange);
-      padding: 5px 10px;
-      margin: 8px 0;
+      padding: 6px 10px;
+      margin: 10px 0;
       background: #fff8f2;
     }
-    .amount-words { font-size: 9.5pt; margin: 8px 0 10px; line-height: 1.35; }
-    .bank-title { font-size: 13pt; font-weight: 700; margin: 0 0 6px; }
-    table.rib { width: 100%; border-collapse: collapse; text-align: center; font-size: 11pt; margin-bottom: 6px; }
-    table.rib th, table.rib td { padding: 3px; font-weight: 400; }
+    .amount-words { font-size: 10pt; margin: 10px 0 12px; line-height: 1.35; }
+    .bank-title { font-size: 13pt; font-weight: 700; margin: 0 0 8px; }
+    table.rib { width: 100%; border-collapse: collapse; text-align: center; font-size: 11pt; margin-bottom: 8px; }
+    table.rib th, table.rib td { padding: 4px; font-weight: 400; }
     .signs {
       display: flex;
       justify-content: flex-end;
       align-items: flex-end;
       gap: 8px;
-      margin-top: 4px;
-      min-height: 88px;
+      margin-top: 8px;
+      min-height: 96px;
     }
-    .signs .cachet { width: 90px; }
-    .signs .signature { width: 58px; margin-bottom: 6px; }
+    .signs .cachet { width: 96px; }
+    .signs .signature { width: 60px; margin-bottom: 6px; }
     footer.legal {
       position: absolute;
       left: 0; right: 0; bottom: 0;
-      height: 44px;
+      height: 46px;
       background: var(--orange);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-style: italic;
-      font-size: 9pt;
+      font-size: 9.5pt;
       font-family: Arial, sans-serif;
     }
     footer.legal::before {
@@ -198,7 +194,7 @@
       clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%);
     }
     footer.legal span { position: relative; z-index: 1; }
-    .note { font-size: 8.5pt; color: #555; margin-top: 2px; }
+    .note { font-size: 8.5pt; color: #555; margin-top: 4px; }
     @media print {
       body { background: #fff; }
       .toolbar { display: none !important; }
@@ -232,7 +228,7 @@
     </div>
 
     <h1 class="title">Proposition de formation — Community Manager</h1>
-    <p class="subtitle">1 participant · Format mixte (présentiel Lomé + visio) · Hébergement &amp; restauration inclus</p>
+    <p class="subtitle">1 participant · Format mixte (présentiel Lomé + visio) · 15–26/09/2026</p>
 
     <div class="meta-grid">
       <div><strong>Profil :</strong> Community Manager</div>
@@ -240,69 +236,43 @@
       <div><strong>Durée :</strong> 2 semaines (10 jours / 70 h)</div>
       <div><strong>Modalité :</strong> Mixte (présentiel + visio)</div>
       <div><strong>Lieu présentiel :</strong> Lomé, Togo</div>
-      <div><strong>Début :</strong> 15/09/2026</div>
-      <div><strong>Fin prévue :</strong> 26/09/2026</div>
-      <div><strong>Hébergement + repas :</strong> Inclus</div>
+      <div><strong>Début / Fin :</strong> 15/09/2026 → 26/09/2026</div>
     </div>
 
-    <table class="prestations">
-      <thead>
-        <tr>
-          <th>Prestations</th>
-          <th class="amt">Montant (FCFA)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Formation Community Manager mixte — 10 jours / 70 h (présentiel Lomé + sessions visio, coaching live)</td>
-          <td class="amt">1 500 000</td>
-        </tr>
-        <tr>
-          <td>Supports pédagogiques, plateforme virtuelle, ateliers pratiques &amp; attestation</td>
-          <td class="amt">250 000</td>
-        </tr>
-        <tr>
-          <td>Hébergement 14 nuits à Lomé (hôtel catégorie affaires, petit-déjeuner inclus)</td>
-          <td class="amt">700 000</td>
-        </tr>
-        <tr>
-          <td>Restauration complète (déjeuner + dîner) — 14 jours</td>
-          <td class="amt">560 000</td>
-        </tr>
-        <tr>
-          <td>Coordination pédagogique, logistique locale &amp; suivi post-formation (30 jours)</td>
-          <td class="amt">490 000</td>
-        </tr>
-        <tr>
-          <td><strong>TOTAL TTC</strong></td>
-          <td class="amt"><strong>3 500 000</strong></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="scope">
+      <h2>Périmètre de la formation (forfait)</h2>
+      <ul>
+        <li>Stratégie &amp; animation Community Management (réseaux sociaux, community care, crise, reporting)</li>
+        <li><strong>Maîtrise des outils d’intelligence artificielle</strong> appliqués au community management (idéation, rédaction assistée, optimisation, automatisation)</li>
+        <li><strong>Infographie &amp; création visuelle</strong> (Canva / outils graphiques, templates, identité visuelle de marque)</li>
+        <li><strong>Gestion du contenu</strong> (calendrier éditorial, workflow de validation, bibliothèque de contenus, planification &amp; publication)</li>
+        <li>Supports pédagogiques, plateforme virtuelle, ateliers pratiques &amp; attestation</li>
+        <li>Coordination pédagogique &amp; suivi post-formation (30 jours)</li>
+      </ul>
+    </div>
 
-    <table class="summary">
-      <tr><td>Montant HT</td><td>3 500 000</td></tr>
-      <tr><td>ISB (2%)</td><td>70 000</td></tr>
-      <tr><td>Net à payer TTC :</td><td><strong>3 500 000</strong></td></tr>
-    </table>
+    <div class="total-box">
+      <div class="label">Montant forfaitaire TTC</div>
+      <div class="value">3 500 000 FCFA</div>
+    </div>
 
     <div class="program">
       <h2>Programme indicatif (format mixte)</h2>
       <ol>
-        <li><strong>S1 présentiel Lomé — Fondations &amp; production :</strong> rôle du CM, persona ANPER, calendrier éditorial, création de contenus, Canva, planification.</li>
-        <li><strong>S1 visio — Diffusion :</strong> Facebook, Instagram, LinkedIn, TikTok, WhatsApp Business ; ateliers à distance encadrés.</li>
-        <li><strong>S2 présentiel — Animation &amp; performance :</strong> community care, modération, gestion de crise, intro pubs sociales, KPIs &amp; reporting.</li>
-        <li><strong>S2 mixte — Mise en situation ANPER :</strong> plan 30/60/90 jours, kit de publication, restitution (présentiel + coaching visio).</li>
+        <li><strong>S1 présentiel Lomé — Fondations :</strong> rôle du CM, persona ANPER, tonalité de marque, bases de la gestion de contenu.</li>
+        <li><strong>S1 mixte — Production &amp; IA :</strong> rédaction assistée par IA, prompts efficaces, contrôle qualité humain, calendrier éditorial.</li>
+        <li><strong>S2 présentiel — Infographie &amp; diffusion :</strong> création visuelle, templates, formats Reels/carrousels, publication multi-plateformes.</li>
+        <li><strong>S2 mixte — Pilotage :</strong> community care, crise, KPIs, plan 30/60/90 jours ANPER, restitution.</li>
       </ol>
     </div>
 
     <div class="assumptions">
-      <strong>Inclus :</strong> formation mixte, supports, plateforme virtuelle, hébergement 14 nuits, petit-déj., déjeuners &amp; dîners, coordination &amp; suivi 30 j.<br />
-      <strong>Non inclus :</strong> billets d’avion A/R · frais personnels hors forfait · validité de l’offre : 30 jours.
+      <strong>Inclus :</strong> formation mixte, outils IA, infographie, gestion de contenu, supports, plateforme, attestation, suivi 30 j.<br />
+      <strong>Non inclus :</strong> hébergement, restauration, billets d’avion A/R · offre valable 30 jours.
     </div>
 
     <p class="amount-words">
-      Arrêtée la présente proposition / facture proforma à la somme de trois millions cinq cent mille
+      Arrêtée la présente proposition / facture proforma à la somme forfaitaire de trois millions cinq cent mille
       (3 500 000) francs CFA TTC. Ce prix inclut l’ISB (2%) qui sera prélevé à la source.
     </p>
 
@@ -316,7 +286,7 @@
       </tbody>
     </table>
 
-    <p class="note">Proforma N° 00006 — ANPER NIGER · Community Manager · Lomé · 15–26/09/2026 · Contacts client : +227 20 35 01 73 · info@anperniger.org</p>
+    <p class="note">Proforma N° 00006 — ANPER NIGER · Community Manager · Lomé · 15–26/09/2026 · +227 20 35 01 73 · info@anperniger.org</p>
 
     <div class="signs">
       <img class="cachet" src="assets/cachet-niger-certify.png" alt="Cachet Niger Certify" />
