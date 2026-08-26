@@ -20,6 +20,20 @@ WiFiZone utilise **Gunicorn avec worker Uvicorn** (ASGI) pour supporter le **Web
 - Docker installé
 - Nginx + Certbot déjà configurés sur le serveur
 - DNS `wifi.nigercertify.com` → IP du serveur
+- Code sur la branche **`cursor/wifizone-saas-django-3301`** (fichier `docker-compose.host-nginx.yml`)
+
+```bash
+cd /opt/wifizone
+git fetch origin
+git checkout cursor/wifizone-saas-django-3301
+git pull origin cursor/wifizone-saas-django-3301
+```
+
+Vérification :
+
+```bash
+bash wifizone/deploy/production/check-deploy.sh
+```
 
 ---
 
