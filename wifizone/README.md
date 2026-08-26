@@ -32,6 +32,18 @@ Plateforme SaaS Django pour opérateurs de zones WiFi (hotspot MikroTik), inspir
 - **SMS** : passerelle HTTP ou console (`SMS_BACKEND=http`)
 - **Cyber café** : délai timer sur page login
 
+## Déploiement production (Ubuntu)
+
+**Guide complet :** [deploy/DEPLOY_UBUNTU.md](deploy/DEPLOY_UBUNTU.md)
+
+```bash
+sudo git clone https://github.com/certify227/NigerCertify.git /opt/wifizone
+cd /opt/wifizone/wifizone
+sudo bash deploy/ubuntu/install.sh
+```
+
+Pack production : Docker sécurisé, Nginx, TLS Let's Encrypt, UFW, secrets générés, durcissement Django.
+
 ## Déploiement rapide (Docker)
 
 ```bash
