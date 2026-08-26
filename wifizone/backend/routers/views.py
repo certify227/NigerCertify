@@ -9,9 +9,11 @@ from accounts.tenant import get_operator
 from billing.services import get_user_subscription
 from hotspots.services.profile_sync import sync_profiles_from_router
 
-from .forms import RouterForm
-from .models import Router
+from .forms import RadiusServerForm, RouterForm
+from .models import RadiusServer, Router
 from .services.mikrotik import get_service_for_router, test_router_connection
+from .services.snmp import get_snmp_stats
+from .services.radius import export_radius_users_file
 
 
 def _router_limit_ok(user):
@@ -83,10 +85,19 @@ def router_detail(request, pk):
         except Exception:
             pass
 
+    snmp_stats = None
+    if router.snmp_enabled:
+        snmp_stats = get_snmp_stats(router.host, router.snmp_community or "public")
+
     return render(
         request,
         "routers/detail.html",
-        {"router": router, "system_info": info, "active_users": active_users},
+        {
+            "router": router,
+            "system_info": info,
+            "active_users": active_users,
+            "snmp_stats": snmp_stats,
+        },
     )
 
 
@@ -148,3 +159,33 @@ def router_sync_profiles(request, pk):
     else:
         messages.info(request, msgs[0] if msgs else "Aucun nouveau profil.")
     return redirect("hotspots:profile_list")
+
+
+@login_required
+def radius_list(request):
+    operator = get_operator(request.user)
+    servers = RadiusServer.objects.filter(operator=operator)
+    if request.method == "POST":
+        form = RadiusServerForm(request.POST)
+        if form.is_valid():
+            server = form.save(commit=False)
+            server.operator = operator
+            server.save()
+            messages.success(request, "Serveur RADIUS ajouté.")
+            return redirect("routers:radius_list")
+    else:
+        form = RadiusServerForm()
+    return render(
+        request,
+        "routers/radius_list.html",
+        {"servers": servers, "form": form},
+    )
+
+
+@login_required
+def radius_export(request, pk):
+    operator = get_operator(request.user)
+    server = get_object_or_404(RadiusServer, pk=pk, operator=operator)
+    path, count = export_radius_users_file(operator, server)
+    messages.success(request, f"{count} utilisateur(s) exporté(s) vers {path}")
+    return redirect("routers:radius_list")

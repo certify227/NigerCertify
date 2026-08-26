@@ -58,6 +58,7 @@ class Router(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     snmp_enabled = models.BooleanField(default=False)
+    snmp_community = models.CharField(max_length=64, default="public", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -76,3 +77,40 @@ class Router(models.Model):
     def get_password(self) -> str:
         f = _get_fernet()
         return f.decrypt(self.password_encrypted.encode()).decode()
+
+
+class RadiusServer(models.Model):
+    """Serveur RADIUS externe (FreeRADIUS) — export utilisateurs, sans paiement."""
+
+    operator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="radius_servers",
+    )
+    name = models.CharField(max_length=100)
+    host = models.CharField(max_length=255)
+    auth_port = models.PositiveIntegerField(default=1812)
+    acct_port = models.PositiveIntegerField(default=1813)
+    secret_encrypted = models.TextField(blank=True)
+    nas_identifier = models.CharField(max_length=100, blank=True)
+    is_enabled = models.BooleanField(default=True)
+    last_export_path = models.CharField(max_length=255, blank=True)
+    last_export_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "serveur RADIUS"
+        verbose_name_plural = "serveurs RADIUS"
+
+    def __str__(self):
+        return f"{self.name} ({self.host})"
+
+    def set_secret(self, raw: str):
+        f = _get_fernet()
+        self.secret_encrypted = f.encrypt(raw.encode()).decode()
+
+    def get_secret(self) -> str:
+        if not self.secret_encrypted:
+            return ""
+        f = _get_fernet()
+        return f.decrypt(self.secret_encrypted.encode()).decode()

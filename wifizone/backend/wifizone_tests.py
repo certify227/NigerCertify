@@ -214,3 +214,50 @@ class WiFiZoneTests(TestCase):
         response = self.client.get("/hotspots/reports/pdf/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
+
+    def test_predictions_and_marketplace(self):
+        from hotspots.models import HotspotLoginTemplate
+
+        other = User.objects.create_user(username="otherop", password="TestPass123!", email="o@x.com")
+        HotspotLoginTemplate.objects.create(
+            owner=other,
+            name="Public Tpl",
+            slug="public-tpl",
+            html_body="<html></html>",
+            is_marketplace_public=True,
+        )
+        self.client.login(username="testop", password="TestPass123!")
+        self.assertEqual(self.client.get("/hotspots/login-templates/marketplace/").status_code, 200)
+
+        from rest_framework.test import APIClient
+
+        api = APIClient()
+        token = api.post(
+            "/api/v1/auth/token/",
+            {"username": "testop", "password": "TestPass123!"},
+            format="json",
+        ).data["access"]
+        api.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        pred = api.get("/api/v1/dashboard/predictions/")
+        self.assertEqual(pred.status_code, 200)
+        self.assertIn("forecast_counts", pred.data)
+
+    def test_snmp_mock(self):
+        from routers.services.snmp import get_snmp_stats
+
+        stats = get_snmp_stats("10.0.0.1")
+        self.assertIn("sysName", stats)
+
+    def test_radius_export(self):
+        from routers.models import RadiusServer
+        from routers.services.radius import export_radius_users_file
+
+        server = RadiusServer.objects.create(
+            operator=self.user,
+            name="R1",
+            host="10.0.0.2",
+        )
+        server.set_secret("secret")
+        server.save()
+        path, count = export_radius_users_file(self.user, server)
+        self.assertTrue(count >= 0)

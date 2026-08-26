@@ -24,6 +24,13 @@ Plateforme SaaS Django pour opérateurs de zones WiFi (hotspot MikroTik), inspir
 - **API OpenAPI** : `/api/docs/` — POS, wallets, notifications, support, dashboard live
 - **App mobile** : Expo (`wifizone/mobile/`) — JWT + stats live
 - **Celery** : health routeurs, alertes abonnement (Redis)
+- **WebSocket** : dashboard live (`/ws/dashboard/`) via Daphne + Channels
+- **SNMP** : monitoring routeurs (mock ou snmpget)
+- **RADIUS** : export FreeRADIUS radcheck
+- **Marketplace** : templates login partagés entre opérateurs
+- **Prévisions** : analytics prédictifs 7 jours
+- **SMS** : passerelle HTTP ou console (`SMS_BACKEND=http`)
+- **Cyber café** : délai timer sur page login
 
 ## Déploiement rapide (Docker)
 

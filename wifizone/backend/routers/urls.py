@@ -12,4 +12,6 @@ urlpatterns = [
     path("<int:pk>/delete/", views.router_delete, name="delete"),
     path("<int:pk>/test/", views.router_test, name="test"),
     path("<int:pk>/sync-profiles/", views.router_sync_profiles, name="sync_profiles"),
+    path("radius/", views.radius_list, name="radius_list"),
+    path("radius/<int:pk>/export/", views.radius_export, name="radius_export"),
 ]

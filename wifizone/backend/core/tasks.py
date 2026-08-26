@@ -30,6 +30,13 @@ def check_routers_health():
                     title=f"Routeur hors ligne : {router.name}",
                     message=msg,
                 )
+            if prefs and prefs.router_offline_sms and router.owner.phone:
+                from core.services.sms import send_sms
+
+                send_sms(
+                    router.owner.phone,
+                    f"WiFiZone: routeur {router.name} hors ligne — {msg[:80]}",
+                )
             fire_webhook(router.owner, "router.offline", {"router_id": router.pk, "name": router.name})
 
 

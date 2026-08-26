@@ -17,6 +17,7 @@ from accounts.tenant import (
 )
 from billing.services import get_user_subscription
 from dashboard.services.analytics import get_dashboard_chart_data, get_subscription_days_left
+from dashboard.services.predictions import predict_voucher_sales
 from hotspots.models import (
     CustomerWallet,
     HotspotLoginTemplate,
@@ -132,6 +133,16 @@ class RouterViewSet(viewsets.ModelViewSet):
         service = get_service_for_router(router)
         ok = service.disconnect_active_user(session_id)
         return Response({"ok": ok})
+
+    @action(detail=True, methods=["get"])
+    def snmp_stats(self, request, pk=None):
+        router = self.get_object()
+        if not router.snmp_enabled:
+            return Response({"enabled": False})
+        from routers.services.snmp import get_snmp_stats
+
+        stats = get_snmp_stats(router.host, router.snmp_community or "public")
+        return Response({"enabled": True, "stats": stats})
 
     @action(detail=True, methods=["get"])
     def cookies(self, request, pk=None):
@@ -400,3 +411,11 @@ class LiveDashboardView(APIView):
             "vouchers_month": sub.vouchers_used_this_month if sub else 0,
             "revenue": int(revenue),
         })
+
+
+class PredictionsView(APIView):
+    permission_classes = [IsOperatorMember]
+
+    def get(self, request):
+        operator = get_operator_from_request(request)
+        return Response(predict_voucher_sales(operator))

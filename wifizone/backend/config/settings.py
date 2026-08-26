@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "api",
     "core",
     "support",
+    "realtime",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -72,6 +74,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                os.getenv("CHANNEL_LAYER_URL", os.getenv("CELERY_BROKER_URL", "redis://redis:6379/1")),
+            ],
+        },
+    },
+}
 
 DATABASES = {
     "default": {
@@ -192,3 +206,6 @@ SPECTACULAR_SETTINGS = {
 }
 
 SMS_BACKEND = os.getenv("SMS_BACKEND", "console")
+SMS_API_URL = os.getenv("SMS_API_URL", "")
+SMS_API_KEY = os.getenv("SMS_API_KEY", "")
+SMS_SENDER_ID = os.getenv("SMS_SENDER_ID", "WiFiZone")

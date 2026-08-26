@@ -29,6 +29,15 @@ class HotspotLoginTemplate(models.Model):
     html_logout = models.TextField("HTML logout", blank=True)
     locale = models.CharField(max_length=10, default="fr", help_text="fr, en, ha")
     ad_video_url = models.URLField(blank=True, help_text="Vidéo/pub avant login")
+    login_delay_seconds = models.PositiveIntegerField(
+        default=0,
+        help_text="Délai cyber café avant login (secondes)",
+    )
+    is_marketplace_public = models.BooleanField(
+        default=False,
+        help_text="Partager sur la marketplace templates",
+    )
+    marketplace_downloads = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -1,0 +1,20 @@
+{% extends "base_app.html" %}
+{% block page_title %}Marketplace templates{% endblock %}
+{% block app_content %}
+<p class="text-muted">Templates partagés par d'autres opérateurs. Clonez et personnalisez.</p>
+<div class="row g-3">
+  {% for t in templates %}
+  <div class="col-md-4">
+    <div class="card h-100 p-3">
+      <h6>{{ t.name }}</h6>
+      <p class="small text-muted">{{ t.description|truncatechars:80 }}</p>
+      <p class="small">Par {{ t.owner.display_name }} — {{ t.marketplace_downloads }} téléchargement(s)</p>
+      <a href="{% url 'hotspots:template_marketplace_clone' t.pk %}" class="btn btn-sm btn-primary">Cloner</a>
+      <a href="{% url 'hotspots:login_template_preview' t.pk %}" class="btn btn-sm btn-outline-secondary">Aperçu</a>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted">Aucun template public pour le moment.</p>
+  {% endfor %}
+</div>
+{% endblock %}

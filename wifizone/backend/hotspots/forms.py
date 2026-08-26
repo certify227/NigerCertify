@@ -57,6 +57,8 @@ class HotspotLoginTemplateForm(forms.ModelForm):
             "background_color",
             "wifi_name",
             "logo_url",
+            "login_delay_seconds",
+            "is_marketplace_public",
             "is_active",
         )
         labels = {
@@ -68,6 +70,8 @@ class HotspotLoginTemplateForm(forms.ModelForm):
             "background_color": "Couleur de fond",
             "wifi_name": "Nom du WiFi affiché",
             "logo_url": "URL du logo",
+            "login_delay_seconds": "Délai cyber café (secondes)",
+            "is_marketplace_public": "Publier sur la marketplace",
             "is_active": "Actif",
         }
         widgets = {

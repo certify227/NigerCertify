@@ -232,6 +232,50 @@ def login_template_list(request):
 
 
 @login_required
+def template_marketplace(request):
+    operator = get_operator(request.user)
+    templates = HotspotLoginTemplate.objects.filter(
+        is_marketplace_public=True,
+        is_active=True,
+    ).exclude(owner=operator).select_related("owner")
+    return render(request, "hotspots/template_marketplace.html", {"templates": templates})
+
+
+@login_required
+def template_marketplace_clone(request, pk):
+    operator = get_operator(request.user)
+    source = get_object_or_404(
+        HotspotLoginTemplate,
+        pk=pk,
+        is_marketplace_public=True,
+        is_active=True,
+    )
+    if source.owner == operator:
+        return redirect("hotspots:template_marketplace")
+    clone = HotspotLoginTemplate.objects.create(
+        owner=operator,
+        name=f"{source.name} (copie)",
+        slug=f"{source.slug}-copy-{operator.pk}",
+        description=source.description,
+        html_body=source.html_body,
+        primary_color=source.primary_color,
+        background_color=source.background_color,
+        wifi_name=source.wifi_name,
+        logo_url=source.logo_url,
+        html_status=source.html_status,
+        html_logout=source.html_logout,
+        locale=source.locale,
+        login_delay_seconds=source.login_delay_seconds,
+        is_system=False,
+        is_marketplace_public=False,
+    )
+    source.marketplace_downloads += 1
+    source.save(update_fields=["marketplace_downloads"])
+    messages.success(request, f"Template « {clone.name} » ajouté à votre compte.")
+    return redirect("hotspots:login_template_edit", pk=clone.pk)
+
+
+@login_required
 def login_template_create(request):
     operator = get_operator(request.user)
     if request.method == "POST":
@@ -276,7 +320,7 @@ def login_template_preview(request, pk):
         HotspotLoginTemplate,
         pk=pk,
     )
-    if template.owner and template.owner != operator:
+    if template.owner and template.owner != operator and not template.is_marketplace_public:
         return redirect("hotspots:login_template_list")
     html = build_mikrotik_login_html(template, operator=operator)
     return render(request, "hotspots/login_template_preview.html", {"template": template, "preview_html": html})
@@ -286,7 +330,12 @@ def login_template_preview(request, pk):
 def login_template_download(request, pk):
     operator = get_operator(request.user)
     template = get_object_or_404(HotspotLoginTemplate, pk=pk)
-    if template.owner and template.owner != operator and not template.is_system:
+    if (
+        template.owner
+        and template.owner != operator
+        and not template.is_system
+        and not template.is_marketplace_public
+    ):
         return redirect("hotspots:login_template_list")
     html = build_mikrotik_login_html(template, operator=operator)
     response = HttpResponse(html, content_type="text/html; charset=utf-8")

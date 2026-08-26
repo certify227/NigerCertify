@@ -101,4 +101,30 @@ def render_login_template(template, operator=None, router=None):
 
 def build_mikrotik_login_html(template, operator=None, router=None) -> str:
     """HTML final pour upload MikroTik (login.html)."""
-    return render_login_template(template, operator=operator, router=router)
+    html = render_login_template(template, operator=operator, router=router)
+    delay = template.login_delay_seconds or 0
+    if delay > 0:
+        cyber_block = f"""
+<div id="wz-cyber-timer" style="text-align:center;padding:1rem;background:#fff3cd;border-radius:8px;margin-bottom:1rem;">
+  Mode cyber café — accès dans <strong id="wz-count">{delay}</strong> s
+</div>
+<script>
+(function() {{
+  var s = {delay};
+  var el = document.getElementById('wz-count');
+  var btn = document.querySelector('button[type=submit], form button');
+  if (btn) btn.disabled = true;
+  var timer = setInterval(function() {{
+    s--;
+    if (el) el.textContent = s;
+    if (s <= 0) {{
+      clearInterval(timer);
+      if (btn) btn.disabled = false;
+      var box = document.getElementById('wz-cyber-timer');
+      if (box) box.style.display = 'none';
+    }}
+  }}, 1000);
+}})();
+</script>"""
+        html = html.replace("</body>", cyber_block + "</body>")
+    return html

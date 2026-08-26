@@ -7,6 +7,7 @@ from accounts.tenant import get_operator
 from billing.models import Plan
 from billing.services import get_user_subscription
 from dashboard.services.analytics import get_dashboard_chart_data, get_subscription_days_left
+from dashboard.services.predictions import predict_voucher_sales
 from hotspots.models import Voucher, VoucherBatch
 from routers.models import Router
 from routers.services.mikrotik import get_service_for_router
@@ -35,6 +36,7 @@ def home(request):
 
     chart = get_dashboard_chart_data(operator)
     days_left = get_subscription_days_left(sub)
+    forecast = predict_voucher_sales(operator)
 
     return render(
         request,
@@ -52,6 +54,10 @@ def home(request):
             "chart_labels": chart["labels"],
             "chart_counts": chart["counts"],
             "chart_revenues": chart["revenues"],
+            "forecast_labels": forecast["forecast_labels"],
+            "forecast_counts": forecast["forecast_counts"],
+            "forecast_total": forecast["total_forecast"],
+            "forecast_revenue": forecast["revenue_forecast"],
         },
     )
 

@@ -1,0 +1,40 @@
+{% extends "base_app.html" %}
+{% block page_title %}Serveurs RADIUS{% endblock %}
+{% block app_content %}
+<p class="text-muted small">Export des vouchers vers format FreeRADIUS (radcheck). Pas de paiement — sync fichier uniquement.</p>
+<div class="card p-4 mb-4">
+  <h5>Ajouter un serveur</h5>
+  <form method="post" class="row g-2">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="col-md-6 mb-2">
+      <label class="form-label">{{ field.label }}</label>
+      {{ field }}
+    </div>
+    {% endfor %}
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Ajouter</button>
+    </div>
+  </form>
+</div>
+<div class="table-responsive card">
+  <table class="table mb-0">
+    <thead><tr><th>Nom</th><th>Host</th><th>Ports</th><th>Export</th><th></th></tr></thead>
+    <tbody>
+      {% for s in servers %}
+      <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.host }}</td>
+        <td>{{ s.auth_port }} / {{ s.acct_port }}</td>
+        <td>{{ s.last_export_count }} users</td>
+        <td>
+          <a href="{% url 'routers:radius_export' s.pk %}" class="btn btn-sm btn-outline-primary">Exporter</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-muted p-3">Aucun serveur RADIUS.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

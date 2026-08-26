@@ -4,6 +4,7 @@
 <div class="d-flex justify-content-between mb-3">
   <p class="text-muted small">Personnalisez la page de connexion hotspot pour vos clients.</p>
   <a href="{% url 'hotspots:login_template_create' %}" class="btn btn-primary">+ Créer template</a>
+  <a href="{% url 'hotspots:template_marketplace' %}" class="btn btn-outline-primary">Marketplace</a>
 </div>
 <div class="row g-3">
   {% for t in templates %}

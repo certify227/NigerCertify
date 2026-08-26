@@ -60,6 +60,11 @@
     </div>
   </div>
   <div class="col-lg-4">
+    <div class="card p-3 mb-3">
+      <h6 class="text-muted mb-2">Prévision 7 jours</h6>
+      <p class="mb-1"><strong>{{ forecast_total }}</strong> vouchers estimés</p>
+      <p class="text-muted small mb-0">~{{ forecast_revenue }} FCFA revenus</p>
+    </div>
     <div class="card p-3">
       <h6 class="text-muted mb-3">Actions rapides</h6>
       <div class="d-grid gap-2">
@@ -128,6 +133,12 @@
 </div>
 {{ chart_labels|json_script:"chart-labels" }}
 {{ chart_counts|json_script:"chart-counts" }}
+{{ forecast_labels|json_script:"forecast-labels" }}
+{{ forecast_counts|json_script:"forecast-counts" }}
+<div class="d-flex align-items-center gap-2 mt-3 small text-muted">
+  <span id="live-indicator" class="badge bg-secondary">Live</span>
+  <span id="live-ts"></span>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -135,23 +146,53 @@
 <script>
   const ctx = document.getElementById('voucherChart');
   if (ctx) {
+    const histLabels = JSON.parse(document.getElementById('chart-labels').textContent);
+    const histCounts = JSON.parse(document.getElementById('chart-counts').textContent);
+    const fcLabels = JSON.parse(document.getElementById('forecast-labels').textContent);
+    const fcCounts = JSON.parse(document.getElementById('forecast-counts').textContent);
     new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: JSON.parse(document.getElementById('chart-labels').textContent),
-        datasets: [{
-          label: 'Vouchers',
-          data: JSON.parse(document.getElementById('chart-counts').textContent),
-          backgroundColor: 'rgba(13, 110, 253, 0.7)',
-          borderRadius: 6,
-        }]
+        labels: histLabels.concat(fcLabels),
+        datasets: [
+          {
+            label: 'Historique',
+            data: histCounts.concat(Array(fcLabels.length).fill(null)),
+            backgroundColor: 'rgba(13, 110, 253, 0.7)',
+            borderRadius: 6,
+          },
+          {
+            label: 'Prévision',
+            data: Array(histLabels.length).fill(null).concat(fcCounts),
+            backgroundColor: 'rgba(255, 193, 7, 0.7)',
+            borderRadius: 6,
+          }
+        ]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        plugins: { legend: { display: true } },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
       }
     });
   }
+
+  (function liveSocket() {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(proto + '//' + location.host + '/ws/dashboard/');
+    const badge = document.getElementById('live-indicator');
+    const ts = document.getElementById('live-ts');
+    ws.onopen = () => { if (badge) badge.className = 'badge bg-success'; };
+    ws.onclose = () => { if (badge) badge.className = 'badge bg-secondary'; };
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.data && ts) {
+          ts.textContent = msg.data.online_count + ' routeur(s) en ligne';
+        }
+      } catch (_) {}
+    };
+    setInterval(() => { if (ws.readyState === 1) ws.send('ping'); }, 10000);
+  })();
 </script>
 {% endblock %}
