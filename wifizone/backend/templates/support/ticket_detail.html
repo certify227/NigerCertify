@@ -1,0 +1,27 @@
+{% extends "base_app.html" %}
+{% block page_title %}Ticket #{{ ticket.pk }}{% endblock %}
+{% block app_content %}
+<div class="card p-4 mb-3">
+  <div class="d-flex justify-content-between">
+    <h5>{{ ticket.subject }}</h5>
+    <span class="badge bg-secondary">{{ ticket.get_status_display }}</span>
+  </div>
+  <p class="mt-3">{{ ticket.message }}</p>
+  <small class="text-muted">{{ ticket.created_at|date:"d/m/Y H:i" }}</small>
+</div>
+{% for reply in ticket.replies.all %}
+<div class="card p-3 mb-2 ms-3">
+  <strong>{{ reply.author.username }}</strong>
+  <p class="mb-0">{{ reply.message }}</p>
+  <small class="text-muted">{{ reply.created_at|date:"d/m/Y H:i" }}</small>
+</div>
+{% endfor %}
+<div class="card p-4">
+  <form method="post">
+    {% csrf_token %}
+    <textarea name="message" class="form-control mb-2" rows="3" placeholder="Répondre…" required></textarea>
+    <button type="submit" class="btn btn-primary btn-sm">Répondre</button>
+    <a href="{% url 'support:list' %}" class="btn btn-link btn-sm">Retour</a>
+  </form>
+</div>
+{% endblock %}

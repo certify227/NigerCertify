@@ -1,0 +1,68 @@
+{% extends "base_app.html" %}
+{% block page_title %}Paramètres{% endblock %}
+{% block app_content %}
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-palette me-2"></i>Branding</h5>
+        <p class="text-muted small">Logo, couleurs, domaine personnalisé, carte publique.</p>
+        {% if is_owner %}
+        <a href="{% url 'core:branding' %}" class="btn btn-outline-primary btn-sm">Configurer</a>
+        {% else %}
+        <span class="text-muted small">Réservé au propriétaire</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-bell me-2"></i>Notifications</h5>
+        <p class="text-muted small">Alertes routeur, abonnement, lots de vouchers.</p>
+        <a href="{% url 'core:notifications' %}" class="btn btn-outline-primary btn-sm">Voir</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-journal-text me-2"></i>Journal d'audit</h5>
+        <p class="text-muted small">Historique des actions sur votre compte.</p>
+        <a href="{% url 'core:audit' %}" class="btn btn-outline-primary btn-sm">Consulter</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-link-45deg me-2"></i>Webhooks</h5>
+        <p class="text-muted small">Intégrations externes (vouchers, routeurs, abonnement).</p>
+        {% if is_owner %}
+        <a href="{% url 'core:webhooks' %}" class="btn btn-outline-primary btn-sm">Gérer</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-compass me-2"></i>Onboarding</h5>
+        {% if onboarding %}
+        <p class="text-muted small">Progression : {{ onboarding.percent }}%</p>
+        {% endif %}
+        <a href="{% url 'core:onboarding' %}" class="btn btn-outline-primary btn-sm">Continuer</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-shield-lock me-2"></i>Sécurité</h5>
+        <p class="text-muted small">Authentification à deux facteurs (2FA).</p>
+        <a href="{% url 'accounts:totp' %}" class="btn btn-outline-primary btn-sm">2FA</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

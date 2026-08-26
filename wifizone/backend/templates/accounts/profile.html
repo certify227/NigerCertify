@@ -1,0 +1,31 @@
+{% extends "base_app.html" %}
+{% block page_title %}Mon profil{% endblock %}
+{% block app_content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-4">
+  {% if subscription %}
+  <div class="card p-4">
+    <h5>Abonnement</h5>
+    <p><strong>{{ subscription.plan.name }}</strong></p>
+    <p class="small text-muted">Statut : {{ subscription.get_status_display }}</p>
+    <p class="small">Expire : {{ subscription.expires_at|date:"d/m/Y" }}</p>
+    <a href="{% url 'billing:pricing' %}" class="btn btn-outline-primary btn-sm">Changer de forfait</a>
+  </div>
+  {% endif %}
+  </div>
+</div>
+{% endblock %}

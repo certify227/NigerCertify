@@ -1,0 +1,42 @@
+{% extends "base_app.html" %}
+{% block page_title %}Portefeuilles clients{% endblock %}
+{% block app_content %}
+<div class="card p-4 mb-4">
+  <h5>Recharge manuelle (sans paiement en ligne)</h5>
+  <form method="post" class="row g-2 align-items-end">
+    {% csrf_token %}
+    <div class="col-md-3">
+      <label class="form-label">Téléphone</label>
+      <input type="text" name="phone" class="form-control" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Montant (FCFA)</label>
+      <input type="number" name="amount" class="form-control" min="0" required>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Note</label>
+      <input type="text" name="note" class="form-control" placeholder="Recharge manuelle">
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Créditer</button>
+    </div>
+  </form>
+</div>
+<div class="table-responsive card">
+  <table class="table mb-0">
+    <thead><tr><th>Téléphone</th><th>Nom</th><th>Solde</th><th>Points fidélité</th></tr></thead>
+    <tbody>
+      {% for w in wallets %}
+      <tr>
+        <td>{{ w.phone }}</td>
+        <td>{{ w.name }}</td>
+        <td>{{ w.balance|floatformat:0 }} FCFA</td>
+        <td>{{ w.loyalty_points }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="text-muted p-3">Aucun portefeuille.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

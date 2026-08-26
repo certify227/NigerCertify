@@ -1,0 +1,20 @@
+{% extends "base_app.html" %}
+{% block page_title %}Impression Bluetooth{% endblock %}
+{% block app_content %}
+<p class="text-muted">Format texte pour imprimantes thermiques / Bluetooth (copier ou envoyer via app mobile).</p>
+{% if batch %}
+<div class="card p-3 mb-3">
+  <strong>Lot #{{ batch.pk }}</strong> — {{ batch.quantity }} voucher(s)
+</div>
+<pre class="card p-3 bg-light" style="font-size: 12px;">{% for v in vouchers %}
+---
+WiFiZone
+User: {{ v.username }}
+Pass: {{ v.password }}
+Code: {{ v.code }}
+---
+{% endfor %}</pre>
+{% else %}
+<p class="text-muted">Sélectionnez un lot depuis la <a href="{% url 'hotspots:batch_list' %}">liste des lots</a> ou ajoutez <code>?batch=ID</code> à l'URL.</p>
+{% endif %}
+{% endblock %}

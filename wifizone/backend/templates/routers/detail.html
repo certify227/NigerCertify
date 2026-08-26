@@ -1,0 +1,69 @@
+{% extends "base_app.html" %}
+{% block page_title %}{{ router.name }}{% endblock %}
+{% block app_content %}
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a href="{% url 'routers:test' router.pk %}" class="btn btn-outline-primary"><i class="bi bi-plug"></i> Tester connexion</a>
+  <a href="{% url 'routers:sync_profiles' router.pk %}" class="btn btn-outline-success"><i class="bi bi-cloud-download"></i> Sync profils MT</a>
+  <a href="{% url 'routers:edit' router.pk %}" class="btn btn-outline-secondary">Modifier</a>
+  <a href="{% url 'routers:delete' router.pk %}" class="btn btn-outline-danger">Supprimer</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>Informations</h5>
+      <dl class="row small">
+        <dt class="col-4">Adresse</dt><dd class="col-8">{{ router.host }}:{{ router.port }}</dd>
+        <dt class="col-4">Utilisateur</dt><dd class="col-8">{{ router.username }}</dd>
+        <dt class="col-4">Hotspot</dt><dd class="col-8">{{ router.hotspot_server }}</dd>
+        <dt class="col-4">Statut</dt><dd class="col-8">{{ router.get_connection_status_display }}</dd>
+        {% if router.last_error %}<dt class="col-4">Erreur</dt><dd class="col-8 text-danger">{{ router.last_error }}</dd>{% endif %}
+      </dl>
+    </div>
+  </div>
+  {% if system_info %}
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>Système MikroTik</h5>
+      <dl class="row small">
+        <dt class="col-4">Identité</dt><dd class="col-8">{{ system_info.identity }}</dd>
+        <dt class="col-4">Version</dt><dd class="col-8">{{ system_info.version }}</dd>
+        <dt class="col-4">Uptime</dt><dd class="col-8">{{ system_info.uptime }}</dd>
+      </dl>
+    </div>
+  </div>
+  {% endif %}
+  {% if snmp_stats %}
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>SNMP</h5>
+      <dl class="row small">
+        {% for key, val in snmp_stats.items %}
+        <dt class="col-4">{{ key }}</dt><dd class="col-8">{{ val }}</dd>
+        {% endfor %}
+      </dl>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% if active_users %}
+<div class="card mt-4">
+  <div class="card-header">Utilisateurs actifs</div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Utilisateur</th><th>IP</th><th>Uptime</th></tr></thead>
+      <tbody>
+        {% for u in active_users %}
+        <tr>
+          <td>{{ u.user }}</td>
+          <td>{{ u.address }}</td>
+          <td>{{ u.uptime }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

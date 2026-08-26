@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Carte WiFi — WiFiZone Pro{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Zones WiFi partenaires</h2>
+  <p class="text-muted">Opérateurs ayant activé la carte publique.</p>
+  <div id="map" style="height: 480px; background: #e9ecef; border-radius: 8px;" class="mb-4"></div>
+  <ul class="list-group">
+    {% for op in operators %}
+    <li class="list-group-item">{{ op.name }} — {{ op.city|default:"" }}</li>
+    {% empty %}
+    <li class="list-group-item text-muted">Aucune zone visible pour le moment.</li>
+    {% endfor %}
+  </ul>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script>
+  const map = L.map('map').setView([13.5, 2.1], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  const ops = {{ operators_json|safe }};
+  ops.forEach(o => L.marker([o.lat, o.lng]).addTo(map).bindPopup(o.name));
+</script>
+{% endblock %}

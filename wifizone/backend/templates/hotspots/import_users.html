@@ -1,0 +1,27 @@
+{% extends "base_app.html" %}
+{% block page_title %}Import utilisateurs MikroTik{% endblock %}
+{% block app_content %}
+<div class="card p-4">
+  <p class="text-muted small">CSV avec colonnes <code>username</code> et <code>password</code> (ou <code>user</code> / <code>pass</code>).</p>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Routeur</label>
+      <select name="router" class="form-select" required>
+        {% for r in routers %}
+        <option value="{{ r.pk }}">{{ r.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Profil MikroTik</label>
+      <input type="text" name="profile" class="form-control" value="default">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Fichier CSV</label>
+      <input type="file" name="file" class="form-control" accept=".csv" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Importer</button>
+  </form>
+</div>
+{% endblock %}

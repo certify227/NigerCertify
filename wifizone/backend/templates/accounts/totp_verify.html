@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Vérification 2FA{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card p-4">
+        <h4>Code d'authentification</h4>
+        <p class="text-muted small">Saisissez le code de votre application 2FA.</p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="text" name="code" class="form-control mb-3" maxlength="6" required autofocus>
+          <button type="submit" class="btn btn-primary w-100">Vérifier</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

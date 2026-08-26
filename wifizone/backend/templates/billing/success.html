@@ -1,0 +1,10 @@
+{% extends "base_app.html" %}
+{% block page_title %}Abonnement activé{% endblock %}
+{% block app_content %}
+<div class="card p-4 text-center">
+  <i class="bi bi-check-circle text-success display-4"></i>
+  <h4 class="mt-3">Forfait {{ plan.name }} activé</h4>
+  <p>Votre abonnement est valide jusqu'au {{ subscription.expires_at|date:"d/m/Y" }}.</p>
+  <a href="{% url 'dashboard:home' %}" class="btn btn-primary">Tableau de bord</a>
+</div>
+{% endblock %}

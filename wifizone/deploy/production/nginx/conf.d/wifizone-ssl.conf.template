@@ -1,0 +1,71 @@
+# Généré par scripts/enable-ssl.sh — ne pas éditer manuellement
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name __NGINX_HOST__ www.__NGINX_HOST__;
+
+    ssl_certificate     /etc/letsencrypt/live/__NGINX_HOST__/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/__NGINX_HOST__/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/__NGINX_HOST__/chain.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' wss:; frame-ancestors 'none';" always;
+
+    limit_conn conn_limit 40;
+
+    location /static/ {
+        alias /var/www/static/;
+        expires 30d;
+        access_log off;
+    }
+
+    location /media/ {
+        alias /var/www/media/;
+        expires 7d;
+        access_log off;
+    }
+
+    location /accounts/login/ {
+        limit_req zone=login_limit burst=10 nodelay;
+        proxy_pass http://wifizone_app;
+        include /etc/nginx/conf.d/proxy_params.conf;
+    }
+
+    location /api/ {
+        limit_req zone=api_limit burst=50 nodelay;
+        proxy_pass http://wifizone_app;
+        include /etc/nginx/conf.d/proxy_params.conf;
+    }
+
+    location /ws/ {
+        proxy_pass http://wifizone_app;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        include /etc/nginx/conf.d/proxy_params.conf;
+        proxy_read_timeout 86400;
+    }
+
+    location / {
+        proxy_pass http://wifizone_app;
+        include /etc/nginx/conf.d/proxy_params.conf;
+    }
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __NGINX_HOST__ www.__NGINX_HOST__;
+    return 301 https://$host$request_uri;
+}

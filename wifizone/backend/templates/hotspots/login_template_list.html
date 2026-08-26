@@ -1,0 +1,35 @@
+{% extends "base_app.html" %}
+{% block page_title %}Templates login MikroTik{% endblock %}
+{% block app_content %}
+<div class="d-flex justify-content-between mb-3">
+  <p class="text-muted small">Personnalisez la page de connexion hotspot pour vos clients.</p>
+  <a href="{% url 'hotspots:login_template_create' %}" class="btn btn-primary">+ Créer template</a>
+  <a href="{% url 'hotspots:template_marketplace' %}" class="btn btn-outline-primary">Marketplace</a>
+</div>
+<div class="row g-3">
+  {% for t in templates %}
+  <div class="col-md-4">
+    <div class="card h-100 p-3">
+      <div class="d-flex justify-content-between">
+        <h5>{{ t.name }}</h5>
+        {% if t.is_system %}<span class="badge bg-info">Système</span>{% endif %}
+      </div>
+      <p class="small text-muted">{{ t.description|default:"—" }}</p>
+      <div class="d-flex gap-1 flex-wrap">
+        <a href="{% url 'hotspots:login_template_preview' t.pk %}" class="btn btn-sm btn-outline-primary">Aperçu</a>
+        <a href="{% url 'hotspots:login_template_download' t.pk %}" class="btn btn-sm btn-outline-secondary">login.html</a>
+        {% if not t.is_system %}
+        <a href="{% url 'hotspots:login_template_edit' t.pk %}" class="btn btn-sm btn-link">Modifier</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted">Aucun template.</p>
+  {% endfor %}
+</div>
+<div class="alert alert-info mt-4 small">
+  <strong>MikroTik :</strong> téléchargez <code>login.html</code>, placez-le dans le dossier hotspot du routeur
+  (Winbox → Files → hotspot) et redéployez la page HTML hotspot.
+</div>
+{% endblock %}
