@@ -209,3 +209,80 @@ SMS_BACKEND = os.getenv("SMS_BACKEND", "console")
 SMS_API_URL = os.getenv("SMS_API_URL", "")
 SMS_API_KEY = os.getenv("SMS_API_KEY", "")
 SMS_SENDER_ID = os.getenv("SMS_SENDER_ID", "WiFiZone")
+
+# Email SMTP (production)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+
+# ---------------------------------------------------------------------------
+# Production — sécurité renforcée (DJANGO_DEBUG=false)
+# ---------------------------------------------------------------------------
+if not DEBUG:
+    from django.core.exceptions import ImproperlyConfigured
+
+    _insecure_markers = ("django-insecure", "change-me", "dev-only")
+    if any(m in SECRET_KEY.lower() for m in _insecure_markers) or len(SECRET_KEY) < 50:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY invalide pour la production. "
+            "Générez une clé avec deploy/production/scripts/generate-secrets.sh"
+        )
+    if not FERNET_KEY:
+        raise ImproperlyConfigured(
+            "FERNET_KEY obligatoire en production (chiffrement mots de passe routeurs)."
+        )
+
+    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "true").lower() == "true"
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+
+    CSRF_TRUSTED_ORIGINS = [
+        o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()
+    ]
+    if not CSRF_TRUSTED_ORIGINS:
+        raise ImproperlyConfigured(
+            "CSRF_TRUSTED_ORIGINS requis en production (ex: https://votre-domaine.com)."
+        )
+
+    CORS_ALLOWED_ORIGINS = [
+        o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()
+    ]
+
+    for _internal in ("127.0.0.1", "web", "localhost"):
+        if _internal not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_internal)
+
+    SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"] = timedelta(
+        hours=int(os.getenv("JWT_ACCESS_HOURS", "4"))
+    )
+    SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"] = timedelta(
+        days=int(os.getenv("JWT_REFRESH_DAYS", "7"))
+    )
+    REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
+        "anon": os.getenv("API_THROTTLE_ANON", "30/min"),
+        "user": os.getenv("API_THROTTLE_USER", "120/min"),
+    }
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {"class": "logging.StreamHandler"},
+        },
+        "root": {"handlers": ["console"], "level": "WARNING"},
+        "loggers": {
+            "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        },
+    }

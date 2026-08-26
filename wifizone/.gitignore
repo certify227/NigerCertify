@@ -4,4 +4,6 @@ db.sqlite3
 staticfiles/
 media/
 .env
+.env.production
+deploy/production/.env.production
 *.egg-info/
