@@ -7,6 +7,8 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+APP_DIR="${APP_DIR:-/opt/wifizone}"
+REPO_URL="${REPO_URL:-}"
 WIFI_DOMAIN="${WIFI_DOMAIN:-wifi.nigercertify.com}"
 
 echo "=== WiFiZone Pro — déploiement production ==="

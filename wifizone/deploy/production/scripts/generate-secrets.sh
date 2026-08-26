@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Génère des secrets pour .env.production (ne commitez jamais le fichier généré).
-set -euo pipefail
+set -eu
+[ -n "${BASH_VERSION:-}" ] && set -o pipefail
 
 OUT="${1:-.env.production}"
 DOMAIN="${WIFI_DOMAIN:-wifi.nigercertify.com}"
