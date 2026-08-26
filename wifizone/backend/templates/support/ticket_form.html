@@ -1,0 +1,27 @@
+{% extends "base_app.html" %}
+{% block page_title %}Nouveau ticket{% endblock %}
+{% block app_content %}
+<div class="card p-4">
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Sujet</label>
+      <input type="text" name="subject" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Priorité</label>
+      <select name="priority" class="form-select">
+        <option value="low">Faible</option>
+        <option value="normal" selected>Normal</option>
+        <option value="high">Urgent</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Message</label>
+      <textarea name="message" class="form-control" rows="5" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Envoyer</button>
+    <a href="{% url 'support:list' %}" class="btn btn-link">Annuler</a>
+  </form>
+</div>
+{% endblock %}

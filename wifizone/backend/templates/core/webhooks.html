@@ -1,0 +1,38 @@
+{% extends "base_app.html" %}
+{% block page_title %}Webhooks{% endblock %}
+{% block app_content %}
+<div class="card mb-4 p-4">
+  <h5>Ajouter un endpoint</h5>
+  <form method="post" class="row g-2 align-items-end">
+    {% csrf_token %}
+    <div class="col-md-5">
+      <label class="form-label">URL</label>
+      <input type="url" name="url" class="form-control" required placeholder="https://...">
+    </div>
+    <div class="col-md-5">
+      <label class="form-label">Événements (virgules)</label>
+      <input type="text" name="events" class="form-control" value="voucher.created,router.offline,subscription.expiring">
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+    </div>
+  </form>
+</div>
+<div class="table-responsive card">
+  <table class="table mb-0">
+    <thead><tr><th>URL</th><th>Événements</th><th>Secret</th><th>Actif</th></tr></thead>
+    <tbody>
+      {% for w in webhooks %}
+      <tr>
+        <td class="small">{{ w.url }}</td>
+        <td class="small">{{ w.events|join:", " }}</td>
+        <td class="small font-monospace">{{ w.secret|truncatechars:16 }}…</td>
+        <td>{% if w.is_active %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="text-muted p-3">Aucun webhook configuré.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

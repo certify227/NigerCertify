@@ -1,0 +1,26 @@
+{% extends "base_app.html" %}
+{% block page_title %}Programme fidélité{% endblock %}
+{% block app_content %}
+<div class="card p-4">
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Points par voucher vendu</label>
+      <input type="number" name="points_per_voucher" class="form-control" value="{{ program.points_per_voucher }}" min="0">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Vouchers pour une récompense</label>
+      <input type="number" name="vouchers_per_reward" class="form-control" value="{{ program.vouchers_per_reward }}" min="1">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Description récompense</label>
+      <input type="text" name="reward_description" class="form-control" value="{{ program.reward_description }}">
+    </div>
+    <div class="form-check mb-3">
+      <input type="checkbox" name="is_active" class="form-check-input" id="loyalty" {% if program.is_active %}checked{% endif %}>
+      <label class="form-check-label" for="loyalty">Programme actif</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+  </form>
+</div>
+{% endblock %}

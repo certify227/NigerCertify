@@ -20,4 +20,11 @@ urlpatterns = [
     path("login-templates/<int:pk>/edit/", views.login_template_edit, name="login_template_edit"),
     path("login-templates/<int:pk>/preview/", views.login_template_preview, name="login_template_preview"),
     path("login-templates/<int:pk>/download/", views.login_template_download, name="login_template_download"),
+    path("pos/", views.pos_list, name="pos_list"),
+    path("wallets/", views.wallet_list, name="wallet_list"),
+    path("import-users/", views.import_users, name="import_users"),
+    path("reports/advanced/", views.advanced_reports, name="advanced_reports"),
+    path("reports/pdf/", views.reports_pdf, name="reports_pdf"),
+    path("print/bluetooth/", views.bluetooth_print, name="bluetooth_print"),
+    path("loyalty/", views.loyalty_settings, name="loyalty"),
 ]

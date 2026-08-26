@@ -1,20 +1,23 @@
 """Résolution tenant opérateur (propriétaire vs employé)."""
 
-from django.conf import settings
-
 from billing.services import get_user_subscription
 
 
 def get_operator(user):
-    """Retourne le propriétaire de la zone WiFi (tenant)."""
     if not user.is_authenticated:
         return None
-    membership = (
-        user.team_memberships.filter(is_active=True).select_related("owner").first()
-    )
+    membership = user.team_memberships.filter(is_active=True).select_related("owner").first()
     if membership:
         return membership.owner
     return user
+
+
+def get_membership(user):
+    if not user.is_authenticated:
+        return None
+    if get_operator(user) == user:
+        return None
+    return user.team_memberships.filter(is_active=True).first()
 
 
 def is_team_owner(user):
@@ -26,17 +29,18 @@ def get_team_role(user):
         return None
     if get_operator(user) == user:
         return "owner"
-    membership = user.team_memberships.filter(is_active=True).first()
+    membership = get_membership(user)
     return membership.role if membership else None
 
 
 def can_manage_team(user):
-    """Gestion équipe : propriétaire ou manager Enterprise."""
-    if not is_team_owner(user):
-        membership = user.team_memberships.filter(is_active=True).first()
-        if not membership or membership.role != "manager":
+    if is_team_owner(user):
+        operator = user
+    else:
+        membership = get_membership(user)
+        if not membership or not membership.can_manage_team:
             return False
-    operator = get_operator(user)
+        operator = membership.owner
     sub = get_user_subscription(operator)
     if not sub or not sub.is_valid:
         return False
@@ -44,13 +48,24 @@ def can_manage_team(user):
 
 
 def can_generate_vouchers(user):
-    role = get_team_role(user)
-    return role in ("owner", "manager", "staff")
+    if is_team_owner(user):
+        return True
+    membership = get_membership(user)
+    return membership and membership.can_generate_vouchers
 
 
 def can_manage_routers(user):
-    role = get_team_role(user)
-    return role in ("owner", "manager")
+    if is_team_owner(user):
+        return True
+    membership = get_membership(user)
+    return membership and membership.can_manage_routers
+
+
+def can_view_reports(user):
+    if is_team_owner(user):
+        return True
+    membership = get_membership(user)
+    return membership and membership.can_view_reports
 
 
 def operator_queryset_filter(user, queryset, owner_field="owner"):

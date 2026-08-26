@@ -25,6 +25,10 @@ class HotspotLoginTemplate(models.Model):
     background_color = models.CharField(max_length=20, default="#1a1d23")
     wifi_name = models.CharField(max_length=120, blank=True, default="WiFiZone")
     logo_url = models.URLField(blank=True)
+    html_status = models.TextField("HTML status", blank=True)
+    html_logout = models.TextField("HTML logout", blank=True)
+    locale = models.CharField(max_length=10, default="fr", help_text="fr, en, ha")
+    ad_video_url = models.URLField(blank=True, help_text="Vidéo/pub avant login")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -41,6 +45,81 @@ class HotspotLoginTemplate(models.Model):
         from hotspots.services.login_template import render_login_template
 
         return render_login_template(self, operator=operator, router=router)
+
+
+class PointOfSale(models.Model):
+    """Point de vente / kiosque."""
+
+    operator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="points_of_sale",
+    )
+    name = models.CharField(max_length=120)
+    location = models.CharField(max_length=200, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "point de vente"
+        verbose_name_plural = "points de vente"
+
+    def __str__(self):
+        return self.name
+
+
+class CustomerWallet(models.Model):
+    """Crédit client prépayé (recharge manuelle, sans passerelle paiement)."""
+
+    operator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="customer_wallets",
+    )
+    phone = models.CharField(max_length=30)
+    name = models.CharField(max_length=120, blank=True)
+    balance = models.DecimalField(max_digits=12, decimal_places=0, default=Decimal("0"))
+    loyalty_points = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("operator", "phone")
+
+    def __str__(self):
+        return f"{self.phone} ({self.balance} FCFA)"
+
+
+class WalletTransaction(models.Model):
+    class TxType(models.TextChoices):
+        TOPUP = "topup", "Recharge manuelle"
+        DEBIT = "debit", "Débit voucher"
+        LOYALTY = "loyalty", "Points fidélité"
+
+    wallet = models.ForeignKey(CustomerWallet, on_delete=models.CASCADE, related_name="transactions")
+    amount = models.DecimalField(max_digits=12, decimal_places=0)
+    tx_type = models.CharField(max_length=20, choices=TxType.choices)
+    note = models.CharField(max_length=200, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class LoyaltyProgram(models.Model):
+    operator = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="loyalty_program",
+    )
+    points_per_voucher = models.PositiveIntegerField(default=1)
+    vouchers_per_reward = models.PositiveIntegerField(
+        default=10,
+        help_text="Nombre de vouchers pour 1 récompense",
+    )
+    reward_description = models.CharField(max_length=200, default="1 voucher gratuit")
+    is_active = models.BooleanField(default=True)
 
 
 class HotspotProfile(models.Model):
@@ -75,6 +154,7 @@ class HotspotProfile(models.Model):
         decimal_places=0,
         default=Decimal("0"),
     )
+    parent_queue = models.CharField(max_length=100, blank=True, help_text="Parent queue MikroTik")
     is_active = models.BooleanField("actif", default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -170,6 +250,23 @@ class Voucher(models.Model):
         max_digits=12,
         decimal_places=0,
         default=Decimal("0"),
+    )
+    sold_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vouchers_sold",
+    )
+    point_of_sale = models.ForeignKey(
+        PointOfSale,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vouchers",
+    )
+    commission_amount = models.DecimalField(
+        max_digits=12, decimal_places=0, default=Decimal("0")
     )
     synced_to_mikrotik = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

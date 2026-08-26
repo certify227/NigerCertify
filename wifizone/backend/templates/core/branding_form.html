@@ -1,0 +1,49 @@
+{% extends "base_app.html" %}
+{% block page_title %}Branding{% endblock %}
+{% block app_content %}
+<div class="card p-4">
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Nom de l'application</label>
+        <input type="text" name="app_name" class="form-control" value="{{ branding.app_name }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">URL du logo</label>
+        <input type="url" name="logo_url" class="form-control" value="{{ branding.logo_url }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Couleur principale</label>
+        <input type="text" name="primary_color" class="form-control" value="{{ branding.primary_color }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Domaine personnalisé</label>
+        <input type="text" name="custom_domain" class="form-control" value="{{ branding.custom_domain }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Email support</label>
+        <input type="email" name="support_email" class="form-control" value="{{ branding.support_email }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Latitude (carte publique)</label>
+        <input type="text" name="latitude" class="form-control" value="{{ branding.latitude|default:'' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Longitude</label>
+        <input type="text" name="longitude" class="form-control" value="{{ branding.longitude|default:'' }}">
+      </div>
+      <div class="col-md-4">
+        <div class="form-check mt-4">
+          <input type="checkbox" name="public_map_enabled" class="form-check-input" id="map" {% if branding.public_map_enabled %}checked{% endif %}>
+          <label class="form-check-label" for="map">Afficher sur la carte WiFi publique</label>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4">
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="{% url 'core:settings' %}" class="btn btn-link">Retour</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

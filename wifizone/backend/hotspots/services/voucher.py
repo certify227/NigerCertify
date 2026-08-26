@@ -1,11 +1,14 @@
 import random
 import string
+from decimal import Decimal
 
 from django.db import transaction
-from django.utils import timezone
 
-from accounts.tenant import get_operator
+from accounts.tenant import get_membership, get_operator
 from billing.services import get_user_subscription
+from core.models import AuditLog
+from core.services.audit import log_action
+from core.services.webhooks import fire_webhook
 from routers.services.mikrotik import MikroTikUser, get_service_for_router
 
 from hotspots.models import HotspotProfile, Voucher, VoucherBatch
@@ -41,6 +44,13 @@ def generate_vouchers(
         return None, f"Limite de profils atteinte ({sub.plan.max_profiles} max)."
 
     service = get_service_for_router(router)
+    membership = get_membership(user)
+    commission_per = Decimal("0")
+    point_of_sale = None
+    if membership and membership.commission_percent:
+        commission_per = profile.price * membership.commission_percent / Decimal("100")
+        point_of_sale = membership.point_of_sale
+
     batch = VoucherBatch(
         router=router,
         profile=profile,
@@ -69,6 +79,9 @@ def generate_vouchers(
                 username=username,
                 password=password,
                 sold_price=profile.price,
+                sold_by=user,
+                point_of_sale=point_of_sale,
+                commission_amount=commission_per,
             )
             vouchers.append(voucher)
 
@@ -90,5 +103,23 @@ def generate_vouchers(
                 voucher.save(update_fields=["synced_to_mikrotik"])
             except Exception:
                 pass
+
+    log_action(
+        operator,
+        user,
+        AuditLog.Action.VOUCHER_GENERATE,
+        f"Lot #{batch.pk}: {quantity} × {profile.name}",
+    )
+    fire_webhook(
+        operator,
+        "voucher.created",
+        {
+            "batch_id": batch.pk,
+            "router_id": router.pk,
+            "profile_id": profile.pk,
+            "quantity": quantity,
+            "total_price": str(batch.total_price),
+        },
+    )
 
     return batch, f"{quantity} voucher(s) généré(s) avec succès."

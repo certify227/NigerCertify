@@ -1,0 +1,19 @@
+{% extends "base_app.html" %}
+{% block page_title %}Notifications{% endblock %}
+{% block app_content %}
+<div class="card">
+  <div class="list-group list-group-flush">
+    {% for n in notifications %}
+    <div class="list-group-item {% if not n.is_read %}bg-light{% endif %}">
+      <div class="d-flex justify-content-between">
+        <strong>{{ n.title }}</strong>
+        <small class="text-muted">{{ n.created_at|date:"d/m/Y H:i" }}</small>
+      </div>
+      <p class="mb-0 small text-muted">{{ n.message }}</p>
+    </div>
+    {% empty %}
+    <div class="list-group-item text-muted">Aucune notification.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

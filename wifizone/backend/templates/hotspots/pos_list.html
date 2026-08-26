@@ -1,0 +1,38 @@
+{% extends "base_app.html" %}
+{% block page_title %}Points de vente{% endblock %}
+{% block app_content %}
+{% if is_owner %}
+<div class="card p-4 mb-4">
+  <form method="post" class="row g-2 align-items-end">
+    {% csrf_token %}
+    <div class="col-md-5">
+      <label class="form-label">Nom</label>
+      <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="col-md-5">
+      <label class="form-label">Emplacement</label>
+      <input type="text" name="location" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+<div class="table-responsive card">
+  <table class="table mb-0">
+    <thead><tr><th>Nom</th><th>Emplacement</th><th>Actif</th></tr></thead>
+    <tbody>
+      {% for pos in pos_list %}
+      <tr>
+        <td>{{ pos.name }}</td>
+        <td>{{ pos.location }}</td>
+        <td>{% if pos.is_active %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="text-muted p-3">Aucun point de vente.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

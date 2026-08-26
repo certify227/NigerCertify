@@ -1,0 +1,17 @@
+{% extends "base_app.html" %}
+{% block page_title %}Guide de démarrage{% endblock %}
+{% block app_content %}
+<div class="card p-4 mb-4">
+  <h5>Progression : {{ progress.percent }}%</h5>
+  <div class="progress mb-3" style="height: 8px;">
+    <div class="progress-bar" style="width: {{ progress.percent }}%"></div>
+  </div>
+  <ul class="list-unstyled">
+    <li class="mb-2">{% if progress.router_added %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-circle text-muted"></i>{% endif %} Ajouter un routeur — <a href="{% url 'routers:create' %}">Routeurs</a></li>
+    <li class="mb-2">{% if progress.profile_created %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-circle text-muted"></i>{% endif %} Créer un profil hotspot — <a href="{% url 'hotspots:profile_create' %}">Profils</a></li>
+    <li class="mb-2">{% if progress.voucher_generated %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-circle text-muted"></i>{% endif %} Générer des vouchers — <a href="{% url 'hotspots:voucher_generate' %}">Générer</a></li>
+    <li class="mb-2">{% if progress.template_customized %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-circle text-muted"></i>{% endif %} Personnaliser le template login — <a href="{% url 'hotspots:login_template_list' %}">Templates</a></li>
+    <li class="mb-2">{% if progress.team_invited %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-circle text-muted"></i>{% endif %} Inviter un employé — <a href="{% url 'accounts:team_list' %}">Équipe</a></li>
+  </ul>
+</div>
+{% endblock %}

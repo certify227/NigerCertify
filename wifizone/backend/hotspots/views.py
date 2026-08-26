@@ -5,7 +5,7 @@ from django.db.models import Q as DQ
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from accounts.tenant import get_operator
+from accounts.tenant import get_operator, can_view_reports, is_team_owner
 from billing.decorators import subscription_required
 from billing.services import get_user_subscription
 from routers.models import Router
@@ -292,3 +292,149 @@ def login_template_download(request, pk):
     response = HttpResponse(html, content_type="text/html; charset=utf-8")
     response["Content-Disposition"] = f'attachment; filename="login-{template.slug}.html"'
     return response
+
+
+@login_required
+def pos_list(request):
+    operator = get_operator(request.user)
+    from hotspots.models import PointOfSale
+    pos_list_qs = PointOfSale.objects.filter(operator=operator)
+    if request.method == "POST" and is_team_owner(request.user):
+        PointOfSale.objects.create(
+            operator=operator,
+            name=request.POST["name"],
+            location=request.POST.get("location", ""),
+        )
+        messages.success(request, "Point de vente créé.")
+        return redirect("hotspots:pos_list")
+    return render(request, "hotspots/pos_list.html", {"pos_list": pos_list_qs, "is_owner": is_team_owner(request.user)})
+
+
+@login_required
+def wallet_list(request):
+    operator = get_operator(request.user)
+    from hotspots.models import CustomerWallet, WalletTransaction
+    wallets = CustomerWallet.objects.filter(operator=operator)
+    if request.method == "POST":
+        phone = request.POST["phone"]
+        amount = int(request.POST.get("amount", 0))
+        wallet, _ = CustomerWallet.objects.get_or_create(operator=operator, phone=phone)
+        wallet.balance += amount
+        wallet.save()
+        WalletTransaction.objects.create(
+            wallet=wallet,
+            amount=amount,
+            tx_type=WalletTransaction.TxType.TOPUP,
+            note=request.POST.get("note", "Recharge manuelle"),
+            created_by=request.user,
+        )
+        from core.services.audit import log_action
+        log_action(operator, request.user, "wallet_topup", f"{phone} +{amount}", request)
+        messages.success(request, f"Recharge {amount} FCFA pour {phone}")
+        return redirect("hotspots:wallet_list")
+    return render(request, "hotspots/wallet_list.html", {"wallets": wallets})
+
+
+@login_required
+def import_users(request):
+    operator = get_operator(request.user)
+    if request.method == "POST" and request.FILES.get("file"):
+        import csv
+        from io import TextIOWrapper
+        from routers.models import Router
+        from routers.services.mikrotik import MikroTikUser, get_service_for_router
+
+        router = get_object_or_404(Router, pk=request.POST["router"], owner=operator)
+        service = get_service_for_router(router)
+        profile = request.POST.get("profile", "default")
+        count = 0
+        reader = csv.DictReader(TextIOWrapper(request.FILES["file"], encoding="utf-8"))
+        for row in reader:
+            u = row.get("username") or row.get("user")
+            p = row.get("password") or row.get("pass")
+            if u and p:
+                service.add_hotspot_user(MikroTikUser(name=u, password=p, profile=profile))
+                count += 1
+        messages.success(request, f"{count} utilisateur(s) importé(s).")
+        return redirect("hotspots:import_users")
+    routers = Router.objects.filter(owner=operator)
+    return render(request, "hotspots/import_users.html", {"routers": routers})
+
+
+@login_required
+def advanced_reports(request):
+    if not can_view_reports(request.user):
+        messages.error(request, "Permission refusée.")
+        return redirect("dashboard:home")
+    operator = get_operator(request.user)
+    from django.db.models.functions import TruncHour
+    from hotspots.models import Voucher
+
+    hourly = (
+        Voucher.objects.filter(router__owner=operator)
+        .annotate(hour=TruncHour("created_at"))
+        .values("hour")
+        .annotate(count=Count("id"), revenue=Sum("sold_price"))
+        .order_by("-hour")[:48]
+    )
+    by_staff = (
+        Voucher.objects.filter(router__owner=operator, sold_by__isnull=False)
+        .values("sold_by__username")
+        .annotate(count=Count("id"), revenue=Sum("sold_price"), commission=Sum("commission_amount"))
+    )
+    return render(
+        request,
+        "hotspots/advanced_reports.html",
+        {"hourly": hourly, "by_staff": by_staff},
+    )
+
+
+@login_required
+def bluetooth_print(request):
+    batch_id = request.GET.get("batch")
+    batch = None
+    vouchers = []
+    if batch_id:
+        batch = get_object_or_404(VoucherBatch, pk=batch_id, router__owner=get_operator(request.user))
+        vouchers = batch.vouchers.all()
+    return render(request, "hotspots/bluetooth_print.html", {"batch": batch, "vouchers": vouchers})
+
+
+@login_required
+def reports_pdf(request):
+    if not can_view_reports(request.user):
+        messages.error(request, "Permission refusée.")
+        return redirect("dashboard:home")
+    operator = get_operator(request.user)
+    total_vouchers = Voucher.objects.filter(router__owner=operator).count()
+    total_revenue = (
+        Voucher.objects.filter(router__owner=operator).aggregate(s=Sum("sold_price"))["s"] or 0
+    )
+    by_profile = list(
+        Voucher.objects.filter(router__owner=operator)
+        .values("profile__name")
+        .annotate(count=Count("id"), revenue=Sum("sold_price"))
+        .order_by("-count")
+    )
+    from hotspots.services.report_pdf import build_reports_pdf
+
+    pdf_bytes = build_reports_pdf(operator.display_name, total_vouchers, total_revenue, by_profile)
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = "attachment; filename=wifizone-rapport.pdf"
+    return response
+
+
+@login_required
+def loyalty_settings(request):
+    operator = get_operator(request.user)
+    from hotspots.models import LoyaltyProgram
+    prog, _ = LoyaltyProgram.objects.get_or_create(operator=operator)
+    if request.method == "POST":
+        prog.points_per_voucher = int(request.POST.get("points_per_voucher", 1))
+        prog.vouchers_per_reward = int(request.POST.get("vouchers_per_reward", 10))
+        prog.reward_description = request.POST.get("reward_description", prog.reward_description)
+        prog.is_active = request.POST.get("is_active") == "on"
+        prog.save()
+        messages.success(request, "Programme fidélité mis à jour.")
+        return redirect("hotspots:loyalty")
+    return render(request, "hotspots/loyalty.html", {"program": prog})

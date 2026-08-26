@@ -12,8 +12,12 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("team/", views.team_list, name="team_list"),
     path("team/add/", views.team_add, name="team_add"),
+    path("team/invite/", views.team_invite, name="team_invite"),
+    path("invite/<str:token>/", views.accept_invite, name="accept_invite"),
     path("team/<int:pk>/toggle/", views.team_toggle, name="team_toggle"),
     path("team/<int:pk>/remove/", views.team_remove, name="team_remove"),
+    path("totp/", views.totp_settings, name="totp"),
+    path("totp/verify/", views.totp_verify, name="totp_verify"),
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(

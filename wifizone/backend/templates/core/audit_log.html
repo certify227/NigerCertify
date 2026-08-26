@@ -1,0 +1,22 @@
+{% extends "base_app.html" %}
+{% block page_title %}Journal d'audit{% endblock %}
+{% block app_content %}
+<div class="table-responsive card">
+  <table class="table mb-0">
+    <thead><tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th><th>IP</th></tr></thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.created_at|date:"d/m/Y H:i" }}</td>
+        <td>{{ log.actor.username|default:"—" }}</td>
+        <td>{{ log.get_action_display }}</td>
+        <td class="small">{{ log.detail }}</td>
+        <td class="small">{{ log.ip_address|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-muted p-3">Aucune entrée.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

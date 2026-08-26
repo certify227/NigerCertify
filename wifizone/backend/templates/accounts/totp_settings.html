@@ -1,0 +1,30 @@
+{% extends "base_app.html" %}
+{% block page_title %}Authentification 2FA{% endblock %}
+{% block app_content %}
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>Statut</h5>
+      {% if user.totp_enabled %}
+      <p class="text-success"><i class="bi bi-shield-check"></i> 2FA activée</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="disable">
+        <button type="submit" class="btn btn-outline-danger btn-sm">Désactiver</button>
+      </form>
+      {% else %}
+      <p class="text-muted">Scannez le QR avec Google Authenticator ou saisissez le code secret.</p>
+      <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR 2FA" class="mb-3" style="max-width: 200px;">
+      <p class="small font-monospace">{{ user.totp_secret }}</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="enable">
+        <label class="form-label">Code de vérification</label>
+        <input type="text" name="code" class="form-control mb-2" maxlength="6" required>
+        <button type="submit" class="btn btn-primary">Activer 2FA</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

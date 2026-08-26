@@ -132,6 +132,35 @@ class MikroTikService:
         finally:
             self.disconnect()
 
+    def list_hotspot_cookies(self) -> list[dict]:
+        if settings.MIKROTIK_MOCK_MODE:
+            return [{"user": "demo-user1", "address": "192.168.88.100"}]
+        self.connect()
+        try:
+            return self._pool.get_api().get_resource("/ip/hotspot/cookie").get()
+        finally:
+            self.disconnect()
+
+    def disconnect_active_user(self, session_id: str) -> bool:
+        if settings.MIKROTIK_MOCK_MODE:
+            return True
+        self.connect()
+        try:
+            resource = self._pool.get_api().get_resource("/ip/hotspot/active")
+            resource.remove(id=session_id)
+            return True
+        finally:
+            self.disconnect()
+
+    def list_simple_queues(self) -> list[dict]:
+        if settings.MIKROTIK_MOCK_MODE:
+            return [{"name": "default", "target": "192.168.88.0/24"}]
+        self.connect()
+        try:
+            return self._pool.get_api().get_resource("/queue/simple").get()
+        finally:
+            self.disconnect()
+
     def get_system_info(self) -> dict:
         if settings.MIKROTIK_MOCK_MODE:
             return {
