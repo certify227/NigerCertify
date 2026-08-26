@@ -1,0 +1,19 @@
+[Unit]
+Description=WiFiZone Pro — Celery worker
+After=wifizone-web.service
+Requires=wifizone-web.service
+
+[Service]
+Type=exec
+User=__WIFIZONE_USER__
+Group=__WIFIZONE_GROUP__
+WorkingDirectory=__BACKEND_DIR__
+EnvironmentFile=__ENV_FILE__
+Environment=DJANGO_SETTINGS_MODULE=config.settings
+ExecStart=__VENV__/bin/celery -A config worker -l warning --concurrency=2
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
