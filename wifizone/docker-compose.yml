@@ -15,12 +15,19 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
   web:
     build: ./backend
     ports:
       - "8080:8000"
     environment:
       DATABASE_URL: postgres://wifizone:wifizone@db:5432/wifizone
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
       DJANGO_SECRET_KEY: change-me-in-production-use-long-random-string
       DJANGO_DEBUG: "true"
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,web
@@ -31,8 +38,35 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     volumes:
       - media_data:/app/media
+
+  celery_worker:
+    build: ./backend
+    command: celery -A config worker -l info
+    environment:
+      DATABASE_URL: postgres://wifizone:wifizone@db:5432/wifizone
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      MIKROTIK_MOCK_MODE: "true"
+    depends_on:
+      - db
+      - redis
+      - web
+
+  celery_beat:
+    build: ./backend
+    command: celery -A config beat -l info
+    environment:
+      DATABASE_URL: postgres://wifizone:wifizone@db:5432/wifizone
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - web
 
 volumes:
   postgres_data:

@@ -29,12 +29,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",
     "accounts",
     "billing",
     "routers",
     "hotspots",
     "dashboard",
     "api",
+    "core",
+    "support",
 ]
 
 MIDDLEWARE = [
@@ -47,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "accounts.middleware.TOTPVerificationMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -147,6 +151,12 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 50,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {"anon": "60/min", "user": "300/min"},
 }
 
 from datetime import timedelta
@@ -161,3 +171,24 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     "http://localhost:3000,http://127.0.0.1:3000",
 ).split(",")
 CORS_ALLOW_CREDENTIALS = True
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+CELERY_BEAT_SCHEDULE = {
+    "check-routers-health": {
+        "task": "core.tasks.check_routers_health",
+        "schedule": 300.0,
+    },
+    "check-subscription-expiring": {
+        "task": "core.tasks.check_subscription_expiring",
+        "schedule": 86400.0,
+    },
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "WiFiZone Pro API",
+    "DESCRIPTION": "API REST opérateurs hotspot MikroTik",
+    "VERSION": "1.0.0",
+}
+
+SMS_BACKEND = os.getenv("SMS_BACKEND", "console")
