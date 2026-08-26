@@ -36,6 +36,8 @@ Plateforme SaaS Django pour opérateurs de zones WiFi (hotspot MikroTik), inspir
 
 **Guide complet :** [deploy/DEPLOY_UBUNTU.md](deploy/DEPLOY_UBUNTU.md)
 
+**Nginx système déjà en place (8000-8003 utilisés) :** [deploy/DEPLOY_HOST_NGINX.md](deploy/DEPLOY_HOST_NGINX.md)
+
 ```bash
 sudo git clone https://github.com/certify227/NigerCertify.git /opt/wifizone
 cd /opt/wifizone/wifizone

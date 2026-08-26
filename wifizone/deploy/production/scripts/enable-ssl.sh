@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Active HTTPS après obtention du certificat Let's Encrypt.
-set -euo pipefail
+set -eu
+[ -n "${BASH_VERSION:-}" ] && set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DEPLOY_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"

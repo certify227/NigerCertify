@@ -33,5 +33,20 @@ else:
 PY
 fi
 
-echo "[wifizone] Démarrage Daphne..."
-exec daphne -b 0.0.0.0 -p 8000 --proxy-headers config.asgi:application
+PORT="${APP_PORT:-8000}"
+ASGI_SERVER="${ASGI_SERVER:-gunicorn}"
+
+if [ "$ASGI_SERVER" = "daphne" ]; then
+  echo "[wifizone] Démarrage Daphne sur :${PORT}..."
+  exec daphne -b 0.0.0.0 -p "${PORT}" --proxy-headers config.asgi:application
+fi
+
+echo "[wifizone] Démarrage Gunicorn (Uvicorn worker) sur :${PORT}..."
+exec gunicorn config.asgi:application \
+  --bind "0.0.0.0:${PORT}" \
+  --workers "${GUNICORN_WORKERS:-2}" \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --timeout 120 \
+  --forwarded-allow-ips="*" \
+  --access-logfile - \
+  --error-logfile -

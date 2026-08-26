@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # WiFiZone Pro — installation production sur Ubuntu 22.04/24.04
-set -euo pipefail
+# Exécuter avec: sudo bash deploy/ubuntu/install.sh  (pas sh)
+set -eu
+if [ -n "${BASH_VERSION:-}" ]; then
+  set -o pipefail
+fi
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "Exécutez ce script en root: sudo $0"
