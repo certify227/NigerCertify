@@ -7,8 +7,7 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-APP_DIR="${APP_DIR:-/opt/wifizone}"
-REPO_URL="${REPO_URL:-}"
+WIFI_DOMAIN="${WIFI_DOMAIN:-wifi.nigercertify.com}"
 
 echo "=== WiFiZone Pro — déploiement production ==="
 
@@ -71,8 +70,8 @@ fi
 cd "$DEPLOY"
 
 if [ ! -f .env.production ]; then
-  echo "Génération des secrets..."
-  bash scripts/generate-secrets.sh .env.production
+  echo "Génération des secrets pour ${WIFI_DOMAIN}..."
+  WIFI_DOMAIN="$WIFI_DOMAIN" bash scripts/generate-secrets.sh .env.production
   echo "Éditez .env.production (domaine, email SMTP) puis relancez:"
   echo "  sudo APP_DIR=$APP_DIR $0"
   exit 0
@@ -92,8 +91,8 @@ echo ""
 echo "1. Pointez votre domaine vers ce serveur (DNS A record)"
 echo "2. Certificat SSL:"
 echo "   cd $DEPLOY"
-echo "   docker compose -f docker-compose.prod.yml run --rm certbot certonly --webroot -w /var/www/certbot -d VOTRE_DOMAINE -d www.VOTRE_DOMAINE --email vous@domaine.com --agree-tos --no-eff-email"
+echo "   docker compose -f docker-compose.prod.yml run --rm certbot certonly --webroot -w /var/www/certbot -d ${WIFI_DOMAIN} -d www.${WIFI_DOMAIN} --email admin@nigercertify.com --agree-tos --no-eff-email"
 echo "3. Activez HTTPS: ./scripts/enable-ssl.sh"
-echo "4. Accès: https://VOTRE_DOMAINE"
+echo "4. Accès: https://${WIFI_DOMAIN}"
 echo ""
 echo "Logs: docker compose -f docker-compose.prod.yml logs -f web"

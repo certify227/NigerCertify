@@ -253,7 +253,7 @@ if not DEBUG:
     ]
     if not CSRF_TRUSTED_ORIGINS:
         raise ImproperlyConfigured(
-            "CSRF_TRUSTED_ORIGINS requis en production (ex: https://votre-domaine.com)."
+            "CSRF_TRUSTED_ORIGINS requis en production (ex: https://wifi.nigercertify.com)."
         )
 
     CORS_ALLOWED_ORIGINS = [

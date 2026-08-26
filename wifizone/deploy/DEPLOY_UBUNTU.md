@@ -1,5 +1,7 @@
 # Déploiement WiFiZone Pro sur Ubuntu (production sécurisée)
 
+**Domaine production :** [https://wifi.nigercertify.com](https://wifi.nigercertify.com)
+
 Guide pour déployer WiFiZone Pro sur un serveur **Ubuntu 22.04 / 24.04** avec Docker, Nginx, TLS et durcissement sécurité.
 
 ## Prérequis
@@ -30,12 +32,10 @@ sudo nano /opt/wifizone/wifizone/deploy/production/.env.production
 
 Modifiez au minimum :
 
-- `DJANGO_ALLOWED_HOSTS` — votre domaine
-- `CSRF_TRUSTED_ORIGINS` — `https://votre-domaine.com`
-- `CORS_ALLOWED_ORIGINS` — si app mobile
-- `NGINX_HOST` — votre domaine
-- `EMAIL_*` — SMTP pour reset mot de passe
+- `EMAIL_*` — SMTP pour reset mot de passe (ex. `smtp.nigercertify.com`)
 - `CREATE_SUPERUSER=true` uniquement au **premier** déploiement
+
+Le domaine est déjà configuré : `wifi.nigercertify.com`
 
 Relancez l’installation :
 
@@ -50,8 +50,8 @@ cd /opt/wifizone/wifizone/deploy/production
 
 docker compose -f docker-compose.prod.yml run --rm certbot certonly \
   --webroot -w /var/www/certbot \
-  -d votre-domaine.com -d www.votre-domaine.com \
-  --email admin@votre-domaine.com --agree-tos --no-eff-email
+  -d wifi.nigercertify.com -d www.wifi.nigercertify.com \
+  --email admin@nigercertify.com --agree-tos --no-eff-email
 
 ./scripts/enable-ssl.sh
 ```
@@ -112,7 +112,7 @@ cd wifizone/deploy/production
 
 Après premier déploiement avec `CREATE_SUPERUSER=true`, connectez-vous à :
 
-`https://votre-domaine.com/admin/` (ou chemin `DJANGO_ADMIN_URL`)
+`https://wifi.nigercertify.com/admin/` (ou chemin `DJANGO_ADMIN_URL`)
 
 **Changez le mot de passe admin** immédiatement et désactivez `CREATE_SUPERUSER`.
 

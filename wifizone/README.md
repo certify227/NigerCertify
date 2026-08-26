@@ -42,7 +42,7 @@ cd /opt/wifizone/wifizone
 sudo bash deploy/ubuntu/install.sh
 ```
 
-Pack production : Docker sécurisé, Nginx, TLS Let's Encrypt, UFW, secrets générés, durcissement Django.
+Pack production : Docker sécurisé, Nginx, TLS Let's Encrypt — **https://wifi.nigercertify.com**
 
 ## Déploiement rapide (Docker)
 
