@@ -45,7 +45,26 @@ if [ -z "$DEPLOY" ]; then
 fi
 
 echo "✅ Fichier trouvé : $DEPLOY/docker-compose.host-nginx.yml"
+
+if [ -f "$DEPLOY/.env.production" ]; then
+  missing=0
+  for key in POSTGRES_PASSWORD REDIS_PASSWORD DJANGO_SECRET_KEY FERNET_KEY DATABASE_URL; do
+    val="$(grep -E "^${key}=" "$DEPLOY/.env.production" | head -1 | cut -d= -f2-)"
+    if [ -z "$val" ]; then
+      echo "❌ Variable vide : $key"
+      missing=1
+    fi
+  done
+  if [ "$missing" -eq 0 ]; then
+    echo "✅ .env.production — secrets présents"
+  else
+    echo "   Regénérez : cd $DEPLOY && mv .env.production .env.production.bak && ./scripts/generate-secrets.sh .env.production"
+  fi
+else
+  echo "❌ .env.production manquant — ./scripts/generate-secrets.sh .env.production"
+fi
+
 echo ""
 echo "Pour déployer :"
 echo "  cd $DEPLOY"
-echo "  docker compose -f docker-compose.host-nginx.yml up -d --build"
+echo "  bash ./scripts/compose-up.sh up -d --build"

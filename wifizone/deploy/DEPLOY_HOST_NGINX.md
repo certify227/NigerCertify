@@ -62,9 +62,18 @@ CREATE_SUPERUSER=true   # premier déploiement seulement
 ```bash
 cd /opt/wifizone/wifizone/deploy/production
 
-docker compose -f docker-compose.host-nginx.yml build --pull
-docker compose -f docker-compose.host-nginx.yml up -d
-docker compose -f docker-compose.host-nginx.yml ps
+bash ./scripts/compose-up.sh build --pull
+bash ./scripts/compose-up.sh up -d
+bash ./scripts/compose-up.sh ps
+```
+
+Le script `compose-up.sh` valide `.env.production`, crée le lien `.env` et passe `--env-file` à Docker Compose (évite l’erreur `POSTGRES_PASSWORD requis`).
+
+Si Git refuse l’accès au dépôt (`dubious ownership`) :
+
+```bash
+sudo git config --global --add safe.directory /opt/wifizone
+sudo chown -R adminsys0:adminsys0 /opt/wifizone
 ```
 
 Vérification locale :
