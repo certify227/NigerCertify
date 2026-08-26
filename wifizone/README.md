@@ -13,6 +13,17 @@ Plateforme SaaS Django pour opérateurs de zones WiFi (hotspot MikroTik), inspir
 - **Rapports** : ventes par profil, graphique 7 jours sur le tableau de bord
 - **Sécurité** : réinitialisation mot de passe par email, chiffrement identifiants routeur
 - **Interface responsive** : Bootstrap 5, mobile-friendly
+- **Enterprise** : équipe multi-utilisateurs, commissions, points de vente, invitations email
+- **Core** : branding white-label, audit, webhooks, notifications, onboarding, carte WiFi publique
+- **Support** : tickets d'assistance
+- **Portefeuilles clients** : recharge manuelle (sans passerelle paiement)
+- **Fidélité** : programme points par voucher
+- **2FA** : TOTP (Google Authenticator)
+- **Rapports** : avancés + export PDF
+- **Import CSV** : utilisateurs MikroTik
+- **API OpenAPI** : `/api/docs/` — POS, wallets, notifications, support, dashboard live
+- **App mobile** : Expo (`wifizone/mobile/`) — JWT + stats live
+- **Celery** : health routeurs, alertes abonnement (Redis)
 
 ## Déploiement rapide (Docker)
 
@@ -51,12 +62,9 @@ python manage.py runserver 8080
 
 Sans routeur réel, définir `MIKROTIK_MOCK_MODE=true` pour simuler les réponses API.
 
-## Abonnements & paiement
+## Abonnements
 
-L'activation des forfaits est simulée. Pour la production, intégrer :
-
-- Stripe / PayPal pour cartes
-- Mobile Money (Orange, MTN, etc.) pour le Niger et l'Afrique de l'Ouest
+L'activation des forfaits est simulée (pas de Stripe / Mobile Money intégré).
 
 ## Structure
 
@@ -67,6 +75,10 @@ wifizone/backend/
   routers/     — routeurs MikroTik + service API
   hotspots/    — profils, vouchers, rapports
   dashboard/   — landing + tableau de bord
+  api/         — REST JWT + OpenAPI
+  core/        — branding, audit, webhooks, notifications
+  support/     — tickets assistance
+wifizone/mobile/ — app Expo (optionnel)
 ```
 
 ## API REST (app mobile)

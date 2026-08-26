@@ -17,7 +17,16 @@ from accounts.tenant import (
 )
 from billing.services import get_user_subscription
 from dashboard.services.analytics import get_dashboard_chart_data, get_subscription_days_left
-from hotspots.models import HotspotLoginTemplate, HotspotProfile, Voucher, VoucherBatch
+from hotspots.models import (
+    CustomerWallet,
+    HotspotLoginTemplate,
+    HotspotProfile,
+    PointOfSale,
+    Voucher,
+    VoucherBatch,
+)
+from core.models import Notification, OperatorBranding
+from support.models import SupportTicket
 from hotspots.services.export import batch_csv_content
 from hotspots.services.login_template import build_mikrotik_login_html
 from hotspots.services.qr import qr_code_base64, voucher_login_payload
@@ -27,12 +36,17 @@ from routers.services.mikrotik import get_service_for_router, test_router_connec
 
 from .permissions import IsOperatorMember, get_operator_from_request
 from .serializers import (
+    BrandingSerializer,
+    CustomerWalletSerializer,
     GenerateVoucherSerializer,
     HotspotProfileSerializer,
     LoginTemplateSerializer,
+    NotificationSerializer,
+    PointOfSaleSerializer,
     RouterCreateSerializer,
     RouterSerializer,
     SubscriptionSerializer,
+    SupportTicketSerializer,
     TeamMemberSerializer,
     UserSerializer,
     VoucherBatchSerializer,
@@ -108,6 +122,22 @@ class RouterViewSet(viewsets.ModelViewSet):
             router.last_connected_at = timezone.now()
         router.save()
         return Response({"ok": ok, "message": message})
+
+    @action(detail=True, methods=["post"])
+    def disconnect_user(self, request, pk=None):
+        router = self.get_object()
+        session_id = request.data.get("session_id")
+        if not session_id:
+            raise ValidationError("session_id requis")
+        service = get_service_for_router(router)
+        ok = service.disconnect_active_user(session_id)
+        return Response({"ok": ok})
+
+    @action(detail=True, methods=["get"])
+    def cookies(self, request, pk=None):
+        router = self.get_object()
+        service = get_service_for_router(router)
+        return Response(service.list_hotspot_cookies())
 
     @action(detail=True, methods=["get"])
     def active_users(self, request, pk=None):
@@ -288,9 +318,85 @@ class TeamMemberViewSet(viewsets.ModelViewSet):
         current = TeamMembership.objects.filter(owner=operator, is_active=True).count()
         if current >= max_staff:
             raise ValidationError(f"Limite employés atteinte ({max_staff} max).")
-        serializer.save(owner=operator)
+        serializer.context["owner"] = operator
+        serializer.save()
 
     def perform_destroy(self, instance):
         if not can_manage_team(self.request.user):
             raise PermissionDenied("Permission refusée.")
         instance.delete()
+
+
+class PointOfSaleViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsOperatorMember]
+    serializer_class = PointOfSaleSerializer
+
+    def get_queryset(self):
+        operator = get_operator_from_request(self.request)
+        return PointOfSale.objects.filter(operator=operator)
+
+    def perform_create(self, serializer):
+        operator = get_operator_from_request(self.request)
+        serializer.save(operator=operator)
+
+
+class CustomerWalletViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsOperatorMember]
+    serializer_class = CustomerWalletSerializer
+
+    def get_queryset(self):
+        operator = get_operator_from_request(self.request)
+        return CustomerWallet.objects.filter(operator=operator)
+
+
+class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsOperatorMember]
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        operator = get_operator_from_request(self.request)
+        return Notification.objects.filter(operator=operator)[:50]
+
+
+class SupportTicketViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsOperatorMember]
+    serializer_class = SupportTicketSerializer
+
+    def get_queryset(self):
+        operator = get_operator_from_request(self.request)
+        return SupportTicket.objects.filter(operator=operator)
+
+    def perform_create(self, serializer):
+        operator = get_operator_from_request(self.request)
+        serializer.save(operator=operator)
+
+
+class BrandingView(APIView):
+    permission_classes = [IsOperatorMember]
+
+    def get(self, request):
+        operator = get_operator_from_request(request)
+        branding, _ = OperatorBranding.objects.get_or_create(operator=operator)
+        return Response(BrandingSerializer(branding).data)
+
+
+class LiveDashboardView(APIView):
+    """Stats temps réel pour polling dashboard / mobile."""
+
+    permission_classes = [IsOperatorMember]
+
+    def get(self, request):
+        from django.utils import timezone
+
+        operator = get_operator_from_request(request)
+        sub = get_user_subscription(operator)
+        routers = Router.objects.filter(owner=operator)
+        revenue = Voucher.objects.filter(router__owner=operator).aggregate(s=Sum("sold_price"))["s"] or 0
+        return Response({
+            "timestamp": timezone.now().isoformat(),
+            "router_count": routers.count(),
+            "online_count": routers.filter(connection_status=Router.ConnectionStatus.ONLINE).count(),
+            "total_vouchers": Voucher.objects.filter(router__owner=operator).count(),
+            "vouchers_month": sub.vouchers_used_this_month if sub else 0,
+            "revenue": int(revenue),
+        })

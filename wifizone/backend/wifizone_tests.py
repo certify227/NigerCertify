@@ -183,3 +183,34 @@ class WiFiZoneTests(TestCase):
         self.client.login(username="testop", password="TestPass123!")
         response = self.client.get("/accounts/team/")
         self.assertEqual(response.status_code, 200)
+
+    def test_core_settings_and_support(self):
+        self.client.login(username="testop", password="TestPass123!")
+        self.assertEqual(self.client.get("/core/settings/").status_code, 200)
+        self.assertEqual(self.client.get("/core/onboarding/").status_code, 200)
+        self.assertEqual(self.client.get("/support/").status_code, 200)
+        response = self.client.post(
+            "/support/new/",
+            {"subject": "Test", "message": "Help", "priority": "normal"},
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_live_dashboard_api(self):
+        from rest_framework.test import APIClient
+
+        api = APIClient()
+        token = api.post(
+            "/api/v1/auth/token/",
+            {"username": "testop", "password": "TestPass123!"},
+            format="json",
+        ).data["access"]
+        api.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        live = api.get("/api/v1/dashboard/live/")
+        self.assertEqual(live.status_code, 200)
+        self.assertIn("timestamp", live.data)
+
+    def test_reports_pdf(self):
+        self.client.login(username="testop", password="TestPass123!")
+        response = self.client.get("/hotspots/reports/pdf/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")

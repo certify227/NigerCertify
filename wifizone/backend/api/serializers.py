@@ -3,7 +3,16 @@ from rest_framework import serializers
 from accounts.models import TeamMembership, User
 from billing.models import Plan, Subscription
 from billing.services import get_user_subscription
-from hotspots.models import HotspotLoginTemplate, HotspotProfile, Voucher, VoucherBatch
+from hotspots.models import (
+    CustomerWallet,
+    HotspotLoginTemplate,
+    HotspotProfile,
+    PointOfSale,
+    Voucher,
+    VoucherBatch,
+)
+from support.models import SupportTicket
+from core.models import Notification, OperatorBranding
 from routers.models import Router
 
 
@@ -134,7 +143,10 @@ class TeamMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeamMembership
-        fields = ("id", "member", "role", "is_active", "joined_at", "username", "email", "password")
+        fields = (
+            "id", "member", "role", "is_active", "joined_at",
+            "commission_percent", "username", "email", "password",
+        )
         read_only_fields = ("id", "member", "joined_at")
 
     def create(self, validated_data):
@@ -143,9 +155,46 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password")
         email = validated_data.pop("email", "")
         user = User.objects.create_user(username=username, password=password, email=email)
-        return TeamMembership.objects.create(
+        membership = TeamMembership(
             owner=owner,
             member=user,
             role=validated_data.get("role", TeamMembership.Role.STAFF),
             is_active=True,
+            commission_percent=validated_data.get("commission_percent") or 0,
+        )
+        membership.apply_role_defaults()
+        membership.save()
+        return membership
+
+
+class PointOfSaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PointOfSale
+        fields = ("id", "name", "location", "is_active", "created_at")
+
+
+class CustomerWalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerWallet
+        fields = ("id", "phone", "name", "balance", "loyalty_points", "created_at")
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ("id", "channel", "title", "message", "is_read", "created_at")
+
+
+class SupportTicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SupportTicket
+        fields = ("id", "subject", "message", "status", "priority", "created_at", "updated_at")
+
+
+class BrandingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OperatorBranding
+        fields = (
+            "app_name", "logo_url", "primary_color", "custom_domain",
+            "support_email", "public_map_enabled", "latitude", "longitude",
         )
