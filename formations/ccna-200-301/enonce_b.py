@@ -10,6 +10,30 @@ EXAM_B = {
     "n_questions": 50,
     "bareme": "58 points (A 36 + B 16 + C 12)",
     "seuil": "80 %  ≈  47 / 58",
+    "referentiel": "Cisco CCNA 200-301 v1.1",
+    "header_line": "Examen blanc CCNA 200-301  ·  Document propriétaire",
+    "blueprint_title": "Répartition (blueprint Cisco 200-301 v1.1)",
+    "blueprint_text": (
+        "Fondamentaux réseau 20 %  ·  Accès réseau 20 %  ·  Connectivité IP 25 %  ·  "
+        "Services IP 10 %  ·  Sécurité 15 %  ·  Automatisation et programmabilité 10 %."
+    ),
+    "scoring_notes": [
+        "Partie A (Q 1–36) : une seule bonne réponse — 1 point.",
+        "Partie B (Q 37–44) : plusieurs bonnes réponses — 2 points, tout ou rien.",
+        "Partie C (Q 45–50) : scénarios / sorties IOS — 2 points.",
+        "Total : 58 points. Seuil indicatif « prêt CCNA » : 80 % (47/58).",
+        "Mini-lab papier : hors barème principal (bonus formateur +10 pts max si activé).",
+        "Écrire lisiblement. Les ratures illisibles sont nulles.",
+    ],
+    "pdf_subject": "Examen blanc CCNA 200-301 v1.1 — Niger Certify",
+    "pdf_keywords": "CCNA, Cisco, Niger Certify, examen blanc, propriétaire",
+    "corrige_code": "NC-CCNA-BLANC-CORRIGE-2026",
+    "corrige_subtitle": "Cisco CCNA 200-301 v1.1  ·  CONFIDENTIEL FORMATEUR",
+    "interpretation": (
+        "≥ 90 % : prêt examen officiel.  80–89 % : blanc réussi, revoir 1–2 domaines.  "
+        "70–79 % : lacunes ciblées (souvent masques, OSPF, ACL, STP).  "
+        "&lt; 70 % : ne pas planifier la date Cisco."
+    ),
     "parts": [
         {
             "title": "Partie A — QCM (une seule bonne réponse)",
@@ -714,6 +738,7 @@ EXAM_B = {
             "Durée indicative 15 minutes. Sujet distinct de la version A. "
             "Le formateur peut attribuer jusqu'à 10 points bonus."
         ),
+        "context_title": "Topologie (description)",
         "topo": (
             "PC-B --- SW-A ===Po1 LACP=== SW-B --- R2 --- FAI\n"
             "VLAN 30 data   VLAN 90 mgmt   native 90\n"

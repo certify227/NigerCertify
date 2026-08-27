@@ -342,7 +342,7 @@ def draw_cover_page(c, exam: dict) -> None:
     # Métadonnées
     meta = [
         ("Code document", exam["code"]),
-        ("Référentiel", "Cisco CCNA 200-301 v1.1"),
+        ("Référentiel", exam.get("referentiel", exam.get("subtitle", ""))),
         ("Durée", exam["duration"]),
         ("Nombre de questions", str(exam["n_questions"])),
         ("Barème", exam["bareme"]),
@@ -413,7 +413,14 @@ def _header_footer(c, doc, exam: dict) -> None:
     c.drawString(22 * mm, h - 7.2 * mm, "NIGER CERTIFY")
     c.setFont("NC", 7)
     c.setFillColor(HexColor("#F3D2BC"))
-    c.drawString(22 * mm, h - 11.6 * mm, "Examen blanc CCNA 200-301  ·  Document propriétaire")
+    c.drawString(
+        22 * mm,
+        h - 11.6 * mm,
+        exam.get(
+            "header_line",
+            "Examen blanc  ·  Document propriétaire",
+        ),
+    )
     c.setFillColor(ORANGE)
     c.roundRect(w - 42 * mm, h - 12.6 * mm, 28 * mm, 7.5 * mm, 1.5 * mm, fill=1, stroke=0)
     c.setFillColor(white)
@@ -565,23 +572,15 @@ def build_story(exam: dict, s: dict) -> list:
     story.append(Paragraph("Modalités de l'épreuve", s["h1"]))
     story.append(info_table(exam, s))
     story.append(Spacer(1, 6))
-    story.append(Paragraph("Répartition (blueprint Cisco 200-301 v1.1)", s["h2"]))
     story.append(
         Paragraph(
-            "Fondamentaux réseau 20 %  ·  Accès réseau 20 %  ·  Connectivité IP 25 %  ·  "
-            "Services IP 10 %  ·  Sécurité 15 %  ·  Automatisation et programmabilité 10 %.",
-            s["body"],
+            exam.get("blueprint_title", "Répartition (blueprint officiel)"),
+            s["h2"],
         )
     )
+    story.append(Paragraph(exam["blueprint_text"], s["body"]))
     story.append(Paragraph("Rappels de notation", s["h2"]))
-    bullets = [
-        "Partie A (Q 1–36) : une seule bonne réponse — 1 point.",
-        "Partie B (Q 37–44) : plusieurs bonnes réponses — 2 points, tout ou rien.",
-        "Partie C (Q 45–50) : scénarios / sorties IOS — 2 points.",
-        "Total : 58 points. Seuil indicatif « prêt CCNA » : 80 % (47/58).",
-        "Mini-lab papier : hors barème principal (bonus formateur +10 pts max si activé).",
-        "Écrire lisiblement. Les ratures illisibles sont nulles.",
-    ]
+    bullets = exam["scoring_notes"]
     story.append(
         ListFlowable(
             [ListItem(Paragraph(b, s["body_left"]), leftIndent=8, bulletColor=ORANGE) for b in bullets],
@@ -621,7 +620,9 @@ def build_story(exam: dict, s: dict) -> list:
     story.append(Paragraph(lab["title"], s["h1"]))
     story.append(Paragraph(lab["intro"], s["body"]))
     if lab.get("topo"):
-        story.append(Paragraph("Topologie (description)", s["h2"]))
+        story.append(
+            Paragraph(lab.get("context_title", "Contexte (description)"), s["h2"])
+        )
         story.append(CodeBox(lab["topo"]))
     story.append(Paragraph("Tâches", s["h2"]))
     for i, task in enumerate(lab["tasks"], 1):
@@ -692,9 +693,11 @@ def build_pdf(exam: dict, outfile: Path) -> Path:
         pagesize=A4,
         title=f"{exam['title']} — Version {exam['version']}",
         author=OWNER,
-        subject=f"Examen blanc CCNA 200-301 v1.1 — {OWNER}",
+        subject=exam.get("pdf_subject", f"Examen blanc — {OWNER}"),
         creator=f"{OWNER} — générateur interne {YEAR}",
-        keywords="CCNA, Cisco, Niger Certify, examen blanc, propriétaire",
+        keywords=exam.get(
+            "pdf_keywords", "Niger Certify, examen blanc, propriétaire"
+        ),
         leftMargin=16 * mm,
         rightMargin=16 * mm,
         topMargin=24 * mm,
@@ -720,27 +723,34 @@ def build_pdf(exam: dict, outfile: Path) -> Path:
     return outfile
 
 
-def build_corrige_pdf(exams: list[dict], outfile: Path) -> Path:
+def build_corrige_pdf(exams: list[dict], outfile: Path, meta: dict | None = None) -> Path:
     """Corrigé formateur (A + B) — ne pas distribuer aux candidats."""
     register_fonts()
     s = styles()
     outfile.parent.mkdir(parents=True, exist_ok=True)
 
-    meta = {
+    sample = exams[0]
+    nq = sample["n_questions"]
+    meta = meta or {
         "version": "CORRIGÉ",
         "title": "Corrigé formateur — Examens blancs A et B",
-        "subtitle": "Cisco CCNA 200-301 v1.1  ·  CONFIDENTIEL FORMATEUR",
-        "code": "NC-CCNA-BLANC-CORRIGE-2026",
+        "subtitle": sample.get(
+            "corrige_subtitle",
+            f"{sample.get('pdf_subject', 'Examen blanc')}  ·  CONFIDENTIEL FORMATEUR",
+        ),
+        "code": sample.get("corrige_code", "NC-BLANC-CORRIGE-2026"),
         "duration": "N/A (document formateur)",
-        "n_questions": "50 + 50",
-        "bareme": "58 pts / version",
-        "seuil": "80 % = 47/58",
+        "n_questions": f"{nq} + {nq}",
+        "bareme": sample.get("bareme", ""),
+        "seuil": sample.get("seuil", ""),
+        "header_line": sample.get("header_line", "Corrigé formateur  ·  Document propriétaire"),
     }
+    meta.setdefault("header_line", sample.get("header_line", "Corrigé formateur · Document propriétaire"))
 
     doc = BaseDocTemplate(
         str(outfile),
         pagesize=A4,
-        title="Corrigé formateur CCNA — Niger Certify",
+        title=f"Corrigé formateur — {OWNER}",
         author=OWNER,
         subject="Corrigé confidentiel — ne pas diffuser aux candidats",
         creator=f"{OWNER} {YEAR}",
@@ -773,7 +783,7 @@ def build_corrige_pdf(exams: list[dict], outfile: Path) -> Path:
         story.append(Paragraph(f"Version {exam['version']} — grille de réponses", s["h1"]))
         story.append(
             Paragraph(
-                f"Code {esc(exam['code'])}. Mini-lab : voir extraits de configuration en fin de version.",
+                f"Code {esc(exam['code'])}. Mini-lab : voir extraits attendus en fin de version.",
                 s["note"],
             )
         )
@@ -817,16 +827,18 @@ def build_corrige_pdf(exams: list[dict], outfile: Path) -> Path:
     story.append(Paragraph("Grille d'interprétation (promo)", s["h1"]))
     story.append(
         Paragraph(
-            "≥ 90 % : prêt examen officiel.  80–89 % : blanc réussi, revoir 1–2 domaines.  "
-            "70–79 % : lacunes ciblées (souvent masques, OSPF, ACL, STP).  "
-            "&lt; 70 % : ne pas planifier la date Cisco.",
+            exams[0].get(
+                "interpretation",
+                "≥ 90 % : prêt examen officiel.  80–89 % : blanc réussi.  "
+                "70–79 % : lacunes ciblées.  &lt; 70 % : ne pas planifier la date d'examen.",
+            ),
             s["body"],
         )
     )
     story.append(Spacer(1, 8))
     story.append(
         Paragraph(
-            f"Fin du corrigé — {OWNER} — NC-CCNA-BLANC-CORRIGE-2026",
+            f"Fin du corrigé — {OWNER} — {meta['code']}",
             s["center_small"],
         )
     )
