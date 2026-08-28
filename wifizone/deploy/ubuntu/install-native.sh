@@ -80,11 +80,12 @@ GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}"
 # PostgreSQL
 if [ "$SKIP_DB_SETUP" != "true" ]; then
   echo "Configuration PostgreSQL..."
-  psql -U postgres -tc "SELECT 1 FROM pg_roles WHERE rolname='${POSTGRES_USER}'" | grep -q 1 \
-    || psql -U postgres -c "CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';"
-  psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname='${POSTGRES_DB}'" | grep -q 1 \
-    || psql -U postgres -c "CREATE DATABASE ${POSTGRES_DB} OWNER ${POSTGRES_USER};"
-  psql -U postgres -c "ALTER USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';"
+  psql_cmd() { sudo -u postgres psql "$@"; }
+  psql_cmd -tc "SELECT 1 FROM pg_roles WHERE rolname='${POSTGRES_USER}'" | grep -q 1 \
+    || psql_cmd -c "CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';"
+  psql_cmd -tc "SELECT 1 FROM pg_database WHERE datname='${POSTGRES_DB}'" | grep -q 1 \
+    || psql_cmd -c "CREATE DATABASE ${POSTGRES_DB} OWNER ${POSTGRES_USER};"
+  psql_cmd -c "ALTER USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';"
 fi
 
 # Redis
