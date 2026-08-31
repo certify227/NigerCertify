@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Creator Pack — preview panneau</title>
+  <link rel="stylesheet" href="../plugin/styles.css" />
+  <style>
+    body { display: flex; gap: 24px; padding: 24px; background: #111; min-height: 100vh; box-sizing: border-box; }
+    .host { width: 340px; height: 760px; background: #1d1d1d; border: 1px solid #3e3e3e; border-radius: 8px; overflow: auto; flex-shrink: 0; }
+    .host .app { min-height: 740px; }
+    sp-button, sp-checkbox, sp-radio, sp-label, sp-textfield, sp-textarea, sp-picker, sp-menu-item, sp-radio-group {
+      display: block; font: inherit; color: inherit;
+    }
+    sp-button {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #3e3e3e; border: 0; border-radius: 4px; padding: 6px 10px; cursor: pointer;
+    }
+    sp-button[variant="cta"] { background: #2680eb; }
+    sp-button[variant="primary"] { background: #1473e6; width: 100%; }
+    sp-textfield, sp-textarea { background: #2a2a2a; border: 1px solid #3e3e3e; border-radius: 4px; padding: 6px; min-height: 28px; }
+    sp-textarea { min-height: 72px; }
+    .aside { color: #f4f4f4; font-family: sans-serif; }
+    .aside h2 { margin: 0 0 12px; }
+    .aside img, .aside object { background: #1d1d1d; border-radius: 8px; max-width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="host">
+    <div class="app">
+      <header class="hero">
+        <div>
+          <h1>Creator Pack</h1>
+          <p id="doc-label">Drop_Septembre.psd</p>
+        </div>
+        <sp-button id="btn-refresh" size="s">Sync</sp-button>
+      </header>
+      <div class="tabs">
+        <div class="tab selected" data-tab="canvas">Canvas</div>
+        <div class="tab" data-tab="type">Type</div>
+        <div class="tab" data-tab="story">Story</div>
+      </div>
+      <section class="page visible" id="page-canvas">
+        <sp-label>Formats cochés par défaut</sp-label>
+        <div class="preset-list">
+          <div class="preset-row"><span>IG 4:5 · Instagram Feed</span><span class="preset-dim">1080×1350</span></div>
+          <div class="preset-row"><span>Story 9:16</span><span class="preset-dim">1080×1920</span></div>
+          <div class="preset-row"><span>TikTok</span><span class="preset-dim">1080×1920</span></div>
+          <div class="preset-row"><span>YT 16:9</span><span class="preset-dim">1280×720</span></div>
+        </div>
+        <sp-label>Recadrage : Subject lock</sp-label>
+        <div class="row mt">
+          <sp-button variant="cta">Générer les artboards</sp-button>
+        </div>
+      </section>
+      <section class="page" id="page-type">
+        <sp-label>Hook / Preuve / CTA</sp-label>
+        <sp-textfield>Plus légère. Plus loin.</sp-textfield>
+        <sp-textfield>Amorti +20% sur chaque foulée</sp-textfield>
+        <sp-textfield>Shop now</sp-textfield>
+        <div class="row mt"><sp-button variant="cta">Appliquer la typo</sp-button></div>
+      </section>
+      <section class="page" id="page-story">
+        <sp-label>Template PAS — 5 frames</sp-label>
+        <div class="beats">
+          <div class="beat"><strong>FR 01 · Problème</strong><span>Nomme la douleur en 5 mots.</span></div>
+          <div class="beat"><strong>FR 02 · Agitation</strong><span>Montre le coût de ne rien changer.</span></div>
+          <div class="beat"><strong>FR 03 · Solution</strong><span>Introduis le produit / l’idée.</span></div>
+          <div class="beat"><strong>FR 04 · Preuve</strong><span>Chiffre, avant/après, témoignage.</span></div>
+          <div class="beat"><strong>FR 05 · CTA</strong><span>Verbe + offre claire.</span></div>
+        </div>
+        <div class="row mt"><sp-button variant="cta">Générer les frames</sp-button></div>
+      </section>
+      <footer class="footer">
+        <sp-button variant="primary">Exporter le pack</sp-button>
+        <p class="status ok">4 artboards + 5 frames prêts à l’export sRGB.</p>
+      </footer>
+    </div>
+  </div>
+  <div class="aside">
+    <h2>Plan Canvas + Story (moteur réel)</h2>
+    <object data="golden-path.svg" type="image/svg+xml" width="920" height="640">golden-path</object>
+    <p>Zones rouges pointillées = safe zones plateforme. Rectangles bleus = CP_SUBJECT.</p>
+  </div>
+  <script>
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.onclick = () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("selected"));
+        document.querySelectorAll(".page").forEach((p) => p.classList.remove("visible"));
+        tab.classList.add("selected");
+        document.getElementById("page-" + tab.dataset.tab).classList.add("visible");
+      };
+    });
+  </script>
+</body>
+</html>

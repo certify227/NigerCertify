@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Creator Pack</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div>
+        <h1>Creator Pack</h1>
+        <p id="doc-label">Aucun document</p>
+      </div>
+      <sp-button id="btn-refresh" size="s" variant="secondary" quiet>Sync</sp-button>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <div class="tab selected" data-tab="canvas" id="tab-canvas">Canvas</div>
+      <div class="tab" data-tab="type" id="tab-type">Type</div>
+      <div class="tab" data-tab="story" id="tab-story">Story</div>
+    </div>
+
+    <section class="page visible" id="page-canvas">
+      <sp-label>Master</sp-label>
+      <div class="row">
+        <sp-button id="btn-master" variant="secondary" size="s">Définir CP_MASTER</sp-button>
+        <sp-button id="btn-subject" variant="secondary" size="s">Détecter le sujet</sp-button>
+      </div>
+
+      <sp-label class="mt">Formats</sp-label>
+      <div id="preset-list" class="preset-list"></div>
+
+      <sp-label class="mt">Recadrage</sp-label>
+      <sp-radio-group id="crop-mode" selected="subject" name="crop-mode">
+        <sp-radio value="subject">Subject lock</sp-radio>
+        <sp-radio value="face">Face bias</sp-radio>
+        <sp-radio value="letterbox">Letterbox marque</sp-radio>
+      </sp-radio-group>
+
+      <sp-checkbox id="chk-safezone" checked>Overlays zones de sécurité</sp-checkbox>
+
+      <div class="row mt">
+        <sp-button id="btn-canvas" variant="cta">Générer les artboards</sp-button>
+        <sp-button id="btn-safe-toggle" variant="secondary" quiet>Masquer overlays</sp-button>
+      </div>
+    </section>
+
+    <section class="page" id="page-type">
+      <sp-label>Brief (une idée par phrase)</sp-label>
+      <sp-textarea id="brief" placeholder="Nouvelles baskets ultra légères. Amorti +20%. Shop now."></sp-textarea>
+      <div class="row">
+        <sp-button id="btn-parse" variant="secondary" size="s">Découper le brief</sp-button>
+      </div>
+
+      <sp-label class="mt">Hook</sp-label>
+      <sp-textfield id="txt-hook" placeholder="Accroche 3–7 mots"></sp-textfield>
+      <div id="hook-variants" class="chips"></div>
+
+      <sp-label class="mt">Preuve</sp-label>
+      <sp-textfield id="txt-proof" placeholder="Bénéfice ou chiffre"></sp-textfield>
+
+      <sp-label class="mt">CTA</sp-label>
+      <sp-textfield id="txt-cta" placeholder="Shop now"></sp-textfield>
+
+      <div class="row mt">
+        <div class="grow">
+          <sp-label>Rythme</sp-label>
+          <sp-picker id="type-template" size="s">
+            <sp-menu slot="options">
+              <sp-menu-item value="hook_proof_cta" selected>Hook / Preuve / CTA</sp-menu-item>
+              <sp-menu-item value="number_context_cta">Chiffre + contexte</sp-menu-item>
+              <sp-menu-item value="question_answer_cta">Question / réponse</sp-menu-item>
+              <sp-menu-item value="quote_source">Citation</sp-menu-item>
+              <sp-menu-item value="silent_caption">Caption Reels</sp-menu-item>
+            </sp-menu>
+          </sp-picker>
+        </div>
+        <div class="grow">
+          <sp-label>Densité</sp-label>
+          <sp-picker id="type-density" size="s">
+            <sp-menu slot="options">
+              <sp-menu-item value="compact">Compact</sp-menu-item>
+              <sp-menu-item value="normal" selected>Normal</sp-menu-item>
+              <sp-menu-item value="airy">Aéré</sp-menu-item>
+            </sp-menu>
+          </sp-picker>
+        </div>
+      </div>
+
+      <sp-checkbox id="chk-scrim" checked>Scrim auto si contraste faible</sp-checkbox>
+      <sp-checkbox id="chk-type-all" checked>Pousser vers tous les artboards CP_*</sp-checkbox>
+
+      <div class="row mt">
+        <sp-button id="btn-type" variant="cta">Appliquer la typo</sp-button>
+      </div>
+      <div id="type-report" class="report"></div>
+    </section>
+
+    <section class="page" id="page-story">
+      <sp-label>Template narratif</sp-label>
+      <sp-picker id="story-template" size="s">
+        <sp-menu slot="options">
+          <sp-menu-item value="pas" selected>PAS — 5 frames</sp-menu-item>
+          <sp-menu-item value="before_after">Avant / Après — 3</sp-menu-item>
+          <sp-menu-item value="howto">How-to — 6</sp-menu-item>
+          <sp-menu-item value="myth">Mythe vs vérité — 4</sp-menu-item>
+          <sp-menu-item value="reels_beats">Reels beats — 6</sp-menu-item>
+        </sp-menu>
+      </sp-picker>
+
+      <div class="row mt">
+        <div class="grow">
+          <sp-label>Nombre de frames</sp-label>
+          <sp-textfield id="frame-count" type="number" value="5"></sp-textfield>
+        </div>
+        <div class="grow">
+          <sp-label>Format des frames</sp-label>
+          <sp-picker id="story-preset" size="s">
+            <sp-menu slot="options">
+              <sp-menu-item value="ig_feed_45" selected>IG 4:5</sp-menu-item>
+              <sp-menu-item value="ig_story">Story 9:16</sp-menu-item>
+              <sp-menu-item value="tiktok">TikTok</sp-menu-item>
+            </sp-menu>
+          </sp-picker>
+        </div>
+      </div>
+
+      <sp-label class="mt">Continuité</sp-label>
+      <sp-checkbox id="chk-cont-bg" checked>Même fond</sp-checkbox>
+      <sp-checkbox id="chk-cont-subject" checked>Même sujet</sp-checkbox>
+      <sp-checkbox id="chk-cont-type" checked>Même style typo</sp-checkbox>
+      <sp-checkbox id="chk-notes">Afficher les notes de beat (non exportées)</sp-checkbox>
+
+      <div id="beat-list" class="beats"></div>
+
+      <div class="row mt">
+        <sp-button id="btn-story" variant="cta">Générer les frames</sp-button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <sp-button id="btn-export" variant="primary">Exporter le pack</sp-button>
+      <p id="status" class="status">Prêt. Charge un document, puis génère les artboards.</p>
+    </footer>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>

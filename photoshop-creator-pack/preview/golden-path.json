@@ -1,0 +1,813 @@
+{
+  "master": {
+    "width": 1080,
+    "height": 1350
+  },
+  "subject": {
+    "left": 280,
+    "top": 220,
+    "right": 800,
+    "bottom": 1180,
+    "width": 520,
+    "height": 960
+  },
+  "canvas": [
+    {
+      "name": "CP_AB_ig_feed_45",
+      "preset": {
+        "id": "ig_feed_45",
+        "label": "Instagram Feed 4:5",
+        "short": "IG 4:5",
+        "platform": "instagram",
+        "width": 1080,
+        "height": 1350,
+        "safeTop": 0.04,
+        "safeBottom": 0.06,
+        "safeSide": 0.05,
+        "type": {
+          "hook": {
+            "minPt": 36,
+            "maxPt": 72,
+            "maxLines": 3
+          },
+          "proof": {
+            "minPt": 22,
+            "maxPt": 36,
+            "maxLines": 3
+          },
+          "cta": {
+            "minPt": 20,
+            "maxPt": 28,
+            "maxLines": 1
+          }
+        },
+        "default": true
+      },
+      "transform": {
+        "scale": 1,
+        "scalePercent": 100,
+        "tx": 0,
+        "ty": 0,
+        "scaledW": 1080,
+        "scaledH": 1350,
+        "dstW": 1080,
+        "dstH": 1350,
+        "needsExpand": false,
+        "crop": {
+          "left": 0,
+          "top": 0,
+          "width": 1080,
+          "height": 1350
+        }
+      },
+      "safe": {
+        "left": 54,
+        "top": 54,
+        "right": 1026,
+        "bottom": 1269,
+        "width": 972,
+        "height": 1215
+      },
+      "typeBoxes": {
+        "safe": {
+          "left": 54,
+          "top": 54,
+          "right": 1026,
+          "bottom": 1269,
+          "width": 972,
+          "height": 1215
+        },
+        "hook": {
+          "left": 54,
+          "top": 54,
+          "right": 1026,
+          "bottom": 549,
+          "width": 972,
+          "height": 495
+        },
+        "proof": {
+          "left": 54,
+          "top": 567,
+          "right": 1026,
+          "bottom": 944,
+          "width": 972,
+          "height": 377
+        },
+        "cta": {
+          "left": 54,
+          "top": 962,
+          "right": 1026,
+          "bottom": 1174,
+          "width": 972,
+          "height": 212
+        }
+      }
+    },
+    {
+      "name": "CP_AB_ig_story",
+      "preset": {
+        "id": "ig_story",
+        "label": "Instagram Story / Reels",
+        "short": "Story 9:16",
+        "platform": "instagram",
+        "width": 1080,
+        "height": 1920,
+        "safeTop": 0.14,
+        "safeBottom": 0.2,
+        "safeSide": 0.08,
+        "type": {
+          "hook": {
+            "minPt": 42,
+            "maxPt": 78,
+            "maxLines": 4
+          },
+          "proof": {
+            "minPt": 24,
+            "maxPt": 40,
+            "maxLines": 3
+          },
+          "cta": {
+            "minPt": 22,
+            "maxPt": 32,
+            "maxLines": 1
+          }
+        },
+        "default": true
+      },
+      "transform": {
+        "scale": 1.4222222222222223,
+        "scalePercent": 142.22222222222223,
+        "tx": -228,
+        "ty": 0,
+        "scaledW": 1536,
+        "scaledH": 1920,
+        "dstW": 1080,
+        "dstH": 1920,
+        "needsExpand": false,
+        "crop": {
+          "left": 228,
+          "top": 0,
+          "width": 1080,
+          "height": 1920
+        }
+      },
+      "safe": {
+        "left": 86,
+        "top": 269,
+        "right": 994,
+        "bottom": 1536,
+        "width": 908,
+        "height": 1267
+      },
+      "typeBoxes": {
+        "safe": {
+          "left": 86,
+          "top": 269,
+          "right": 994,
+          "bottom": 1536,
+          "width": 908,
+          "height": 1267
+        },
+        "hook": {
+          "left": 86,
+          "top": 269,
+          "right": 994,
+          "bottom": 786,
+          "width": 908,
+          "height": 517
+        },
+        "proof": {
+          "left": 86,
+          "top": 804,
+          "right": 994,
+          "bottom": 1198,
+          "width": 908,
+          "height": 394
+        },
+        "cta": {
+          "left": 86,
+          "top": 1216,
+          "right": 994,
+          "bottom": 1438,
+          "width": 908,
+          "height": 222
+        }
+      }
+    },
+    {
+      "name": "CP_AB_tiktok",
+      "preset": {
+        "id": "tiktok",
+        "label": "TikTok",
+        "short": "TikTok",
+        "platform": "tiktok",
+        "width": 1080,
+        "height": 1920,
+        "safeTop": 0.12,
+        "safeBottom": 0.22,
+        "safeSide": 0.1,
+        "type": {
+          "hook": {
+            "minPt": 42,
+            "maxPt": 78,
+            "maxLines": 4
+          },
+          "proof": {
+            "minPt": 24,
+            "maxPt": 38,
+            "maxLines": 3
+          },
+          "cta": {
+            "minPt": 22,
+            "maxPt": 32,
+            "maxLines": 1
+          }
+        },
+        "default": true
+      },
+      "transform": {
+        "scale": 1.4222222222222223,
+        "scalePercent": 142.22222222222223,
+        "tx": -228,
+        "ty": 0,
+        "scaledW": 1536,
+        "scaledH": 1920,
+        "dstW": 1080,
+        "dstH": 1920,
+        "needsExpand": false,
+        "crop": {
+          "left": 228,
+          "top": 0,
+          "width": 1080,
+          "height": 1920
+        }
+      },
+      "safe": {
+        "left": 108,
+        "top": 230,
+        "right": 972,
+        "bottom": 1498,
+        "width": 864,
+        "height": 1268
+      },
+      "typeBoxes": {
+        "safe": {
+          "left": 108,
+          "top": 230,
+          "right": 972,
+          "bottom": 1498,
+          "width": 864,
+          "height": 1268
+        },
+        "hook": {
+          "left": 108,
+          "top": 230,
+          "right": 972,
+          "bottom": 747,
+          "width": 864,
+          "height": 517
+        },
+        "proof": {
+          "left": 108,
+          "top": 765,
+          "right": 972,
+          "bottom": 1159,
+          "width": 864,
+          "height": 394
+        },
+        "cta": {
+          "left": 108,
+          "top": 1177,
+          "right": 972,
+          "bottom": 1399,
+          "width": 864,
+          "height": 222
+        }
+      }
+    },
+    {
+      "name": "CP_AB_yt_thumb",
+      "preset": {
+        "id": "yt_thumb",
+        "label": "YouTube Miniature",
+        "short": "YT 16:9",
+        "platform": "youtube",
+        "width": 1280,
+        "height": 720,
+        "safeTop": 0.08,
+        "safeBottom": 0.12,
+        "safeSide": 0.06,
+        "type": {
+          "hook": {
+            "minPt": 28,
+            "maxPt": 64,
+            "maxLines": 2
+          },
+          "proof": {
+            "minPt": 18,
+            "maxPt": 28,
+            "maxLines": 2
+          },
+          "cta": {
+            "minPt": 16,
+            "maxPt": 24,
+            "maxLines": 1
+          }
+        },
+        "default": true
+      },
+      "transform": {
+        "scale": 1.1851851851851851,
+        "scalePercent": 118.5185185185185,
+        "tx": 0,
+        "ty": -469.62962962962956,
+        "scaledW": 1280,
+        "scaledH": 1600,
+        "dstW": 1280,
+        "dstH": 720,
+        "needsExpand": false,
+        "crop": {
+          "left": 0,
+          "top": 470,
+          "width": 1280,
+          "height": 720
+        }
+      },
+      "safe": {
+        "left": 77,
+        "top": 58,
+        "right": 1203,
+        "bottom": 634,
+        "width": 1126,
+        "height": 576
+      },
+      "typeBoxes": {
+        "safe": {
+          "left": 77,
+          "top": 58,
+          "right": 1203,
+          "bottom": 634,
+          "width": 1126,
+          "height": 576
+        },
+        "hook": {
+          "left": 77,
+          "top": 58,
+          "right": 1203,
+          "bottom": 285,
+          "width": 1126,
+          "height": 227
+        },
+        "proof": {
+          "left": 77,
+          "top": 303,
+          "right": 1203,
+          "bottom": 476,
+          "width": 1126,
+          "height": 173
+        },
+        "cta": {
+          "left": 77,
+          "top": 494,
+          "right": 1203,
+          "bottom": 591,
+          "width": 1126,
+          "height": 97
+        }
+      }
+    }
+  ],
+  "type": {
+    "slots": {
+      "hook": "Plus légère. Plus loin.",
+      "proof": "Amorti +20% sur chaque foulée",
+      "cta": "Shop now"
+    },
+    "variants": [
+      "Plus légère. Plus loin.",
+      "PLUS LÉGÈRE. PLUS LOIN.",
+      "Stop. Plus légère. Plus loin."
+    ],
+    "items": [
+      {
+        "presetId": "ig_feed_45",
+        "artboard": "CP_AB_ig_feed_45",
+        "boxes": {
+          "safe": {
+            "left": 54,
+            "top": 54,
+            "right": 1026,
+            "bottom": 1269,
+            "width": 972,
+            "height": 1215
+          },
+          "hook": {
+            "left": 54,
+            "top": 54,
+            "right": 1026,
+            "bottom": 549,
+            "width": 972,
+            "height": 495
+          },
+          "proof": {
+            "left": 54,
+            "top": 567,
+            "right": 1026,
+            "bottom": 944,
+            "width": 972,
+            "height": 377
+          },
+          "cta": {
+            "left": 54,
+            "top": 962,
+            "right": 1026,
+            "bottom": 1174,
+            "width": 972,
+            "height": 212
+          }
+        },
+        "hook": {
+          "text": "Plus légère. Plus loin.",
+          "fit": {
+            "size": 72,
+            "lines": [
+              "Plus légère. Plus loin."
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "proof": {
+          "text": "Amorti +20% sur chaque foulée",
+          "fit": {
+            "size": 36,
+            "lines": [
+              "Amorti +20% sur chaque foulée"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "cta": {
+          "text": "Shop now",
+          "fit": {
+            "size": 28,
+            "lines": [
+              "Shop now"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "overflow": false
+      },
+      {
+        "presetId": "ig_story",
+        "artboard": "CP_AB_ig_story",
+        "boxes": {
+          "safe": {
+            "left": 86,
+            "top": 269,
+            "right": 994,
+            "bottom": 1536,
+            "width": 908,
+            "height": 1267
+          },
+          "hook": {
+            "left": 86,
+            "top": 269,
+            "right": 994,
+            "bottom": 786,
+            "width": 908,
+            "height": 517
+          },
+          "proof": {
+            "left": 86,
+            "top": 804,
+            "right": 994,
+            "bottom": 1198,
+            "width": 908,
+            "height": 394
+          },
+          "cta": {
+            "left": 86,
+            "top": 1216,
+            "right": 994,
+            "bottom": 1438,
+            "width": 908,
+            "height": 222
+          }
+        },
+        "hook": {
+          "text": "Plus légère. Plus loin.",
+          "fit": {
+            "size": 78,
+            "lines": [
+              "Plus légère. Plus",
+              "loin."
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "proof": {
+          "text": "Amorti +20% sur chaque foulée",
+          "fit": {
+            "size": 40,
+            "lines": [
+              "Amorti +20% sur chaque foulée"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "cta": {
+          "text": "Shop now",
+          "fit": {
+            "size": 32,
+            "lines": [
+              "Shop now"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "overflow": false
+      },
+      {
+        "presetId": "tiktok",
+        "artboard": "CP_AB_tiktok",
+        "boxes": {
+          "safe": {
+            "left": 108,
+            "top": 230,
+            "right": 972,
+            "bottom": 1498,
+            "width": 864,
+            "height": 1268
+          },
+          "hook": {
+            "left": 108,
+            "top": 230,
+            "right": 972,
+            "bottom": 747,
+            "width": 864,
+            "height": 517
+          },
+          "proof": {
+            "left": 108,
+            "top": 765,
+            "right": 972,
+            "bottom": 1159,
+            "width": 864,
+            "height": 394
+          },
+          "cta": {
+            "left": 108,
+            "top": 1177,
+            "right": 972,
+            "bottom": 1399,
+            "width": 864,
+            "height": 222
+          }
+        },
+        "hook": {
+          "text": "Plus légère. Plus loin.",
+          "fit": {
+            "size": 78,
+            "lines": [
+              "Plus légère. Plus",
+              "loin."
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "proof": {
+          "text": "Amorti +20% sur chaque foulée",
+          "fit": {
+            "size": 38,
+            "lines": [
+              "Amorti +20% sur chaque foulée"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "cta": {
+          "text": "Shop now",
+          "fit": {
+            "size": 32,
+            "lines": [
+              "Shop now"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "overflow": false
+      },
+      {
+        "presetId": "yt_thumb",
+        "artboard": "CP_AB_yt_thumb",
+        "boxes": {
+          "safe": {
+            "left": 77,
+            "top": 58,
+            "right": 1203,
+            "bottom": 634,
+            "width": 1126,
+            "height": 576
+          },
+          "hook": {
+            "left": 77,
+            "top": 58,
+            "right": 1203,
+            "bottom": 285,
+            "width": 1126,
+            "height": 227
+          },
+          "proof": {
+            "left": 77,
+            "top": 303,
+            "right": 1203,
+            "bottom": 476,
+            "width": 1126,
+            "height": 173
+          },
+          "cta": {
+            "left": 77,
+            "top": 494,
+            "right": 1203,
+            "bottom": 591,
+            "width": 1126,
+            "height": 97
+          }
+        },
+        "hook": {
+          "text": "Plus légère. Plus loin.",
+          "fit": {
+            "size": 64,
+            "lines": [
+              "Plus légère. Plus loin."
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "proof": {
+          "text": "Amorti +20% sur chaque foulée",
+          "fit": {
+            "size": 28,
+            "lines": [
+              "Amorti +20% sur chaque foulée"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "cta": {
+          "text": "Shop now",
+          "fit": {
+            "size": 24,
+            "lines": [
+              "Shop now"
+            ],
+            "overflow": false,
+            "lineHeight": 1.15,
+            "tracking": 0
+          }
+        },
+        "overflow": false
+      }
+    ]
+  },
+  "story": {
+    "template": {
+      "id": "pas",
+      "label": "PAS (problème → agitate → solution)",
+      "minFrames": 5,
+      "maxFrames": 5,
+      "defaultFrames": 5,
+      "beats": [
+        {
+          "slot": "hook",
+          "title": "Problème",
+          "hint": "Nomme la douleur en 5 mots."
+        },
+        {
+          "slot": "proof",
+          "title": "Agitation",
+          "hint": "Montre le coût de ne rien changer."
+        },
+        {
+          "slot": "proof",
+          "title": "Solution",
+          "hint": "Introduis le produit / l’idée."
+        },
+        {
+          "slot": "proof",
+          "title": "Preuve",
+          "hint": "Chiffre, avant/après, témoignage."
+        },
+        {
+          "slot": "cta",
+          "title": "CTA",
+          "hint": "Verbe + offre claire."
+        }
+      ]
+    },
+    "preset": {
+      "id": "ig_feed_45",
+      "label": "Instagram Feed 4:5",
+      "short": "IG 4:5",
+      "platform": "instagram",
+      "width": 1080,
+      "height": 1350,
+      "safeTop": 0.04,
+      "safeBottom": 0.06,
+      "safeSide": 0.05,
+      "type": {
+        "hook": {
+          "minPt": 36,
+          "maxPt": 72,
+          "maxLines": 3
+        },
+        "proof": {
+          "minPt": 22,
+          "maxPt": 36,
+          "maxLines": 3
+        },
+        "cta": {
+          "minPt": 20,
+          "maxPt": 28,
+          "maxLines": 1
+        }
+      },
+      "default": true
+    },
+    "frames": [
+      {
+        "name": "CP_FR_01",
+        "beat": {
+          "slot": "hook",
+          "title": "Problème",
+          "hint": "Nomme la douleur en 5 mots.",
+          "index": 1
+        },
+        "export": true
+      },
+      {
+        "name": "CP_FR_02",
+        "beat": {
+          "slot": "proof",
+          "title": "Agitation",
+          "hint": "Montre le coût de ne rien changer.",
+          "index": 2
+        },
+        "export": true
+      },
+      {
+        "name": "CP_FR_03",
+        "beat": {
+          "slot": "proof",
+          "title": "Solution",
+          "hint": "Introduis le produit / l’idée.",
+          "index": 3
+        },
+        "export": true
+      },
+      {
+        "name": "CP_FR_04",
+        "beat": {
+          "slot": "proof",
+          "title": "Preuve",
+          "hint": "Chiffre, avant/après, témoignage.",
+          "index": 4
+        },
+        "export": true
+      },
+      {
+        "name": "CP_FR_05",
+        "beat": {
+          "slot": "cta",
+          "title": "CTA",
+          "hint": "Verbe + offre claire.",
+          "index": 5
+        },
+        "export": true
+      }
+    ]
+  }
+}

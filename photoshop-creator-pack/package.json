@@ -1,0 +1,12 @@
+{
+  "name": "photoshop-creator-pack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plugin UXP Photoshop 2025 — Social Canvas, Type Rhythm, Storyboard Frames",
+  "scripts": {
+    "test": "node tests/run.js",
+    "icons": "python3 scripts/generate-icons.py",
+    "visualize": "node tests/visualize.js && python3 scripts/rasterize.py",
+    "pack": "node scripts/pack.js"
+  }
+}
