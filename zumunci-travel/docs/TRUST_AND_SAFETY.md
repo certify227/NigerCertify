@@ -7,13 +7,16 @@ Empêcher les arnaques et les comportements déplacés en **contrôlant la mise 
 ZumunciTravel n’est **pas** un réseau social ni une appli de rencontre.  
 C’est une plateforme de **transport interurbain** uniquement.
 
-## Règles d’or
+## Règles d’or (pilote)
 
-1. **Vérification obligatoire** avant de publier ou réserver un trajet  
-2. **Aucun contact direct** (téléphone / WhatsApp) tant que la réservation n’est pas **payée**  
-3. **Paiement uniquement via la plateforme** (Mobile Money) — jamais hors plateforme  
-4. **Usage transport uniquement** — signalement immédiat en cas de harcèlement ou proposition déplacée  
-5. **Charte de sécurité** acceptée avant toute activité
+1. **Vérification obligatoire** avant de publier ou réserver un trajet (SLA KYC ≤ 24 h)  
+2. **Aucun contact direct** tant que la réservation n’est pas **payée**  
+3. Après paiement : **appel ou WhatsApp** autorisé, uniquement pour ce trajet  
+4. **Cash interdit en covoiturage** ; Mobile Money obligatoire  
+5. **Commission 10 %** plateforme sur chaque réservation  
+6. **Usage transport uniquement** — option « priorité femmes » + signalement  
+7. **Charte de sécurité** acceptée avant toute activité  
+8. Pilote limité aux axes **Niamey ↔ Maradi / Dosso / Tillabéri / Tahoua**
 
 ## Flux de mise en relation contrôlée
 

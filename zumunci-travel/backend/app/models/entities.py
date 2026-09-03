@@ -145,6 +145,7 @@ class Ride(Base):
     vehicle_info: Mapped[str | None] = mapped_column(String(120), nullable=True)
     meeting_point: Mapped[str | None] = mapped_column(String(200), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    women_priority: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
@@ -160,6 +161,8 @@ class Booking(Base):
     passenger_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     seats: Mapped[int] = mapped_column(Integer, default=1)
     total_amount: Mapped[int] = mapped_column(Integer)
+    platform_fee: Mapped[int] = mapped_column(Integer, default=0)
+    driver_amount: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[BookingStatus] = mapped_column(SAEnum(BookingStatus), default=BookingStatus.PENDING)
     contact_unlocked: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

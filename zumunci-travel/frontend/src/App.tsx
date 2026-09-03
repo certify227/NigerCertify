@@ -10,7 +10,7 @@ import {
   setToken,
   VERIF_LABELS,
 } from "./api";
-import type { Booking, City, Ride, SafetyCharter, User } from "./api";
+import type { Booking, City, ProductConfig, Ride, SafetyCharter, User } from "./api";
 import "./App.css";
 
 function useAuth() {
@@ -97,6 +97,7 @@ function Shell({
 
 function HomePage() {
   const [cities, setCities] = useState<City[]>([]);
+  const [config, setConfig] = useState<ProductConfig | null>(null);
   const [origin, setOrigin] = useState("Niamey");
   const [destination, setDestination] = useState("Maradi");
   const [date, setDate] = useState("");
@@ -104,6 +105,7 @@ function HomePage() {
 
   useEffect(() => {
     void api.cities().then(setCities).catch(() => setCities([]));
+    void api.productConfig().then(setConfig).catch(() => setConfig(null));
   }, []);
 
   const onSubmit = (e: FormEvent) => {
@@ -117,12 +119,19 @@ function HomePage() {
 
   return (
     <section className="hero">
+      {config?.pilot_mode && (
+        <div className="notice">
+          <strong>Pilote {config.pilot_hub}</strong> — axes : {config.pilot_corridors.join(" · ")}.
+          Commission plateforme {(config.commission_rate * 100).toFixed(0)} % · KYC ≤{" "}
+          {config.kyc_sla_hours}h · cash interdit en covoiturage.
+        </div>
+      )}
       <div className="hero-copy">
         <p className="eyebrow">Transport sécurisé · Niger</p>
         <h1>ZumunciTravel : voyagez sans arnaque ni relation déplacée.</h1>
         <p>
-          Vérification d’identité avant toute mise en relation. Le téléphone du convoyeur reste
-          masqué jusqu’au paiement. Plateforme de transport uniquement — pas de rencontres.
+          Vérification d’identité avant toute mise en relation. Contact (appel/WhatsApp) débloqué
+          uniquement après paiement Mobile Money. Transport uniquement — pas de rencontres.
         </p>
       </div>
       <form className="search-card" onSubmit={onSubmit}>
@@ -193,6 +202,8 @@ function RideCard({ ride }: { ride: Ride }) {
         {ride.driver.is_verified ? " · ✓ vérifié" : ""}
         {" · "}
         {ride.driver.contact_hidden ? "contact masqué" : ride.driver.phone}
+        {ride.women_priority ? " · priorité femmes" : ""}
+        {ride.night_departure ? " · départ soir/nuit" : ""}
       </p>
     </Link>
   );
@@ -240,14 +251,30 @@ function RideDetailPage({ user }: { user: User | null }) {
   const [seats, setSeats] = useState(1);
   const [provider, setProvider] = useState("orange_money");
   const [providers, setProviders] = useState<string[]>([]);
+  const [config, setConfig] = useState<ProductConfig | null>(null);
   const [message, setMessage] = useState("");
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!id) return;
     void api.ride(Number(id)).then(setRide).catch((e: Error) => setError(e.message));
     void api.providers().then(setProviders).catch(() => undefined);
+    void api.productConfig().then(setConfig).catch(() => setConfig(null));
   }, [id]);
+
+  const allowedProviders = useMemo(() => {
+    const all = providers.length ? providers : ["orange_money", "airtel_money", "moov_money", "cash"];
+    if (!ride || !config) return all;
+    if (config.cash_allowed_modes.includes(ride.mode)) return all;
+    return all.filter((p) => p !== "cash");
+  }, [providers, ride, config]);
+
+  useEffect(() => {
+    if (allowedProviders.length && !allowedProviders.includes(provider)) {
+      setProvider(allowedProviders[0]);
+    }
+  }, [allowedProviders, provider]);
 
   const book = async () => {
     if (!user) {
@@ -270,8 +297,10 @@ function RideDetailPage({ user }: { user: User | null }) {
         await api.confirmPayment(booking.payment.id, true);
       }
       const contact = await api.revealContact(booking.id);
+      setWhatsappUrl(contact.driver_whatsapp_url);
       setMessage(
-        `Réservation confirmée. Contact débloqué : ${contact.driver_phone}. ${contact.warning}`,
+        `Réservation confirmée (${formatXof(booking.total_amount)}, dont commission ${formatXof(booking.platform_fee)}). ` +
+          `Contact : ${contact.driver_phone}. ${contact.warning}`,
       );
       setRide(await api.ride(ride.id));
     } catch (e) {
@@ -306,6 +335,16 @@ function RideDetailPage({ user }: { user: User | null }) {
             ? `${ride.driver.phone} — masqué jusqu’au paiement`
             : ride.driver.phone}
         </li>
+        {ride.women_priority && (
+          <li>
+            <strong>Option :</strong> priorité femmes (ambiance professionnelle)
+          </li>
+        )}
+        {ride.night_departure && (
+          <li>
+            <strong>Attention :</strong> départ soir/nuit — restez prudente·e
+          </li>
+        )}
         {ride.vehicle_info && (
           <li>
             <strong>Véhicule :</strong> {ride.vehicle_info}
@@ -318,8 +357,8 @@ function RideDetailPage({ user }: { user: User | null }) {
         )}
       </ul>
       <div className="notice">
-        ZumunciTravel débloque le contact uniquement après vérification + paiement. Usage transport
-        uniquement.
+        Contact (appel/WhatsApp) débloqué après paiement Mobile Money. En covoiturage, le cash est
+        interdit. Commission plateforme {(config ? config.commission_rate * 100 : 10).toFixed(0)} %.
       </div>
       <div className="book-box">
         <label>
@@ -335,13 +374,11 @@ function RideDetailPage({ user }: { user: User | null }) {
         <label>
           Paiement
           <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-            {(providers.length ? providers : ["orange_money", "airtel_money", "moov_money", "cash"]).map(
-              (p) => (
-                <option key={p} value={p}>
-                  {p.replaceAll("_", " ")}
-                </option>
-              ),
-            )}
+            {allowedProviders.map((p) => (
+              <option key={p} value={p}>
+                {p.replaceAll("_", " ")}
+              </option>
+            ))}
           </select>
         </label>
         <button className="btn btn-primary" type="button" onClick={() => void book()}>
@@ -349,6 +386,11 @@ function RideDetailPage({ user }: { user: User | null }) {
         </button>
       </div>
       {message && <p className="success">{message}</p>}
+      {whatsappUrl && (
+        <a className="btn btn-primary" href={whatsappUrl} target="_blank" rel="noreferrer">
+          Contacter le convoyeur sur WhatsApp
+        </a>
+      )}
       {error && <p className="error">{error}</p>}
     </section>
   );
@@ -563,6 +605,7 @@ function PublishPage({ user }: { user: User | null }) {
     vehicle_info: "",
     meeting_point: "",
     notes: "",
+    women_priority: false,
   });
   const [error, setError] = useState("");
 
@@ -587,7 +630,9 @@ function PublishPage({ user }: { user: User | null }) {
   return (
     <section className="stack narrow">
       <h2>Publier un trajet</h2>
-      <p className="muted">Réservé aux comptes vérifiés. Votre numéro reste masqué aux non-payeurs.</p>
+      <p className="muted">
+        Pilote Niamey ↔ Maradi / Dosso / Tillabéri / Tahoua. Numéro masqué jusqu’au paiement.
+      </p>
       <form className="form" onSubmit={(e) => void submit(e)}>
         <label>
           De
@@ -670,6 +715,14 @@ function PublishPage({ user }: { user: User | null }) {
             onChange={(e) => setForm({ ...form, vehicle_info: e.target.value })}
           />
         </label>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={form.women_priority}
+            onChange={(e) => setForm({ ...form, women_priority: e.target.checked })}
+          />
+          Trajet priorité femmes (ambiance professionnelle uniquement)
+        </label>
         <button className="btn btn-primary" type="submit">
           Publier
         </button>
@@ -738,7 +791,14 @@ function AccountPage({ user }: { user: User | null }) {
             <p>
               Contact {b.contact_unlocked ? "débloqué" : "masqué"}
               {b.driver_phone ? ` · ${b.driver_phone}` : ""}
+              {" · "}
+              commission {formatXof(b.platform_fee || 0)}
             </p>
+            {b.driver_whatsapp_url && (
+              <a className="btn btn-small" href={b.driver_whatsapp_url} target="_blank" rel="noreferrer">
+                WhatsApp
+              </a>
+            )}
             <button type="button" className="btn btn-small danger" onClick={() => void reportDriver(b)}>
               Signaler un abus
             </button>

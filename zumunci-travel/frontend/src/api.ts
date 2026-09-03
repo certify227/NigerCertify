@@ -36,6 +36,8 @@ export type Ride = {
   vehicle_info: string | null;
   meeting_point: string | null;
   notes: string | null;
+  women_priority: boolean;
+  night_departure: boolean;
   is_active: boolean;
   driver: {
     id: number;
@@ -53,11 +55,14 @@ export type Booking = {
   ride_id: number;
   seats: number;
   total_amount: number;
+  platform_fee: number;
+  driver_amount: number;
   status: string;
   contact_unlocked: boolean;
   created_at: string;
   driver_phone?: string | null;
   passenger_phone?: string | null;
+  driver_whatsapp_url?: string | null;
   ride?: Ride;
   payment?: {
     id: number;
@@ -68,6 +73,21 @@ export type Booking = {
     status: string;
     external_ref: string | null;
   };
+};
+
+export type ProductConfig = {
+  app: string;
+  pilot_mode: boolean;
+  pilot_hub: string;
+  pilot_corridors: string[];
+  commission_rate: number;
+  currency: string;
+  kyc_sla_hours: number;
+  cash_allowed_modes: string[];
+  night_start_hour: number;
+  night_end_hour: number;
+  default_locale: string;
+  payment_providers: string[];
 };
 
 export type SafetyCharter = {
@@ -83,6 +103,8 @@ export type ContactReveal = {
   driver_phone: string | null;
   passenger_name: string | null;
   passenger_phone: string | null;
+  driver_whatsapp_url: string | null;
+  passenger_whatsapp_url: string | null;
   warning: string;
 };
 
@@ -113,6 +135,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   health: () => request<{ status: string; app: string }>("/health"),
+  productConfig: () => request<ProductConfig>("/product/config"),
   cities: () => request<City[]>("/cities"),
   charter: () => request<SafetyCharter>("/safety/charter"),
   rides: (params: URLSearchParams) => request<Ride[]>(`/rides?${params}`),

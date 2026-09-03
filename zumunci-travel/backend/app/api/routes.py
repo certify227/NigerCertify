@@ -34,6 +34,7 @@ from app.schemas.schemas import (
     MessageOut,
     PaymentConfirm,
     PaymentOut,
+    ProductConfigOut,
     RatingCreate,
     RatingOut,
     RideCreate,
@@ -51,10 +52,15 @@ from app.schemas.schemas import (
 from app.services.payments import get_payment_adapter
 from app.services.safety import (
     SAFETY_CHARTER,
+    assert_payment_allowed,
+    compute_fees,
     contact_may_be_revealed,
+    corridor_allowed,
     ensure_active,
     ensure_can_transact,
+    is_night_departure,
     mask_phone,
+    whatsapp_link,
 )
 
 router = APIRouter()
@@ -88,6 +94,8 @@ def serialize_ride(ride: Ride, *, reveal_phone: bool = False) -> dict:
         "vehicle_info": ride.vehicle_info,
         "meeting_point": ride.meeting_point,
         "notes": ride.notes,
+        "women_priority": ride.women_priority,
+        "night_departure": is_night_departure(ride.departure_time),
         "is_active": ride.is_active,
         "driver": _driver_brief(ride.driver, reveal_phone=reveal_phone),
     }
@@ -98,11 +106,17 @@ def serialize_booking(booking: Booking, viewer: User) -> dict:
     reveal = contact_may_be_revealed(booking.status, booking.contact_unlocked)
     is_party = viewer.id in {booking.passenger_id, ride.driver_id}
     show_contact = reveal and is_party
+    wa_msg = (
+        f"Bonjour, réservation ZumunciTravel #{booking.id} "
+        f"{ride.origin_city} → {ride.destination_city} le {ride.departure_date}."
+    )
     return {
         "id": booking.id,
         "ride_id": booking.ride_id,
         "seats": booking.seats,
         "total_amount": booking.total_amount,
+        "platform_fee": booking.platform_fee,
+        "driver_amount": booking.driver_amount,
         "status": booking.status,
         "contact_unlocked": booking.contact_unlocked,
         "created_at": booking.created_at,
@@ -110,6 +124,7 @@ def serialize_booking(booking: Booking, viewer: User) -> dict:
         "payment": booking.payment,
         "driver_phone": ride.driver.phone if show_contact else None,
         "passenger_phone": booking.passenger.phone if show_contact and booking.passenger else None,
+        "driver_whatsapp_url": whatsapp_link(ride.driver.phone, wa_msg) if show_contact else None,
     }
 
 
@@ -139,6 +154,24 @@ def health() -> HealthOut:
         country=settings.default_country,
         currency=settings.currency,
         version=__version__,
+    )
+
+
+@router.get("/product/config", response_model=ProductConfigOut)
+def product_config() -> ProductConfigOut:
+    return ProductConfigOut(
+        app=settings.app_name,
+        pilot_mode=settings.pilot_mode,
+        pilot_hub=settings.pilot_hub,
+        pilot_corridors=[f"{a} → {b}" for a, b in settings.pilot_corridor_pairs],
+        commission_rate=settings.commission_rate,
+        currency=settings.currency,
+        kyc_sla_hours=settings.kyc_sla_hours,
+        cash_allowed_modes=settings.cash_allowed_mode_list,
+        night_start_hour=settings.night_start_hour,
+        night_end_hour=settings.night_end_hour,
+        default_locale=settings.default_locale,
+        payment_providers=settings.payment_provider_list,
     )
 
 
@@ -302,6 +335,8 @@ def search_rides(
     if mode:
         q = q.filter(Ride.mode == mode)
     rides = q.order_by(Ride.departure_date, Ride.departure_time).all()
+    if settings.pilot_mode:
+        rides = [r for r in rides if corridor_allowed(r.origin_city, r.destination_city)]
     return [
         serialize_ride(ride, reveal_phone=user_can_see_driver_phone(db, viewer, ride)) for ride in rides
     ]
@@ -331,12 +366,22 @@ def publish_ride(
     db: Session = Depends(get_db),
 ) -> dict:
     ensure_can_transact(user)
-    if payload.origin_city.strip().lower() == payload.destination_city.strip().lower():
+    origin = payload.origin_city.strip().title()
+    destination = payload.destination_city.strip().title()
+    if origin.casefold() == destination.casefold():
         raise HTTPException(status_code=400, detail="Départ et arrivée doivent être différents")
+    if not corridor_allowed(origin, destination):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Pilote ZumunciTravel limité aux axes depuis/vers Niamey "
+                "(Maradi, Dosso, Tillabéri, Tahoua)."
+            ),
+        )
     ride = Ride(
         driver_id=user.id,
-        origin_city=payload.origin_city.strip().title(),
-        destination_city=payload.destination_city.strip().title(),
+        origin_city=origin,
+        destination_city=destination,
         departure_date=payload.departure_date,
         departure_time=payload.departure_time,
         seats_total=payload.seats_total,
@@ -346,6 +391,7 @@ def publish_ride(
         vehicle_info=payload.vehicle_info,
         meeting_point=payload.meeting_point,
         notes=payload.notes,
+        women_priority=payload.women_priority,
     )
     db.add(ride)
     db.commit()
@@ -377,13 +423,18 @@ def book_ride(
     if payload.seats > ride.seats_available:
         raise HTTPException(status_code=400, detail="Pas assez de places disponibles")
 
+    assert_payment_allowed(ride.mode, payload.payment_provider.value)
+
     total = payload.seats * ride.price_per_seat
+    platform_fee, driver_amount = compute_fees(total)
     payment_phone = payload.payment_phone or user.phone
     booking = Booking(
         ride_id=ride.id,
         passenger_id=user.id,
         seats=payload.seats,
         total_amount=total,
+        platform_fee=platform_fee,
+        driver_amount=driver_amount,
         status=BookingStatus.PENDING,
         contact_unlocked=False,
     )
@@ -508,21 +559,28 @@ def reveal_contact(
             booking_id=booking.id,
             contact_unlocked=False,
             warning=(
-                "Contact masqué. Finalisez le paiement sur ZumunciTravel pour débloquer "
-                "la mise en relation. Aucun échange hors plateforme avant cela."
+                "Contact masqué. Finalisez le paiement Mobile Money sur ZumunciTravel "
+                "pour débloquer la mise en relation. Aucun échange hors plateforme avant cela."
             ),
         )
 
+    ride = booking.ride
+    wa_msg = (
+        f"Bonjour, réservation ZumunciTravel #{booking.id} "
+        f"{ride.origin_city} → {ride.destination_city} le {ride.departure_date}."
+    )
     return ContactRevealOut(
         booking_id=booking.id,
         contact_unlocked=True,
-        driver_name=booking.ride.driver.full_name,
-        driver_phone=booking.ride.driver.phone,
+        driver_name=ride.driver.full_name,
+        driver_phone=ride.driver.phone,
         passenger_name=booking.passenger.full_name,
         passenger_phone=booking.passenger.phone,
+        driver_whatsapp_url=whatsapp_link(ride.driver.phone, wa_msg),
+        passenger_whatsapp_url=whatsapp_link(booking.passenger.phone, wa_msg),
         warning=(
-            "Contact débloqué uniquement pour ce trajet. Usage transport uniquement — "
-            "signalez tout comportement déplacé ou tentative d'arnaque."
+            "Contact débloqué uniquement pour ce trajet (appel ou WhatsApp). "
+            "Usage transport uniquement — signalez tout comportement déplacé ou arnaque."
         ),
     )
 

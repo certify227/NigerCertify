@@ -89,6 +89,7 @@ class RideCreate(BaseModel):
     vehicle_info: str | None = None
     meeting_point: str | None = None
     notes: str | None = None
+    women_priority: bool = False
 
 
 class DriverBrief(BaseModel):
@@ -119,6 +120,8 @@ class RideOut(BaseModel):
     vehicle_info: str | None
     meeting_point: str | None
     notes: str | None
+    women_priority: bool = False
+    night_departure: bool = False
     is_active: bool
     driver: DriverBrief
 
@@ -149,6 +152,8 @@ class BookingOut(BaseModel):
     ride_id: int
     seats: int
     total_amount: int
+    platform_fee: int = 0
+    driver_amount: int = 0
     status: BookingStatus
     contact_unlocked: bool
     created_at: datetime
@@ -156,6 +161,7 @@ class BookingOut(BaseModel):
     payment: PaymentOut | None = None
     driver_phone: str | None = None
     passenger_phone: str | None = None
+    driver_whatsapp_url: str | None = None
 
 
 class PaymentConfirm(BaseModel):
@@ -237,4 +243,21 @@ class ContactRevealOut(BaseModel):
     driver_phone: str | None = None
     passenger_name: str | None = None
     passenger_phone: str | None = None
+    driver_whatsapp_url: str | None = None
+    passenger_whatsapp_url: str | None = None
     warning: str
+
+
+class ProductConfigOut(BaseModel):
+    app: str
+    pilot_mode: bool
+    pilot_hub: str
+    pilot_corridors: list[str]
+    commission_rate: float
+    currency: str
+    kyc_sla_hours: int
+    cash_allowed_modes: list[str]
+    night_start_hour: int
+    night_end_hour: int
+    default_locale: str
+    payment_providers: list[str]

@@ -6,18 +6,20 @@
 > **Aucun contact (téléphone) avant paiement confirmé.**  
 > **Usage transport uniquement — pas de relations déplacées.**
 
-## Contrôles anti-arnaque
+## Contrôles anti-arnaque (décisions pilote)
 
 | Contrôle | Comportement |
 |---|---|
-| Charte de sécurité | Obligatoire à l’inscription / vérification |
-| KYC (CNI / passeport / permis) | Statut `pending` → validation admin → `verified` |
-| Publication / réservation | Bloquées si non vérifié |
-| Téléphone convoyeur | Masqué jusqu’au paiement |
-| Signalement | Arnaque, harcèlement, paiement hors plateforme… |
-| Admin | Approuve / rejette les dossiers KYC |
+| Zone pilote | Niamey ↔ Maradi / Dosso / Tillabéri / Tahoua |
+| Charte de sécurité | Obligatoire |
+| KYC | `pending` → admin → `verified` (≤ 24 h) |
+| Cash | **Interdit en covoiturage** |
+| Contact | Masqué puis téléphone + WhatsApp après paiement |
+| Commission | **10 %** plateforme |
+| Priorité femmes | Option sur les trajets |
+| Signalement | Arnaque / harcèlement / hors plateforme |
 
-Voir [`docs/TRUST_AND_SAFETY.md`](docs/TRUST_AND_SAFETY.md).
+Voir [`docs/PRODUCT_DECISIONS.md`](docs/PRODUCT_DECISIONS.md) et [`docs/TRUST_AND_SAFETY.md`](docs/TRUST_AND_SAFETY.md).
 
 ## Structure
 

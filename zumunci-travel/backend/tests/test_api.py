@@ -170,3 +170,53 @@ def test_safety_report(client):
     )
     assert report.status_code == 201
     assert report.json()["reason"] == "scam"
+
+
+def test_product_config_pilot(client):
+    r = client.get("/api/product/config")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["pilot_mode"] is True
+    assert data["pilot_hub"] == "Niamey"
+    assert data["commission_rate"] == 0.10
+    assert "carpool" not in data["cash_allowed_modes"]
+
+
+def test_cash_forbidden_on_carpool(client):
+    login = client.post(
+        "/api/auth/login",
+        json={"phone": "90000002", "password": "zumunci123"},
+    )
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride_id = rides.json()[0]["id"]
+    booking = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=headers,
+        json={"seats": 1, "payment_provider": "cash"},
+    )
+    assert booking.status_code == 400
+
+
+def test_commission_and_whatsapp_after_payment(client):
+    login = client.post(
+        "/api/auth/login",
+        json={"phone": "90000002", "password": "zumunci123"},
+    )
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride = rides.json()[0]
+    booking = client.post(
+        f"/api/rides/{ride['id']}/book",
+        headers=headers,
+        json={"seats": 1, "payment_provider": "orange_money"},
+    )
+    assert booking.status_code == 201
+    body = booking.json()
+    assert body["platform_fee"] == int(round(body["total_amount"] * 0.10))
+    assert body["driver_amount"] == body["total_amount"] - body["platform_fee"]
+    payment_id = body["payment"]["id"]
+    client.post(f"/api/payments/{payment_id}/confirm", headers=headers, json={"success": True})
+    contact = client.get(f"/api/bookings/{body['id']}/contact", headers=headers)
+    assert contact.status_code == 200
+    assert contact.json()["driver_whatsapp_url"].startswith("https://wa.me/22790000001")
