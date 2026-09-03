@@ -1,5 +1,7 @@
 # 🛠 Niger Certify Offensive Lab
 
+> Nouveau projet produit dans ce dépôt : **[ZumunciTravel](zumunci-travel/)** — marketplace de covoiturage / taxi brousse / bus adaptée au Niger (XOF, Mobile Money, PWA).
+
 > **Auteur :** Niger certify – Consultant & Formateur en Sécurité Informatique  
 > **Public cible :** Étudiants, stagiaires, passionnés de cybersécurité  
 > **Usage :** Pédagogique uniquement (machines vulnérables type DVWA, Metasploitable2, VulnHub, etc.)
