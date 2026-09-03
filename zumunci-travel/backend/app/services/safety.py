@@ -32,12 +32,17 @@ def ensure_active(user: User) -> None:
 
 
 def ensure_can_transact(user: User) -> None:
-    """Publier ou réserver nécessite vérification + charte."""
+    """Publier ou réserver nécessite OTP + KYC + charte."""
     ensure_active(user)
     if not user.accepted_safety_charter:
         raise HTTPException(
             status_code=403,
             detail="Vous devez accepter la charte de sécurité avant toute mise en relation",
+        )
+    if not user.phone_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Vérifiez votre numéro de téléphone (OTP) avant de publier ou réserver",
         )
     if user.verification_status != VerificationStatus.VERIFIED or not user.is_verified:
         raise HTTPException(

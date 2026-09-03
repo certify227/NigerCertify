@@ -63,9 +63,41 @@ class UserOut(BaseModel):
     verification_status: VerificationStatus
     accepted_safety_charter: bool
     phone_verified: bool
+    emergency_contact_name: str | None = None
+    emergency_contact_phone: str | None = None
     is_suspended: bool
     bio: str | None = None
     created_at: datetime
+
+
+class OtpSendOut(BaseModel):
+    message: str
+    demo_code: str | None = None
+    expires_in_seconds: int = 300
+
+
+class OtpVerifyIn(BaseModel):
+    code: str = Field(min_length=4, max_length=8)
+
+
+class EmergencyContactIn(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    phone: str = Field(min_length=8, max_length=20)
+
+
+class CancelBookingIn(BaseModel):
+    reason: str | None = Field(default=None, max_length=255)
+
+
+class TripShareOut(BaseModel):
+    booking_id: int
+    share_text: str
+    emergency_whatsapp_url: str | None = None
+
+
+class ReportStatusUpdate(BaseModel):
+    status: ReportStatus
+    suspend_user: bool = False
 
 
 class CityOut(BaseModel):

@@ -1,3 +1,3 @@
 """ZumunciTravel API — marketplace de transport au Niger."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"

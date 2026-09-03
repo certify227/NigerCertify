@@ -13,7 +13,19 @@ export type User = {
   verification_status: VerificationStatus;
   accepted_safety_charter: boolean;
   phone_verified: boolean;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
   is_suspended: boolean;
+};
+
+export type SafetyReport = {
+  id: number;
+  reported_user_id: number;
+  reason: string;
+  details: string;
+  status: string;
+  booking_id: number | null;
+  created_at: string;
 };
 
 export type City = {
@@ -159,6 +171,18 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ accept: true }),
     }),
+  sendOtp: () =>
+    request<{ message: string; demo_code: string | null }>("/me/otp/send", { method: "POST" }),
+  verifyOtp: (code: string) =>
+    request<User>("/me/otp/verify", {
+      method: "POST",
+      body: JSON.stringify({ code }),
+    }),
+  setEmergencyContact: (name: string, phone: string) =>
+    request<User>("/me/emergency-contact", {
+      method: "PUT",
+      body: JSON.stringify({ name, phone }),
+    }),
   submitVerification: (body: Record<string, unknown>) =>
     request<User>("/me/verification", {
       method: "POST",
@@ -179,6 +203,15 @@ export const api = {
       body: JSON.stringify({ success }),
     }),
   revealContact: (bookingId: number) => request<ContactReveal>(`/bookings/${bookingId}/contact`),
+  cancelBooking: (bookingId: number, reason?: string) =>
+    request<Booking>(`/bookings/${bookingId}/cancel`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+  shareTrip: (bookingId: number) =>
+    request<{ booking_id: number; share_text: string; emergency_whatsapp_url: string | null }>(
+      `/bookings/${bookingId}/share`,
+    ),
   report: (body: Record<string, unknown>) =>
     request("/safety/reports", { method: "POST", body: JSON.stringify(body) }),
   providers: () => request<string[]>("/payments/providers"),
@@ -187,6 +220,12 @@ export const api = {
     request<User>(`/admin/verifications/${userId}/review`, {
       method: "POST",
       body: JSON.stringify({ approve, notes }),
+    }),
+  adminReports: () => request<SafetyReport[]>("/admin/reports"),
+  reviewReport: (reportId: number, status: string, suspend_user = false) =>
+    request<SafetyReport>(`/admin/reports/${reportId}/review`, {
+      method: "POST",
+      body: JSON.stringify({ status, suspend_user }),
     }),
 };
 

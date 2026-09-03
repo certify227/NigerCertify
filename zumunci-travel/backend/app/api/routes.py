@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import or_
@@ -18,6 +19,7 @@ from app.models.entities import (
     Payment,
     PaymentStatus,
     Rating,
+    ReportStatus,
     Ride,
     SafetyReport,
     User,
@@ -28,21 +30,27 @@ from app.schemas.schemas import (
     AcceptCharterIn,
     BookingCreate,
     BookingOut,
+    CancelBookingIn,
     CityOut,
     ContactRevealOut,
+    EmergencyContactIn,
     HealthOut,
     MessageOut,
+    OtpSendOut,
+    OtpVerifyIn,
     PaymentConfirm,
     PaymentOut,
     ProductConfigOut,
     RatingCreate,
     RatingOut,
+    ReportStatusUpdate,
     RideCreate,
     RideOut,
     SafetyCharterOut,
     SafetyReportCreate,
     SafetyReportOut,
     TokenOut,
+    TripShareOut,
     UserCreate,
     UserLogin,
     UserOut,
@@ -238,6 +246,64 @@ def accept_charter(
     return user
 
 
+@router.post("/me/otp/send", response_model=OtpSendOut)
+def send_otp(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> OtpSendOut:
+    ensure_active(user)
+    if user.phone_verified:
+        return OtpSendOut(message="Numéro déjà vérifié", demo_code=None, expires_in_seconds=0)
+    # MVP: OTP démo fixe en development pour tests Windows / QA
+    code = "123456" if settings.app_env == "development" else f"{secrets.randbelow(1_000_000):06d}"
+    user.otp_code = code
+    user.otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+    db.commit()
+    return OtpSendOut(
+        message=f"Code OTP envoyé (simulé) vers {mask_phone(user.phone)}",
+        demo_code=code if settings.app_env == "development" else None,
+        expires_in_seconds=300,
+    )
+
+
+@router.post("/me/otp/verify", response_model=UserOut)
+def verify_otp(
+    payload: OtpVerifyIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> User:
+    ensure_active(user)
+    if user.phone_verified:
+        return user
+    if not user.otp_code or not user.otp_expires_at:
+        raise HTTPException(status_code=400, detail="Aucun OTP en cours — renvoyez un code")
+    expires = user.otp_expires_at
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) > expires:
+        raise HTTPException(status_code=400, detail="OTP expiré — renvoyez un code")
+    if payload.code.strip() != user.otp_code:
+        raise HTTPException(status_code=400, detail="Code OTP incorrect")
+    user.phone_verified = True
+    user.otp_code = None
+    user.otp_expires_at = None
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.put("/me/emergency-contact", response_model=UserOut)
+def set_emergency_contact(
+    payload: EmergencyContactIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> User:
+    ensure_active(user)
+    phone = UserCreate.normalize_phone(payload.phone)
+    user.emergency_contact_name = payload.name.strip()
+    user.emergency_contact_phone = phone
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 @router.post("/me/verification", response_model=UserOut)
 def submit_verification(
     payload: VerificationSubmit,
@@ -318,6 +384,8 @@ def search_rides(
     destination: str | None = Query(default=None),
     departure_date: date | None = Query(default=None),
     mode: str | None = Query(default=None),
+    women_priority: bool | None = Query(default=None),
+    region: str | None = Query(default=None),
     db: Session = Depends(get_db),
     viewer: User | None = Depends(get_optional_user),
 ) -> list[dict]:
@@ -339,9 +407,23 @@ def search_rides(
         q = q.filter(Ride.departure_date == departure_date)
     if mode:
         q = q.filter(Ride.mode == mode)
+    if women_priority is True:
+        q = q.filter(Ride.women_priority.is_(True))
     rides = q.order_by(Ride.departure_date, Ride.departure_time).all()
-    if settings.pilot_mode:
+    if settings.national_coverage or settings.pilot_mode:
         rides = [r for r in rides if corridor_allowed(r.origin_city, r.destination_city)]
+    if region:
+        region_cf = region.strip().casefold()
+        city_names = {
+            c.name
+            for c in db.query(City).filter(City.region.ilike(f"%{region.strip()}%")).all()
+        }
+        city_cf = {n.casefold() for n in city_names} | {region_cf}
+        rides = [
+            r
+            for r in rides
+            if r.origin_city.casefold() in city_cf or r.destination_city.casefold() in city_cf
+        ]
     return [
         serialize_ride(ride, reveal_phone=user_can_see_driver_phone(db, viewer, ride)) for ride in rides
     ]
@@ -590,6 +672,102 @@ def reveal_contact(
     )
 
 
+@router.post("/bookings/{booking_id}/cancel", response_model=BookingOut)
+def cancel_booking(
+    booking_id: int,
+    payload: CancelBookingIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.payment),
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+        )
+        .filter(Booking.id == booking_id)
+        .first()
+    )
+    if not booking:
+        raise HTTPException(status_code=404, detail="Réservation introuvable")
+    ride = booking.ride
+    if user.id not in {booking.passenger_id, ride.driver_id}:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    if booking.status in {BookingStatus.CANCELLED, BookingStatus.COMPLETED}:
+        raise HTTPException(status_code=400, detail="Cette réservation ne peut plus être annulée")
+    # Règle V1 : annulation libre avant le jour du départ
+    if ride.departure_date < date.today():
+        raise HTTPException(status_code=400, detail="Trajet déjà passé — annulation impossible")
+    if ride.departure_date == date.today():
+        raise HTTPException(
+            status_code=400,
+            detail="Annulation le jour du départ non autorisée en V1 — contactez le support",
+        )
+
+    if booking.status in {BookingStatus.PENDING, BookingStatus.PAID}:
+        ride.seats_available = min(ride.seats_total, ride.seats_available + booking.seats)
+    booking.status = BookingStatus.CANCELLED
+    booking.contact_unlocked = False
+    booking.cancelled_at = datetime.now(timezone.utc)
+    booking.cancel_reason = (payload.reason or "Annulation utilisateur").strip()
+    if booking.payment and booking.payment.status == PaymentStatus.SUCCESS:
+        booking.payment.status = PaymentStatus.FAILED  # marque remboursement à traiter (MVP)
+    db.commit()
+    db.refresh(booking)
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.payment),
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+        )
+        .filter(Booking.id == booking_id)
+        .one()
+    )
+    return serialize_booking(booking, user)
+
+
+@router.get("/bookings/{booking_id}/share", response_model=TripShareOut)
+def share_trip(
+    booking_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TripShareOut:
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+        )
+        .filter(Booking.id == booking_id)
+        .first()
+    )
+    if not booking:
+        raise HTTPException(status_code=404, detail="Réservation introuvable")
+    if booking.passenger_id != user.id:
+        raise HTTPException(status_code=403, detail="Seul le passager peut partager son trajet")
+    if booking.status not in {BookingStatus.PAID, BookingStatus.COMPLETED}:
+        raise HTTPException(status_code=400, detail="Partage disponible après paiement")
+
+    ride = booking.ride
+    driver_phone = ride.driver.phone if booking.contact_unlocked else "masqué"
+    share_text = (
+        f"ZumunciTravel — je voyage le {ride.departure_date} à {ride.departure_time} "
+        f"de {ride.origin_city} vers {ride.destination_city}. "
+        f"Convoyeur : {ride.driver.full_name} ({driver_phone}). "
+        f"Réservation #{booking.id}. En cas de souci, contactez-moi."
+    )
+    emergency_url = None
+    if user.emergency_contact_phone:
+        emergency_url = whatsapp_link(user.emergency_contact_phone, share_text)
+    return TripShareOut(
+        booking_id=booking.id,
+        share_text=share_text,
+        emergency_whatsapp_url=emergency_url,
+    )
+
+
 @router.post("/safety/reports", response_model=SafetyReportOut, status_code=status.HTTP_201_CREATED)
 def create_report(
     payload: SafetyReportCreate,
@@ -615,6 +793,38 @@ def create_report(
         details=payload.details.strip(),
     )
     db.add(report)
+    db.commit()
+    db.refresh(report)
+    return report
+
+
+@router.get("/admin/reports", response_model=list[SafetyReportOut])
+def list_reports(
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[SafetyReport]:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+    return db.query(SafetyReport).order_by(SafetyReport.created_at.desc()).limit(100).all()
+
+
+@router.post("/admin/reports/{report_id}/review", response_model=SafetyReportOut)
+def review_report(
+    report_id: int,
+    payload: ReportStatusUpdate,
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> SafetyReport:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+    report = db.get(SafetyReport, report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Signalement introuvable")
+    report.status = payload.status
+    if payload.suspend_user:
+        target = db.get(User, report.reported_user_id)
+        if target and target.role != UserRole.ADMIN:
+            target.is_suspended = True
     db.commit()
     db.refresh(report)
     return report
