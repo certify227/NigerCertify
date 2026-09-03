@@ -1,6 +1,40 @@
 from functools import lru_cache
+from itertools import permutations
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# 8 régions administratives du Niger (+ villes secondaires fréquentes)
+NIGER_REGIONS = [
+    "Agadez",
+    "Diffa",
+    "Dosso",
+    "Maradi",
+    "Tahoua",
+    "Tillabéri",
+    "Zinder",
+    "Niamey",
+]
+
+NIGER_SERVICE_CITIES = [
+    "Niamey",
+    "Maradi",
+    "Zinder",
+    "Tahoua",
+    "Agadez",
+    "Dosso",
+    "Diffa",
+    "Tillabéri",
+    "Birni N'Konni",
+    "Tessaoua",
+    "Gaya",
+    "Arlit",
+    "Madaoua",
+    "Magaria",
+    "Filingué",
+    "N'Guigmi",
+    "Tchin-Tabaraden",
+    "Ayorou",
+]
 
 
 class Settings(BaseSettings):
@@ -17,13 +51,14 @@ class Settings(BaseSettings):
     default_country: str = "NE"
     mobile_money_providers: str = "orange_money,airtel_money,moov_money,cash"
 
-    # Décisions produit pilote
+    # Couverture nationale : toutes les régions
     pilot_mode: bool = True
     pilot_hub: str = "Niamey"
-    pilot_corridors: str = (
-        "Niamey-Maradi,Niamey-Dosso,Niamey-Tillabéri,Niamey-Tahoua,"
-        "Maradi-Niamey,Dosso-Niamey,Tillabéri-Niamey,Tahoua-Niamey"
-    )
+    national_coverage: bool = True
+    niger_regions: str = ",".join(NIGER_REGIONS)
+    service_cities: str = ",".join(NIGER_SERVICE_CITIES)
+    # Conservé pour compatibilité API ; généré dynamiquement si vide
+    pilot_corridors: str = ""
     commission_rate: float = 0.10
     kyc_sla_hours: int = 24
     cash_allowed_modes: str = "bush_taxi,bus"
@@ -44,15 +79,27 @@ class Settings(BaseSettings):
         return [m.strip() for m in self.cash_allowed_modes.split(",") if m.strip()]
 
     @property
+    def region_list(self) -> list[str]:
+        return [r.strip() for r in self.niger_regions.split(",") if r.strip()]
+
+    @property
+    def service_city_list(self) -> list[str]:
+        return [c.strip() for c in self.service_cities.split(",") if c.strip()]
+
+    @property
     def pilot_corridor_pairs(self) -> list[tuple[str, str]]:
-        pairs: list[tuple[str, str]] = []
-        for item in self.pilot_corridors.split(","):
-            item = item.strip()
-            if "-" not in item:
-                continue
-            a, b = item.split("-", 1)
-            pairs.append((a.strip(), b.strip()))
-        return pairs
+        """Tous les trajets entre chefs-lieux de région (couverture nationale)."""
+        if self.pilot_corridors.strip():
+            pairs: list[tuple[str, str]] = []
+            for item in self.pilot_corridors.split(","):
+                item = item.strip()
+                if "-" not in item:
+                    continue
+                a, b = item.split("-", 1)
+                pairs.append((a.strip(), b.strip()))
+            return pairs
+        # Toutes les paires entre les 8 régions
+        return [(a, b) for a, b in permutations(self.region_list, 2)]
 
 
 @lru_cache

@@ -119,11 +119,12 @@ function HomePage() {
 
   return (
     <section className="hero">
-      {config?.pilot_mode && (
+      {config && (
         <div className="notice">
-          <strong>Pilote {config.pilot_hub}</strong> — axes : {config.pilot_corridors.join(" · ")}.
-          Commission plateforme {(config.commission_rate * 100).toFixed(0)} % · KYC ≤{" "}
-          {config.kyc_sla_hours}h · cash interdit en covoiturage.
+          <strong>Couverture nationale</strong> — {config.regions.length} régions :{" "}
+          {config.regions.join(", ")}. Villes desservies : {config.service_cities.length}.
+          Commission {(config.commission_rate * 100).toFixed(0)} % · KYC ≤ {config.kyc_sla_hours}h ·
+          cash interdit en covoiturage.
         </div>
       )}
       <div className="hero-copy">
@@ -631,7 +632,7 @@ function PublishPage({ user }: { user: User | null }) {
     <section className="stack narrow">
       <h2>Publier un trajet</h2>
       <p className="muted">
-        Pilote Niamey ↔ Maradi / Dosso / Tillabéri / Tahoua. Numéro masqué jusqu’au paiement.
+        Toutes les régions du Niger sont ouvertes. Numéro masqué jusqu’au paiement.
       </p>
       <form className="form" onSubmit={(e) => void submit(e)}>
         <label>

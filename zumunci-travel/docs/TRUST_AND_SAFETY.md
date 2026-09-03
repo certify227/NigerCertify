@@ -16,7 +16,7 @@ C’est une plateforme de **transport interurbain** uniquement.
 5. **Commission 10 %** plateforme sur chaque réservation  
 6. **Usage transport uniquement** — option « priorité femmes » + signalement  
 7. **Charte de sécurité** acceptée avant toute activité  
-8. Pilote limité aux axes **Niamey ↔ Maradi / Dosso / Tillabéri / Tahoua**
+8. Couverture des **8 régions du Niger** (villes du référentiel ZumunciTravel)
 
 ## Flux de mise en relation contrôlée
 

@@ -1,4 +1,4 @@
-"""Données de démarrage — villes du Niger + comptes vérifiés démo."""
+"""Données de démarrage — toutes les régions du Niger + trajets démo."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ from app.models.entities import (
     VerificationStatus,
 )
 
+# Chefs-lieux des 8 régions + villes secondaires
 NIGER_CITIES = [
     ("Niamey", "Niamey", 13.5127, 2.1126),
     ("Maradi", "Maradi", 13.4833, 7.1000),
@@ -30,6 +31,12 @@ NIGER_CITIES = [
     ("Tessaoua", "Maradi", 13.7531, 7.9864),
     ("Gaya", "Dosso", 11.8844, 3.4492),
     ("Arlit", "Agadez", 18.7391, 7.3853),
+    ("Madaoua", "Tahoua", 14.0731, 5.9600),
+    ("Magaria", "Zinder", 12.9981, 8.9097),
+    ("Filingué", "Tillabéri", 14.3500, 3.3167),
+    ("N'Guigmi", "Diffa", 14.2520, 13.1100),
+    ("Tchin-Tabaraden", "Tahoua", 15.8980, 5.7950),
+    ("Ayorou", "Tillabéri", 14.7310, 0.9190),
 ]
 
 
@@ -61,7 +68,7 @@ def seed_database(db: Session) -> None:
                 password_hash=hash_password("zumunci123"),
                 role=UserRole.DRIVER,
                 city="Niamey",
-                bio="Conducteur régulier Niamey–Maradi. Véhicule climatisé.",
+                bio="Conducteur régulier Niamey–Maradi / Zinder.",
                 id_document_number="NE-CNI-000001",
                 id_full_name="Ibrahim Conducteur",
             ),
@@ -79,8 +86,8 @@ def seed_database(db: Session) -> None:
                 full_name="Moussa Taxi Brousse",
                 password_hash=hash_password("zumunci123"),
                 role=UserRole.DRIVER,
-                city="Niamey",
-                bio="Liaisons Niamey–Tillabéri / Tahoua en taxi brousse.",
+                city="Zinder",
+                bio="Liaisons Est : Zinder, Diffa, Agadez.",
                 id_document_number="NE-CNI-000003",
                 id_full_name="Moussa Taxi Brousse",
             ),
@@ -93,7 +100,6 @@ def seed_database(db: Session) -> None:
                 id_document_number="NE-ADM-000099",
                 id_full_name="Admin Zumunci",
             ),
-            # Compte non vérifié pour démontrer le blocage
             User(
                 phone="+22790000004",
                 full_name="Nouveau Sans Verif",
@@ -113,6 +119,7 @@ def seed_database(db: Session) -> None:
         moussa = db.query(User).filter_by(phone="+22790000003").one()
         today = date.today()
         rides = [
+            # Niamey
             Ride(
                 driver_id=ibrahim.id,
                 origin_city="Niamey",
@@ -142,32 +149,86 @@ def seed_database(db: Session) -> None:
                 meeting_point="Nouveau marché",
             ),
             Ride(
-                driver_id=moussa.id,
+                driver_id=ibrahim.id,
                 origin_city="Niamey",
                 destination_city="Tillabéri",
-                departure_date=today + timedelta(days=3),
-                departure_time="05:30",
-                seats_total=8,
-                seats_available=6,
+                departure_date=today + timedelta(days=2),
+                departure_time="08:00",
+                seats_total=3,
+                seats_available=3,
                 price_per_seat=3500,
-                mode=RideMode.BUSH_TAXI,
-                vehicle_info="Hiace 14 places",
-                meeting_point="Gare de Niamey",
-                notes="Taxi brousse — paiement Mobile Money recommandé.",
+                mode=RideMode.CARPOOL,
+                meeting_point="Katako",
+                women_priority=True,
             ),
             Ride(
-                driver_id=moussa.id,
+                driver_id=ibrahim.id,
                 origin_city="Niamey",
                 destination_city="Tahoua",
+                departure_date=today + timedelta(days=3),
+                departure_time="05:45",
+                seats_total=3,
+                seats_available=2,
+                price_per_seat=9000,
+                mode=RideMode.CARPOOL,
+                vehicle_info="Hyundai Tucson",
+                meeting_point="Terminus Wadata",
+            ),
+            # Maradi / Zinder
+            Ride(
+                driver_id=moussa.id,
+                origin_city="Maradi",
+                destination_city="Zinder",
                 departure_date=today + timedelta(days=1),
                 departure_time="14:00",
                 seats_total=12,
                 seats_available=10,
-                price_per_seat=8000,
+                price_per_seat=4000,
                 mode=RideMode.BUS,
                 vehicle_info="Bus 30 places",
-                meeting_point="Station Wadata",
+                meeting_point="Station Maradi centre",
             ),
+            Ride(
+                driver_id=moussa.id,
+                origin_city="Zinder",
+                destination_city="Diffa",
+                departure_date=today + timedelta(days=2),
+                departure_time="06:00",
+                seats_total=8,
+                seats_available=5,
+                price_per_seat=7000,
+                mode=RideMode.BUSH_TAXI,
+                vehicle_info="Hiace 14 places",
+                meeting_point="Gare de Zinder",
+            ),
+            # Agadez / Nord
+            Ride(
+                driver_id=moussa.id,
+                origin_city="Zinder",
+                destination_city="Agadez",
+                departure_date=today + timedelta(days=3),
+                departure_time="05:00",
+                seats_total=8,
+                seats_available=6,
+                price_per_seat=10000,
+                mode=RideMode.BUSH_TAXI,
+                vehicle_info="Hiace 14 places",
+                meeting_point="Gare de Zinder",
+                notes="Liaison Est–Nord.",
+            ),
+            Ride(
+                driver_id=moussa.id,
+                origin_city="Agadez",
+                destination_city="Arlit",
+                departure_date=today + timedelta(days=4),
+                departure_time="07:30",
+                seats_total=6,
+                seats_available=4,
+                price_per_seat=5000,
+                mode=RideMode.BUSH_TAXI,
+                meeting_point="Gare Agadez",
+            ),
+            # Retours / autres régions
             Ride(
                 driver_id=ibrahim.id,
                 origin_city="Maradi",
@@ -181,6 +242,18 @@ def seed_database(db: Session) -> None:
                 vehicle_info="Hyundai Tucson",
                 meeting_point="Gare Maradi",
                 women_priority=True,
+            ),
+            Ride(
+                driver_id=ibrahim.id,
+                origin_city="Dosso",
+                destination_city="Gaya",
+                departure_date=today + timedelta(days=5),
+                departure_time="09:00",
+                seats_total=2,
+                seats_available=2,
+                price_per_seat=2500,
+                mode=RideMode.CARPOOL,
+                meeting_point="Gare Dosso",
             ),
         ]
         db.add_all(rides)

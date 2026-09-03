@@ -10,7 +10,7 @@
 
 | Contrôle | Comportement |
 |---|---|
-| Zone pilote | Niamey ↔ Maradi / Dosso / Tillabéri / Tahoua |
+| Couverture | **8 régions** du Niger (Agadez → Diffa → … → Niamey) |
 | Charte de sécurité | Obligatoire |
 | KYC | `pending` → admin → `verified` (≤ 24 h) |
 | Cash | **Interdit en covoiturage** |

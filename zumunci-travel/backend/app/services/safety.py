@@ -98,13 +98,25 @@ def is_night_departure(departure_time: str) -> bool:
     return hour >= settings.night_start_hour or hour < settings.night_end_hour
 
 
+def _normalize_city(name: str) -> str:
+    return " ".join(name.strip().split()).casefold()
+
+
 def corridor_allowed(origin: str, destination: str) -> bool:
+    """Autorise tout trajet entre villes desservies du Niger (toutes régions)."""
     settings = get_settings()
-    if not settings.pilot_mode:
-        return True
-    o = origin.strip().casefold()
-    d = destination.strip().casefold()
+    o = _normalize_city(origin)
+    d = _normalize_city(destination)
+    if o == d:
+        return False
+
+    allowed = {_normalize_city(c) for c in settings.service_city_list}
+    # Couverture nationale : toute ville du référentiel est valide
+    if settings.national_coverage:
+        return o in allowed and d in allowed
+
+    # Fallback legacy : paires explicites
     for a, b in settings.pilot_corridor_pairs:
-        if o == a.casefold() and d == b.casefold():
+        if o == _normalize_city(a) and d == _normalize_city(b):
             return True
     return False

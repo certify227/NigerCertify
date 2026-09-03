@@ -159,11 +159,16 @@ def health() -> HealthOut:
 
 @router.get("/product/config", response_model=ProductConfigOut)
 def product_config() -> ProductConfigOut:
+    # Affiche les liaisons inter-régions (chefs-lieux), pas toutes les permutations secondaires
+    region_links = [f"{a} → {b}" for a, b in settings.pilot_corridor_pairs]
     return ProductConfigOut(
         app=settings.app_name,
         pilot_mode=settings.pilot_mode,
         pilot_hub=settings.pilot_hub,
-        pilot_corridors=[f"{a} → {b}" for a, b in settings.pilot_corridor_pairs],
+        national_coverage=settings.national_coverage,
+        regions=settings.region_list,
+        service_cities=settings.service_city_list,
+        pilot_corridors=region_links,
         commission_rate=settings.commission_rate,
         currency=settings.currency,
         kyc_sla_hours=settings.kyc_sla_hours,
@@ -374,8 +379,8 @@ def publish_ride(
         raise HTTPException(
             status_code=400,
             detail=(
-                "Pilote ZumunciTravel limité aux axes depuis/vers Niamey "
-                "(Maradi, Dosso, Tillabéri, Tahoua)."
+                "Trajet hors couverture ZumunciTravel. "
+                "Choisissez des villes desservies dans les 8 régions du Niger."
             ),
         )
     ride = Ride(

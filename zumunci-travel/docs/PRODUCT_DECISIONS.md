@@ -8,7 +8,7 @@ Objectif : un **pilote réaliste, sûr et lançable** au Niger.
 | Sujet | Décision |
 |---|---|
 | Modes au lancement | **Covoiturage + taxi brousse** prioritaires ; bus disponible mais secondaire |
-| Zone pilote | **Hub Niamey** + axes Niamey ↔ Maradi / Dosso / Tillabéri / Tahoua |
+| Couverture | **Les 8 régions du Niger** : Agadez, Diffa, Dosso, Maradi, Tahoua, Tillabéri, Zinder, Niamey |
 | KYC | Validation **interne admin**, délai cible **≤ 24 h** |
 | Contact | Masqué jusqu’au paiement ; puis **téléphone + bouton WhatsApp** |
 | Chat in-app | **Non** en V1 (trop lourd) |
@@ -22,7 +22,7 @@ Objectif : un **pilote réaliste, sûr et lançable** au Niger.
 
 ## Pourquoi ces choix
 
-1. **Niamey + 4 axes** : densité suffisante pour matcher sans diluer l’offre.  
+1. **8 régions** : couverture nationale dès le départ (chefs-lieux + villes secondaires).  
 2. **Pas de cash en covoiturage** : principal vecteur d’arnaque hors plateforme.  
 3. **WhatsApp après paiement** : usage réel au Niger, sans exposer le numéro trop tôt.  
 4. **10 %** : simple à expliquer, finance KYC/support sans tuer l’offre.  

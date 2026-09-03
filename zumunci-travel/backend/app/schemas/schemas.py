@@ -252,6 +252,9 @@ class ProductConfigOut(BaseModel):
     app: str
     pilot_mode: bool
     pilot_hub: str
+    national_coverage: bool
+    regions: list[str]
+    service_cities: list[str]
     pilot_corridors: list[str]
     commission_rate: float
     currency: str

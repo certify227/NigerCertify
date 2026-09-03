@@ -172,14 +172,49 @@ def test_safety_report(client):
     assert report.json()["reason"] == "scam"
 
 
-def test_product_config_pilot(client):
+def test_product_config_national(client):
     r = client.get("/api/product/config")
     assert r.status_code == 200
     data = r.json()
-    assert data["pilot_mode"] is True
-    assert data["pilot_hub"] == "Niamey"
+    assert data["national_coverage"] is True
     assert data["commission_rate"] == 0.10
     assert "carpool" not in data["cash_allowed_modes"]
+    for region in ["Agadez", "Diffa", "Dosso", "Maradi", "Tahoua", "Tillabéri", "Zinder", "Niamey"]:
+        assert region in data["regions"]
+
+
+def test_all_regions_cities_seeded(client):
+    r = client.get("/api/cities")
+    assert r.status_code == 200
+    names = {c["name"] for c in r.json()}
+    for city in ["Niamey", "Maradi", "Zinder", "Tahoua", "Agadez", "Dosso", "Diffa", "Tillabéri"]:
+        assert city in names
+
+
+def test_inter_region_ride_publish(client):
+    login = client.post(
+        "/api/auth/login",
+        json={"phone": "90000001", "password": "zumunci123"},
+    )
+    token = login.json()["access_token"]
+    from datetime import date, timedelta
+
+    r = client.post(
+        "/api/rides",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "origin_city": "Zinder",
+            "destination_city": "Diffa",
+            "departure_date": str(date.today() + timedelta(days=6)),
+            "departure_time": "10:00",
+            "seats_total": 3,
+            "price_per_seat": 6000,
+            "mode": "carpool",
+        },
+    )
+    assert r.status_code == 201
+    assert r.json()["origin_city"] == "Zinder"
+    assert r.json()["destination_city"] == "Diffa"
 
 
 def test_cash_forbidden_on_carpool(client):

@@ -79,6 +79,9 @@ export type ProductConfig = {
   app: string;
   pilot_mode: boolean;
   pilot_hub: string;
+  national_coverage: boolean;
+  regions: string[];
+  service_cities: string[];
   pilot_corridors: string[];
   commission_rate: number;
   currency: string;
