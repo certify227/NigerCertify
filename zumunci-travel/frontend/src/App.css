@@ -9,7 +9,12 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  flex-wrap: wrap;
 }
 
 .brand {
@@ -41,18 +46,43 @@
 
 .topbar nav {
   display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-links {
+  display: flex;
   gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
 }
 
-.topbar nav a,
-.linkish {
-  color: #0f172a;
-  background: none;
+.menu-button {
+  display: none;
   border: 0;
+  background: #0e7490;
+  color: white;
   cursor: pointer;
-  padding: 0.35rem 0.5rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.nav-links a:not(.btn),
+.nav-links .linkish {
+  color: #0f172a;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.nav-links a:not(.btn):hover,
+.nav-links .linkish:hover {
+  background: #ecfeff;
+  border-color: #a5f3fc;
 }
 
 .btn {
@@ -73,6 +103,41 @@
   color: white !important;
   padding: 0.55rem 0.9rem;
   border-radius: 999px;
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar nav {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .menu-button {
+    display: inline-flex;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0.35rem;
+    padding-top: 0.5rem;
+  }
+
+  .nav.nav-open .nav-links {
+    display: flex;
+  }
+
+  .nav-links a:not(.btn),
+  .nav-links .linkish {
+    width: 100%;
+    text-align: left;
+  }
 }
 
 .hero {
@@ -285,8 +350,20 @@ textarea {
 
 .row-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+.form.filters {
+  grid-template-columns: 1fr 1fr auto auto;
+  align-items: end;
+}
+
+@media (max-width: 720px) {
+  .form.filters {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (min-width: 720px) {

@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { Link, Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import {
   api,
   clearToken,
@@ -54,6 +63,14 @@ function Shell({
   onLogout: () => void;
   children: ReactNode;
 }) {
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Ferme le menu mobile dès qu'on change de page.
+    setMenuOpen(false);
+  }, [location.pathname]);
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -64,24 +81,56 @@ function Shell({
             <small>Voyagez en confiance</small>
           </div>
         </Link>
-        <nav>
-          <Link to="/">Rechercher</Link>
-          <Link to="/publish">Publier</Link>
-          <Link to="/safety">Sécurité</Link>
-          {user ? (
-            <>
-              <Link to="/verify">Vérification</Link>
-              <Link to="/me">Compte</Link>
-              {user.role === "admin" && <Link to="/admin">Admin</Link>}
-              <button type="button" className="linkish" onClick={onLogout}>
-                Sortir
-              </button>
-            </>
-          ) : (
-            <Link to="/login" className="btn btn-small">
-              Connexion
+        <nav className={menuOpen ? "nav nav-open" : "nav"} aria-label="Navigation principale">
+          <button
+            type="button"
+            className="menu-button"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            Menu
+          </button>
+
+          <div className="nav-links" id="primary-nav-links">
+            <Link to="/" onClick={() => setMenuOpen(false)}>
+              Rechercher
             </Link>
-          )}
+            <Link to="/publish" onClick={() => setMenuOpen(false)}>
+              Publier
+            </Link>
+            <Link to="/safety" onClick={() => setMenuOpen(false)}>
+              Sécurité
+            </Link>
+            {user ? (
+              <>
+                <Link to="/verify" onClick={() => setMenuOpen(false)}>
+                  Vérification
+                </Link>
+                <Link to="/me" onClick={() => setMenuOpen(false)}>
+                  Compte
+                </Link>
+                {user.role === "admin" && (
+                  <Link to="/admin" onClick={() => setMenuOpen(false)}>
+                    Admin
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  className="linkish"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onLogout();
+                  }}
+                >
+                  Sortir
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="btn btn-small" onClick={() => setMenuOpen(false)}>
+                Connexion
+              </Link>
+            )}
+          </div>
         </nav>
       </header>
       <main>{children}</main>
@@ -211,10 +260,13 @@ function RideCard({ ride }: { ride: Ride }) {
 }
 
 function SearchPage() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const [rides, setRides] = useState<Ride[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState(params.get("mode") || "");
+  const [womenOnly, setWomenOnly] = useState(params.get("women_priority") === "true");
+  const [region, setRegion] = useState(params.get("region") || "");
 
   useEffect(() => {
     setLoading(true);
@@ -225,12 +277,59 @@ function SearchPage() {
       .finally(() => setLoading(false));
   }, [params]);
 
+  const applyFilters = (e: FormEvent) => {
+    e.preventDefault();
+    const next = new URLSearchParams(params);
+    if (mode) next.set("mode", mode);
+    else next.delete("mode");
+    if (womenOnly) next.set("women_priority", "true");
+    else next.delete("women_priority");
+    if (region) next.set("region", region);
+    else next.delete("region");
+    setParams(next);
+  };
+
   return (
     <section className="stack">
       <h2>Résultats</h2>
       <p className="muted">
         Seuls les convoyeurs <strong>vérifiés</strong> apparaissent. Contacts masqués avant paiement.
       </p>
+      <form className="form filters" onSubmit={applyFilters}>
+        <label>
+          Mode
+          <select value={mode} onChange={(e) => setMode(e.target.value)}>
+            <option value="">Tous</option>
+            <option value="carpool">Covoiturage</option>
+            <option value="bush_taxi">Taxi brousse</option>
+            <option value="bus">Bus</option>
+          </select>
+        </label>
+        <label>
+          Région
+          <select value={region} onChange={(e) => setRegion(e.target.value)}>
+            <option value="">Toutes</option>
+            {["Agadez", "Diffa", "Dosso", "Maradi", "Tahoua", "Tillabéri", "Zinder", "Niamey"].map(
+              (r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ),
+            )}
+          </select>
+        </label>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={womenOnly}
+            onChange={(e) => setWomenOnly(e.target.checked)}
+          />
+          Priorité femmes uniquement
+        </label>
+        <button className="btn btn-primary" type="submit">
+          Filtrer
+        </button>
+      </form>
       {loading && <p>Chargement…</p>}
       {error && <p className="error">{error}</p>}
       {!loading && !error && rides.length === 0 && (
@@ -504,10 +603,36 @@ function VerifyPage({ user, onRefresh }: { user: User | null; onRefresh: () => P
   const [docNumber, setDocNumber] = useState("");
   const [idName, setIdName] = useState(user?.full_name || "");
   const [accept, setAccept] = useState(true);
+  const [otpCode, setOtpCode] = useState("");
+  const [demoOtp, setDemoOtp] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
 
   if (!user) return <Navigate to="/login" replace />;
+
+  const sendOtp = async () => {
+    setError("");
+    try {
+      const res = await api.sendOtp();
+      setDemoOtp(res.demo_code);
+      setOk(res.message);
+      await onRefresh();
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
+
+  const confirmOtp = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    try {
+      await api.verifyOtp(otpCode);
+      setOk("Numéro vérifié avec succès.");
+      await onRefresh();
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -528,16 +653,38 @@ function VerifyPage({ user, onRefresh }: { user: User | null; onRefresh: () => P
 
   return (
     <section className="stack narrow">
-      <h2>Vérification d’identité</h2>
+      <h2>Vérification</h2>
       <p className="muted">
-        Statut actuel : <strong>{VERIF_LABELS[user.verification_status]}</strong>
+        Téléphone : <strong>{user.phone_verified ? "vérifié" : "non vérifié"}</strong> · Identité :{" "}
+        <strong>{VERIF_LABELS[user.verification_status]}</strong>
       </p>
+
+      {!user.phone_verified && (
+        <div className="form">
+          <h3>1. Vérifier le téléphone (OTP)</h3>
+          <button className="btn btn-primary" type="button" onClick={() => void sendOtp()}>
+            Envoyer le code SMS (simulé)
+          </button>
+          {demoOtp && <p className="notice">Code démo : <code>{demoOtp}</code></p>}
+          <form onSubmit={(e) => void confirmOtp(e)}>
+            <label>
+              Code OTP
+              <input value={otpCode} onChange={(e) => setOtpCode(e.target.value)} required />
+            </label>
+            <button className="btn btn-primary" type="submit">
+              Valider le numéro
+            </button>
+          </form>
+        </div>
+      )}
+
       {user.verification_status === "verified" ? (
         <div className="success">
           Votre identité est vérifiée. Vous pouvez publier et réserver en toute sécurité.
         </div>
       ) : (
         <form className="form" onSubmit={(e) => void submit(e)}>
+          <h3>2. Pièce d’identité</h3>
           <label>
             Type de pièce
             <select value={docType} onChange={(e) => setDocType(e.target.value)}>
@@ -733,15 +880,29 @@ function PublishPage({ user }: { user: User | null }) {
   );
 }
 
-function AccountPage({ user }: { user: User | null }) {
+function AccountPage({
+  user,
+  onRefresh,
+}: {
+  user: User | null;
+  onRefresh: () => Promise<void>;
+}) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
   const [reportMsg, setReportMsg] = useState("");
+  const [emName, setEmName] = useState(user?.emergency_contact_name || "");
+  const [emPhone, setEmPhone] = useState(user?.emergency_contact_phone || "");
+
+  const reload = async () => {
+    setBookings(await api.myBookings());
+    setRides(await api.myRides());
+  };
 
   useEffect(() => {
     if (!user) return;
-    void api.myBookings().then(setBookings).catch(() => setBookings([]));
-    void api.myRides().then(setRides).catch(() => setRides([]));
+    void reload().catch(() => undefined);
+    setEmName(user.emergency_contact_name || "");
+    setEmPhone(user.emergency_contact_phone || "");
   }, [user]);
 
   if (!user) return <Navigate to="/login" replace />;
@@ -762,19 +923,70 @@ function AccountPage({ user }: { user: User | null }) {
     }
   };
 
+  const cancel = async (booking: Booking) => {
+    try {
+      await api.cancelBooking(booking.id, "Annulation depuis mon compte");
+      setReportMsg("Réservation annulée.");
+      await reload();
+    } catch (e) {
+      setReportMsg((e as Error).message);
+    }
+  };
+
+  const share = async (booking: Booking) => {
+    try {
+      const res = await api.shareTrip(booking.id);
+      if (res.emergency_whatsapp_url) {
+        window.open(res.emergency_whatsapp_url, "_blank");
+      } else {
+        await navigator.clipboard.writeText(res.share_text);
+        setReportMsg("Texte de partage copié. Ajoutez un contact d’urgence pour WhatsApp direct.");
+      }
+    } catch (e) {
+      setReportMsg((e as Error).message);
+    }
+  };
+
+  const saveEmergency = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.setEmergencyContact(emName, emPhone);
+      setReportMsg("Contact d’urgence enregistré.");
+      await onRefresh();
+    } catch (err) {
+      setReportMsg((err as Error).message);
+    }
+  };
+
   return (
     <section className="stack">
       <h2>Bonjour, {user.full_name}</h2>
       <p className="muted">
-        {user.phone} · {VERIF_LABELS[user.verification_status]}
+        {user.phone} · {user.phone_verified ? "OTP OK" : "OTP manquant"} ·{" "}
+        {VERIF_LABELS[user.verification_status]}
         {user.accepted_safety_charter ? " · charte acceptée" : ""}
       </p>
-      {user.verification_status !== "verified" && (
+      {(user.verification_status !== "verified" || !user.phone_verified) && (
         <div className="notice">
-          Votre compte n’est pas encore vérifié. <Link to="/verify">Compléter la vérification</Link>{" "}
-          pour réserver ou publier.
+          Complétez <Link to="/verify">OTP + identité</Link> pour réserver ou publier.
         </div>
       )}
+
+      <form className="form narrow" onSubmit={(e) => void saveEmergency(e)}>
+        <h3>Contact d’urgence</h3>
+        <label>
+          Nom
+          <input value={emName} onChange={(e) => setEmName(e.target.value)} required />
+        </label>
+        <label>
+          Téléphone
+          <input value={emPhone} onChange={(e) => setEmPhone(e.target.value)} required />
+        </label>
+        <button className="btn btn-primary" type="submit">
+          Enregistrer
+        </button>
+      </form>
+
       <h3>Mes réservations</h3>
       <div className="ride-list">
         {bookings.length === 0 && <div className="empty">Aucune réservation pour l’instant.</div>}
@@ -795,14 +1007,26 @@ function AccountPage({ user }: { user: User | null }) {
               {" · "}
               commission {formatXof(b.platform_fee || 0)}
             </p>
-            {b.driver_whatsapp_url && (
-              <a className="btn btn-small" href={b.driver_whatsapp_url} target="_blank" rel="noreferrer">
-                WhatsApp
-              </a>
-            )}
-            <button type="button" className="btn btn-small danger" onClick={() => void reportDriver(b)}>
-              Signaler un abus
-            </button>
+            <div className="row-actions">
+              {b.driver_whatsapp_url && (
+                <a className="btn btn-small" href={b.driver_whatsapp_url} target="_blank" rel="noreferrer">
+                  WhatsApp
+                </a>
+              )}
+              {b.status !== "cancelled" && b.status !== "completed" && (
+                <button type="button" className="btn btn-small" onClick={() => void cancel(b)}>
+                  Annuler
+                </button>
+              )}
+              {(b.status === "paid" || b.status === "completed") && (
+                <button type="button" className="btn btn-small" onClick={() => void share(b)}>
+                  Partager / urgence
+                </button>
+              )}
+              <button type="button" className="btn btn-small danger" onClick={() => void reportDriver(b)}>
+                Signaler
+              </button>
+            </div>
           </article>
         ))}
       </div>
@@ -820,14 +1044,16 @@ function AccountPage({ user }: { user: User | null }) {
 
 function AdminPage({ user }: { user: User | null }) {
   const [pending, setPending] = useState<User[]>([]);
+  const [reports, setReports] = useState<import("./api").SafetyReport[]>([]);
   const [msg, setMsg] = useState("");
 
   const load = async () => {
     setPending(await api.pendingVerifications());
+    setReports(await api.adminReports());
   };
 
   useEffect(() => {
-    if (user?.role === "admin") void load().catch(() => setPending([]));
+    if (user?.role === "admin") void load().catch(() => undefined);
   }, [user]);
 
   if (!user) return <Navigate to="/login" replace />;
@@ -866,6 +1092,43 @@ function AdminPage({ user }: { user: User | null }) {
           </article>
         ))}
       </div>
+
+      <h2>Signalements</h2>
+      <div className="ride-list">
+        {reports.length === 0 && <div className="empty">Aucun signalement.</div>}
+        {reports.map((r) => (
+          <article key={r.id} className="ride-card static">
+            <div className="ride-top">
+              <span className="badge">{r.status}</span>
+              <strong>{r.reason}</strong>
+            </div>
+            <p>
+              User #{r.reported_user_id} · {r.details}
+            </p>
+            <div className="row-actions">
+              <button
+                type="button"
+                className="btn btn-small"
+                onClick={() => void api.reviewReport(r.id, "resolved").then(load)}
+              >
+                Résoudre
+              </button>
+              <button
+                type="button"
+                className="btn btn-small danger"
+                onClick={() =>
+                  void api.reviewReport(r.id, "resolved", true).then(() => {
+                    setMsg("Utilisateur suspendu");
+                    return load();
+                  })
+                }
+              >
+                Suspendre
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
@@ -885,7 +1148,10 @@ export default function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/rides/:id" element={<RideDetailPage user={auth.user} />} />
         <Route path="/publish" element={<PublishPage user={auth.user} />} />
-        <Route path="/me" element={<AccountPage user={auth.user} />} />
+        <Route
+          path="/me"
+          element={<AccountPage user={auth.user} onRefresh={auth.refresh} />}
+        />
         <Route path="/verify" element={<VerifyPage user={auth.user} onRefresh={auth.refresh} />} />
         <Route path="/safety" element={<SafetyPage />} />
         <Route path="/admin" element={<AdminPage user={auth.user} />} />
