@@ -1,7 +1,23 @@
 :root {
-  color: #0f172a;
-  background: #f4f7fb;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --ink: #14212b;
+  --muted: #5b6b76;
+  --paper: #f3f7f4;
+  --surface: #ffffff;
+  --line: #d7e2dc;
+  --brand: #0b6e75;
+  --brand-deep: #08565c;
+  --brand-soft: #e6f4f2;
+  --accent: #c45c26;
+  --danger: #b42318;
+  --ok: #1b7a3c;
+  --radius: 0.9rem;
+  --radius-sm: 0.65rem;
+  --shadow: 0 12px 28px rgba(20, 33, 43, 0.07);
+  --font-display: "Outfit", "Avenir Next", sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: var(--font-body);
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -17,12 +33,14 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    radial-gradient(circle at top right, rgba(14, 116, 144, 0.12), transparent 40%),
-    #f4f7fb;
+    radial-gradient(ellipse 70% 45% at 100% -10%, rgba(11, 110, 117, 0.18), transparent 55%),
+    radial-gradient(ellipse 55% 40% at -5% 20%, rgba(196, 92, 38, 0.1), transparent 50%),
+    linear-gradient(180deg, #eef5f1 0%, var(--paper) 42%, #e8f0eb 100%);
+  background-attachment: fixed;
 }
 
 a {
-  color: #0e7490;
+  color: var(--brand);
   text-decoration: none;
 }
 

@@ -72,74 +72,100 @@ function Shell({
   }, [location.pathname]);
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <Link to="/" className="brand">
-          <span className="brand-mark">Z</span>
-          <div>
-            <strong>ZumunciTravel</strong>
-            <small>Voyagez en confiance</small>
-          </div>
-        </Link>
-        <nav className={menuOpen ? "nav nav-open" : "nav"} aria-label="Navigation principale">
+    <div className="app-frame">
+      <header className={`topbar${menuOpen ? " topbar-open" : ""}`}>
+        <div className="topbar-inner">
+          <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
+            <span className="brand-mark" aria-hidden="true">
+              Z
+            </span>
+            <span className="brand-text">
+              <strong>ZumunciTravel</strong>
+              <small>Voyagez en confiance</small>
+            </span>
+          </Link>
+
           <button
             type="button"
-            className="menu-button"
+            className={`menu-button${menuOpen ? " is-open" : ""}`}
             aria-expanded={menuOpen}
+            aria-controls="primary-nav-links"
+            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             onClick={() => setMenuOpen((v) => !v)}
           >
-            Menu
+            <span className="menu-icon" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
           </button>
 
-          <div className="nav-links" id="primary-nav-links">
-            <Link to="/" onClick={() => setMenuOpen(false)}>
+          <nav
+            className={menuOpen ? "nav nav-open" : "nav"}
+            aria-label="Navigation principale"
+            id="primary-nav-links"
+          >
+            <Link to="/" className={location.pathname === "/" ? "is-active" : undefined}>
               Rechercher
             </Link>
-            <Link to="/publish" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/publish"
+              className={location.pathname.startsWith("/publish") ? "is-active" : undefined}
+            >
               Publier
             </Link>
-            <Link to="/safety" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/safety"
+              className={location.pathname.startsWith("/safety") ? "is-active" : undefined}
+            >
               Sécurité
             </Link>
             {user ? (
               <>
-                <Link to="/verify" onClick={() => setMenuOpen(false)}>
+                <Link
+                  to="/verify"
+                  className={location.pathname.startsWith("/verify") ? "is-active" : undefined}
+                >
                   Vérification
                 </Link>
-                <Link to="/me" onClick={() => setMenuOpen(false)}>
+                <Link
+                  to="/me"
+                  className={location.pathname.startsWith("/me") ? "is-active" : undefined}
+                >
                   Compte
                 </Link>
                 {user.role === "admin" && (
-                  <Link to="/admin" onClick={() => setMenuOpen(false)}>
+                  <Link
+                    to="/admin"
+                    className={location.pathname.startsWith("/admin") ? "is-active" : undefined}
+                  >
                     Admin
                   </Link>
                 )}
-                <button
-                  type="button"
-                  className="linkish"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onLogout();
-                  }}
-                >
+                <button type="button" className="linkish" onClick={onLogout}>
                   Sortir
                 </button>
               </>
             ) : (
-              <Link to="/login" className="btn btn-small" onClick={() => setMenuOpen(false)}>
+              <Link to="/login" className="btn btn-small btn-nav">
                 Connexion
               </Link>
             )}
-          </div>
-        </nav>
+          </nav>
+        </div>
       </header>
-      <main>{children}</main>
-      <footer className="footer">
-        <p>
-          ZumunciTravel — mise en relation contrôlée · identité vérifiée · contact masqué jusqu’au
-          paiement · XOF
-        </p>
-      </footer>
+
+      <div className="app-shell">
+        <main className="page-enter" key={location.pathname}>
+          {children}
+        </main>
+        <footer className="footer">
+          <p>
+            ZumunciTravel — mise en relation contrôlée · identité vérifiée · contact masqué jusqu’au
+            paiement · XOF
+          </p>
+        </footer>
+      </div>
     </div>
   );
 }
@@ -168,53 +194,51 @@ function HomePage() {
 
   return (
     <section className="hero">
-      {config && (
-        <div className="notice">
-          <strong>Couverture nationale</strong> — {config.regions.length} régions :{" "}
-          {config.regions.join(", ")}. Villes desservies : {config.service_cities.length}.
-          Commission {(config.commission_rate * 100).toFixed(0)} % · KYC ≤ {config.kyc_sla_hours}h ·
-          cash interdit en covoiturage.
+      <div className="hero-panel">
+        <div className="hero-copy">
+          <p className="eyebrow">Transport sécurisé · Niger</p>
+          <h1>
+            <span className="brand-inline">ZumunciTravel</span>
+            <span className="hero-line">Voyagez sans arnaque ni relation déplacée.</span>
+          </h1>
+          <p className="hero-lead">
+            Identité vérifiée avant mise en relation. Contact débloqué uniquement après paiement
+            Mobile Money.
+          </p>
         </div>
-      )}
-      <div className="hero-copy">
-        <p className="eyebrow">Transport sécurisé · Niger</p>
-        <h1>ZumunciTravel : voyagez sans arnaque ni relation déplacée.</h1>
-        <p>
-          Vérification d’identité avant toute mise en relation. Contact (appel/WhatsApp) débloqué
-          uniquement après paiement Mobile Money. Transport uniquement — pas de rencontres.
-        </p>
+        <form className="search-card" onSubmit={onSubmit}>
+          <label>
+            De
+            <select value={origin} onChange={(e) => setOrigin(e.target.value)} required>
+              <option value="">Ville de départ</option>
+              {cities.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Vers
+            <select value={destination} onChange={(e) => setDestination(e.target.value)} required>
+              <option value="">Ville d&apos;arrivée</option>
+              {cities.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Date
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </label>
+          <button className="btn btn-primary" type="submit">
+            Rechercher
+          </button>
+        </form>
       </div>
-      <form className="search-card" onSubmit={onSubmit}>
-        <label>
-          De
-          <select value={origin} onChange={(e) => setOrigin(e.target.value)} required>
-            <option value="">Ville de départ</option>
-            {cities.map((c) => (
-              <option key={c.id} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Vers
-          <select value={destination} onChange={(e) => setDestination(e.target.value)} required>
-            <option value="">Ville d&apos;arrivée</option>
-            {cities.map((c) => (
-              <option key={c.id} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Date
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        </label>
-        <button className="btn btn-primary" type="submit">
-          Rechercher
-        </button>
-      </form>
+
       <div className="usp-grid">
         <article>
           <h3>Vérification KYC</h3>
@@ -229,6 +253,14 @@ function HomePage() {
           <p>Paiement sur plateforme + signalement immédiat des abus.</p>
         </article>
       </div>
+
+      {config && (
+        <div className="notice notice-soft">
+          <strong>Couverture nationale</strong> — {config.regions.length} régions ·{" "}
+          {config.service_cities.length} villes · commission{" "}
+          {(config.commission_rate * 100).toFixed(0)} % · KYC ≤ {config.kyc_sla_hours}h
+        </div>
+      )}
     </section>
   );
 }
