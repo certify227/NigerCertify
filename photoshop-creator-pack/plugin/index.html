@@ -9,7 +9,7 @@
   <div class="app">
     <header class="hero">
       <div>
-        <h1>Creator Pack</h1>
+        <h1>Creator Pack <span class="ver">1.1</span></h1>
         <p id="doc-label">Aucun document</p>
       </div>
       <sp-button id="btn-refresh" size="s" variant="secondary" quiet>Sync</sp-button>
@@ -28,17 +28,24 @@
         <sp-button id="btn-subject" variant="secondary" size="s">Détecter le sujet</sp-button>
       </div>
 
-      <sp-label class="mt">Formats</sp-label>
+      <div class="row mt between">
+        <sp-label>Formats</sp-label>
+        <div class="row tight">
+          <sp-button id="btn-presets-all" variant="secondary" quiet size="s">Tout</sp-button>
+          <sp-button id="btn-presets-none" variant="secondary" quiet size="s">Aucun</sp-button>
+        </div>
+      </div>
       <div id="preset-list" class="preset-list"></div>
 
       <sp-label class="mt">Recadrage</sp-label>
       <sp-radio-group id="crop-mode" selected="subject" name="crop-mode">
-        <sp-radio value="subject">Subject lock</sp-radio>
-        <sp-radio value="face">Face bias</sp-radio>
-        <sp-radio value="letterbox">Letterbox marque</sp-radio>
+        <sp-radio value="subject">Ancrage sujet</sp-radio>
+        <sp-radio value="face">Priorité visage</sp-radio>
+        <sp-radio value="letterbox">Letterbox (pas de crop)</sp-radio>
       </sp-radio-group>
 
       <sp-checkbox id="chk-safezone" checked>Overlays zones de sécurité</sp-checkbox>
+      <sp-checkbox id="chk-replace">Remplacer les artboards existants</sp-checkbox>
 
       <div class="row mt">
         <sp-button id="btn-canvas" variant="cta">Générer les artboards</sp-button>
@@ -89,7 +96,7 @@
       </div>
 
       <sp-checkbox id="chk-scrim" checked>Scrim auto si contraste faible</sp-checkbox>
-      <sp-checkbox id="chk-type-all" checked>Pousser vers tous les artboards CP_*</sp-checkbox>
+      <sp-checkbox id="chk-type-all" checked>Pousser vers tous les artboards CP_* (hors frames)</sp-checkbox>
 
       <div class="row mt">
         <sp-button id="btn-type" variant="cta">Appliquer la typo</sp-button>
@@ -115,7 +122,7 @@
           <sp-textfield id="frame-count" type="number" value="5"></sp-textfield>
         </div>
         <div class="grow">
-          <sp-label>Format des frames</sp-label>
+          <sp-label>Format source</sp-label>
           <sp-picker id="story-preset" size="s">
             <sp-menu slot="options">
               <sp-menu-item value="ig_feed_45" selected>IG 4:5</sp-menu-item>
@@ -129,7 +136,7 @@
       <sp-label class="mt">Continuité</sp-label>
       <sp-checkbox id="chk-cont-bg" checked>Même fond</sp-checkbox>
       <sp-checkbox id="chk-cont-subject" checked>Même sujet</sp-checkbox>
-      <sp-checkbox id="chk-cont-type" checked>Même style typo</sp-checkbox>
+      <sp-checkbox id="chk-cont-type" checked>Typo du brief sur le master avant duplication</sp-checkbox>
       <sp-checkbox id="chk-notes">Afficher les notes de beat (non exportées)</sp-checkbox>
 
       <div id="beat-list" class="beats"></div>
@@ -140,6 +147,7 @@
     </section>
 
     <footer class="footer">
+      <sp-checkbox id="chk-export-master">Inclure CP_MASTER dans l’export</sp-checkbox>
       <sp-button id="btn-export" variant="primary">Exporter le pack</sp-button>
       <p id="status" class="status">Prêt. Charge un document, puis génère les artboards.</p>
     </footer>

@@ -3,134 +3,27 @@ const crop = require("../core/crop.js");
 const fit = require("../core/fit.js");
 const copy = require("../core/copy.js");
 const ps = require("../core/ps.js");
+const text = require("../core/text.js");
 const { getPreset } = require("../data/presets.js");
-const { artboardsOf, getArtboardRect, findLayerByName } = ps;
 
-function slotNames() {
-  return [naming.TXT.hook, naming.TXT.proof, naming.TXT.cta];
+function findInBoard(board, name) {
+  if (!board || !board.layers) return null;
+  return ps.walkLayers(board.layers, []).find((l) => l.name === name) || null;
 }
 
-async function makeTextBox(opts) {
-  const { name, text, box, size, rgb, align } = opts;
-  const color = rgb || [255, 255, 255];
-  const alignment = align || "center";
-  await ps.batchPlay([
-    {
-      _obj: "make",
-      _target: [{ _ref: "textLayer" }],
-      using: {
-        _obj: "textLayer",
-        textKey: text,
-        textShape: [
-          {
-            _obj: "textShape",
-            char: { _enum: "char", _value: "box" },
-            bounds: {
-              _obj: "rectangle",
-              top: box.top,
-              left: box.left,
-              bottom: box.bottom,
-              right: box.right
-            }
-          }
-        ],
-        textStyleRange: [
-          {
-            _obj: "textStyleRange",
-            from: 0,
-            to: String(text).length,
-            textStyle: {
-              _obj: "textStyle",
-              fontName: "Myriad Pro",
-              fontStyleName: "Bold",
-              fontPostScriptName: "MyriadPro-Bold",
-              size: { _unit: "pointsUnit", _value: size },
-              color: {
-                _obj: "RGBColor",
-                red: color[0],
-                green: color[1],
-                blue: color[2]
-              }
-            }
-          }
-        ],
-        paragraphStyleRange: [
-          {
-            _obj: "paragraphStyleRange",
-            from: 0,
-            to: String(text).length,
-            paragraphStyle: {
-              _obj: "paragraphStyle",
-              align: { _enum: "alignmentType", _value: alignment },
-              hyphenate: true
-            }
-          }
-        ]
-      },
-      _options: { dialogOptions: "dontDisplay" }
-    }
-  ]);
-  const { app } = ps.photoshop();
-  const layer = app.activeDocument.activeLayers[0];
-  if (layer) layer.name = name;
-  return layer;
-}
-
-async function setTextContents(layer, text, size, rgb) {
-  const color = rgb || [255, 255, 255];
-  try {
-    if (layer.textItem) {
-      layer.textItem.contents = text;
-      if (layer.textItem.characterStyle) {
-        layer.textItem.characterStyle.size = size;
-      }
-      return;
-    }
-  } catch (_) {
-    /* batchPlay fallback */
+function layerBelongsTo(layer, board) {
+  let p = layer.parent;
+  while (p) {
+    if (p.id === board.id) return true;
+    p = p.parent;
   }
-  await ps.selectOnly(layer);
-  await ps.batchPlay([
-    {
-      _obj: "set",
-      _target: [{ _ref: "textLayer", _id: layer.id }],
-      to: {
-        _obj: "textLayer",
-        textKey: text,
-        textStyleRange: [
-          {
-            _obj: "textStyleRange",
-            from: 0,
-            to: String(text).length,
-            textStyle: {
-              _obj: "textStyle",
-              size: { _unit: "pointsUnit", _value: size },
-              color: {
-                _obj: "RGBColor",
-                red: color[0],
-                green: color[1],
-                blue: color[2]
-              }
-            }
-          }
-        ]
-      },
-      _options: { dialogOptions: "dontDisplay" }
-    }
-  ]);
+  return false;
 }
 
 function resolvePresetForBoard(board, fallbackId) {
   const name = board && board.name;
-  if (name && name.startsWith("CP_AB_")) {
-    return getPreset(name.replace("CP_AB_", "")) || getPreset(fallbackId);
-  }
-  if (name && name.startsWith("CP_FR_")) {
-    return getPreset(fallbackId) || getPreset("ig_feed_45");
-  }
-  if (name === naming.MASTER) {
-    return getPreset(fallbackId) || getPreset("ig_feed_45");
-  }
+  const fromAb = naming.parsePresetId(name);
+  if (fromAb && getPreset(fromAb)) return getPreset(fromAb);
   return getPreset(fallbackId) || getPreset("ig_feed_45");
 }
 
@@ -169,7 +62,7 @@ async function sampleBackground(doc, box) {
 }
 
 async function applyType(options) {
-  const slotsIn = copy.applyTemplate(
+  const slots = copy.applyTemplate(
     {
       hook: options.hook,
       proof: options.proof,
@@ -177,14 +70,15 @@ async function applyType(options) {
     },
     options.templateId || "hook_proof_cta"
   );
-  const variants = copy.hookVariants(slotsIn.hook);
-  const hook = variants[options.variantIndex || 0] || slotsIn.hook;
-  const slots = { ...slotsIn, hook };
   const density = options.density || "normal";
   const fallbackId = options.fallbackPresetId || "ig_feed_45";
+  const skipFrames = Boolean(options.skipFrames);
 
   return ps.execute("Creator Pack — Type Rhythm", async (_ctx, doc) => {
-    let boards = artboardsOf(doc).filter((b) => naming.isArtboardName(b.name));
+    let boards = ps.artboardsOf(doc).filter((b) => naming.isArtboardName(b.name));
+    if (skipFrames) {
+      boards = boards.filter((b) => naming.parseFrameIndex(b.name) == null);
+    }
     if (options.scope === "active") {
       const active = doc.activeLayers && doc.activeLayers[0];
       const pick = active && naming.isArtboardName(active.name) ? [active] : boards.slice(0, 1);
@@ -197,7 +91,7 @@ async function applyType(options) {
     const report = [];
     for (const board of boards) {
       const preset = resolvePresetForBoard(board, fallbackId);
-      const rect = await getArtboardRect(board);
+      const rect = await ps.getArtboardRect(board);
       const boxes = absoluteBoxes(rect, preset, density);
       const bg = await sampleBackground(doc, boxes.hook);
       const ink = fit.pickTextColor(bg);
@@ -220,27 +114,22 @@ async function applyType(options) {
           maxLines: spec.scale.maxLines,
           density
         });
-        let layer = findInBoard(board, spec.name) || findLayerByName(doc, spec.name);
-        if (layer && options.scope !== "active" && !layerBelongsTo(layer, board)) {
-          layer = findInBoard(board, spec.name);
+        let layer = findInBoard(board, spec.name);
+        if (!layer) {
+          const found = ps.findLayerByName(doc, spec.name);
+          if (found && layerBelongsTo(found, board)) layer = found;
         }
         if (!layer) {
-          layer = await makeTextBox({
+          layer = await text.makeTextBox({
             name: spec.name,
             text: spec.text,
             box: spec.box,
             size: fitted.size,
             rgb: ink.rgb
           });
-          try {
-            if (layer && typeof layer.move === "function") {
-              await layer.move(board, "inside");
-            }
-          } catch (_) {
-            /* keep */
-          }
+          await ps.moveInto(layer, board);
         } else {
-          await setTextContents(layer, spec.text, fitted.size, ink.rgb);
+          await text.setTextContents(layer, spec.text, fitted.size, ink.rgb);
         }
         item.slots[spec.key] = { size: fitted.size, overflow: fitted.overflow };
         if (fitted.overflow) item.overflow = true;
@@ -251,34 +140,19 @@ async function applyType(options) {
       }
       report.push(item);
     }
-    return { slots, variants, report };
+    return { slots, report };
   });
 }
 
-function findInBoard(board, name) {
-  if (!board.layers) return null;
-  return ps.walkLayers(board.layers, []).find((l) => l.name === name) || null;
-}
-
-function layerBelongsTo(layer, board) {
-  let p = layer.parent;
-  while (p) {
-    if (p.id === board.id) return true;
-    p = p.parent;
-  }
-  return false;
-}
-
 async function ensureScrim(doc, board, box) {
-  const name = "CP_SCRIM";
-  if (findInBoard(board, name)) return;
+  if (findInBoard(board, naming.SCRIM)) return;
   await ps.batchPlay([
     {
       _obj: "make",
       _target: [{ _ref: "contentLayer" }],
       using: {
         _obj: "contentLayer",
-        name,
+        name: naming.SCRIM,
         type: {
           _obj: "solidColorLayer",
           color: { _obj: "RGBColor", red: 0, green: 0, blue: 0 }
@@ -297,16 +171,12 @@ async function ensureScrim(doc, board, box) {
   ]);
   const layer = doc.activeLayers && doc.activeLayers[0];
   if (layer) {
-    layer.name = name;
+    layer.name = naming.SCRIM;
     layer.opacity = 40;
-    try {
-      await layer.move(board, "inside");
-    } catch (_) {
-      /* ignore */
-    }
+    await ps.moveInto(layer, board);
   }
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { applyType, slotNames, makeTextBox };
+  module.exports = { applyType, findInBoard };
 }

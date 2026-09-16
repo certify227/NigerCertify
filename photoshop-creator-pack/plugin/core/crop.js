@@ -84,7 +84,13 @@ function computeCoverTransform(src, dst, subject, cropMode) {
 
   const needsExpand = mode !== "letterbox" && (scaledW + 0.5 < dstW || scaledH + 0.5 < dstH);
 
+  let cropLeft = mode === "letterbox" ? 0 : Math.round(-tx);
+  let cropTop = mode === "letterbox" ? 0 : Math.round(-ty);
+  cropLeft = clamp(cropLeft, 0, Math.max(0, Math.round(scaledW - dstW)));
+  cropTop = clamp(cropTop, 0, Math.max(0, Math.round(scaledH - dstH)));
+
   return {
+    mode,
     scale,
     scalePercent: scale * 100,
     tx,
@@ -95,10 +101,12 @@ function computeCoverTransform(src, dst, subject, cropMode) {
     dstH,
     needsExpand,
     crop: {
-      left: mode === "letterbox" ? 0 : Math.round(-tx),
-      top: mode === "letterbox" ? 0 : Math.round(-ty),
+      left: cropLeft,
+      top: cropTop,
       width: dstW,
-      height: dstH
+      height: dstH,
+      right: cropLeft + dstW,
+      bottom: cropTop + dstH
     }
   };
 }

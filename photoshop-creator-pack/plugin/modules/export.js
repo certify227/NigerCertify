@@ -4,14 +4,20 @@ const ps = require("../core/ps.js");
 
 async function pickFolder() {
   const fs = ps.uxp().storage.localFileSystem;
-  const folder = await fs.getFolder();
-  if (!folder) throw new Error("Aucun dossier choisi.");
+  let folder;
+  try {
+    folder = await fs.getFolder();
+  } catch (err) {
+    throw new ps.UserCancel("Export annulé.");
+  }
+  if (!folder) throw new ps.UserCancel("Export annulé.");
   return folder;
 }
 
 async function exportPack(options) {
   const folder = await pickFolder();
   const includeNotes = Boolean(options.includeNotes);
+  const includeMaster = options.includeMaster !== false;
   const meta = {
     document: "",
     canvas: { targets: options.presetIds || [] },
@@ -22,110 +28,85 @@ async function exportPack(options) {
 
   await ps.execute("Creator Pack — Export", async (_ctx, doc) => {
     meta.document = doc.title || doc.name || "";
-    const boards = ps.artboardsOf(doc).filter((b) => naming.isArtboardName(b.name));
-    const targets = boards.length ? boards : [null];
-
-    const hidden = [];
-    if (!includeNotes) {
-      for (const layer of ps.allLayers(doc)) {
-        if (naming.exportSkip(layer.name) && layer.visible) {
-          layer.visible = false;
-          hidden.push(layer);
-        }
-      }
-    }
+    const boards = ps
+      .artboardsOf(doc)
+      .filter((b) => naming.shouldExportArtboard(b.name, includeMaster));
 
     try {
       if (boards.length) {
-        await exportViaQuickExport(folder, doc);
-        for (const board of boards) {
-          meta.files.push(`${board.name}.png`);
-        }
+        await exportByDuplicate(folder, doc, boards, meta, includeNotes);
       } else {
-        const file = await folder.createFile("CP_MASTER.png", { overwrite: true });
+        const file = await folder.createFile("CP_EXPORT.png", { overwrite: true });
         await doc.saveAs.png(file, { compression: 6 }, true);
-        meta.files.push("CP_MASTER.png");
+        meta.files.push("CP_EXPORT.png");
       }
     } catch (err) {
-      await exportByDuplicate(folder, doc, targets, meta);
-      if (!meta.files.length) throw err;
+      if (!boards.length) throw err;
+      await exportViaQuickExport(folder, doc, boards);
+      if (!meta.files.length) {
+        boards.forEach((board) => meta.files.push(`${board.name}.png`));
+      }
     }
-
-    hidden.forEach((layer) => {
-      layer.visible = true;
-    });
   });
 
   const manifest = plan.buildManifest({
     ...meta,
     createdAt: new Date().toISOString()
   });
+  const formats = ps.uxp().storage.formats;
   const manifestFile = await folder.createFile("manifest.json", { overwrite: true });
-  await manifestFile.write(JSON.stringify(manifest, null, 2));
-  return { folder: folder.nativePath || folder.name, files: meta.files.concat(["manifest.json"]) };
+  if (formats && formats.utf8) {
+    await manifestFile.write(JSON.stringify(manifest, null, 2), { format: formats.utf8 });
+  } else {
+    await manifestFile.write(JSON.stringify(manifest, null, 2));
+  }
+  return {
+    folder: folder.nativePath || folder.name,
+    files: meta.files.concat(["manifest.json"])
+  };
 }
 
-async function exportViaQuickExport(folder, doc) {
-  const dest = folder.nativePath;
-  if (!dest) {
-    throw new Error("Chemin dossier indisponible (nativePath).");
-  }
-  const boards = ps.artboardsOf(doc);
-  if (boards.length) {
-    for (const board of boards) {
-      if (!naming.isArtboardName(board.name)) continue;
-      await ps.selectOnly(board);
-      await ps.batchPlay([
-        {
-          _obj: "exportSelectionAsFileTypePressed",
-          _target: { _ref: "layer", _enum: "ordinal", _value: "targetEnum" },
-          fileType: "png",
-          quality: 32,
-          metadata: 0,
-          destFolder: dest,
-          sRGB: true,
-          openWindow: false,
-          _options: { dialogOptions: "dontDisplay" }
-        }
-      ]);
-    }
-    return;
-  }
-  await ps.batchPlay([
-    {
-      _obj: "exportDocumentAsFileTypePressed",
-      fileType: "png",
-      quality: 32,
-      metadata: 0,
-      destFolder: dest,
-      sRGB: true,
-      openWindow: false,
-      _options: { dialogOptions: "dontDisplay" }
-    }
-  ]);
-}
-
-async function exportByDuplicate(folder, doc, targets, meta) {
-  const { app } = ps.photoshop();
-  const originId = doc.id;
-  for (const board of targets) {
-    const copy = await doc.duplicate(board ? board.name : "CP_EXPORT");
+async function exportByDuplicate(folder, origin, boards, meta, includeNotes) {
+  const originId = origin.id;
+  for (const board of boards) {
+    const filename = `${board.name}.png`;
+    const box = await ps.getArtboardRect(board);
+    let copy;
     try {
-      if (board) {
-        const box = await ps.getArtboardRect(board);
-        if (typeof copy.crop === "function") {
-          await copy.crop({ left: box.left, top: box.top, right: box.right, bottom: box.bottom });
+      copy = await origin.duplicate(board.name);
+      if (!includeNotes) {
+        for (const layer of ps.allLayers(copy)) {
+          if (naming.exportSkip(layer.name)) layer.visible = false;
         }
       }
-      const filename = `${(board && board.name) || "CP_MASTER"}.png`;
+      await ps.cropDoc(copy, box);
       const file = await folder.createFile(filename, { overwrite: true });
       await copy.saveAs.png(file, { compression: 6 }, true);
       meta.files.push(filename);
     } finally {
-      copy.closeWithoutSaving();
-      const origin = Array.from(app.documents).find((d) => d.id === originId);
-      if (origin) app.activeDocument = origin;
+      await ps.closeTemp(copy, originId);
     }
+  }
+}
+
+async function exportViaQuickExport(folder, doc, boards) {
+  const dest = folder.nativePath;
+  if (!dest) throw new Error("Chemin dossier indisponible (nativePath).");
+  for (const board of boards) {
+    await ps.selectOnly(board);
+    await ps.batchPlay([
+      {
+        _obj: "exportSelectionAsFileTypePressed",
+        _target: { _ref: "layer", _enum: "ordinal", _value: "targetEnum" },
+        fileType: "png",
+        quality: 32,
+        metadata: 0,
+        destFolder: dest,
+        sRGB: true,
+        openWindow: false,
+        _options: { dialogOptions: "dontDisplay" }
+      }
+    ]);
   }
 }
 
