@@ -6,6 +6,7 @@ const BG = "CP_BG";
 const ACCENT = "CP_ACCENT";
 const META = "CP_META";
 const NOTE = "CP_NOTE";
+const SCRIM = "CP_SCRIM";
 const SHAPE_CTA = "CP_SHAPE_CTA";
 const ADJ_PALETTE = "CP_ADJ_PALETTE";
 
@@ -33,6 +34,11 @@ function parseFrameIndex(name) {
   return m ? parseInt(m[1], 10) : null;
 }
 
+function parsePresetId(name) {
+  const m = /^CP_AB_(.+)$/.exec(name || "");
+  return m ? m[1] : null;
+}
+
 function isManaged(name) {
   return typeof name === "string" && name.startsWith(PREFIX);
 }
@@ -42,7 +48,13 @@ function isArtboardName(name) {
 }
 
 function exportSkip(name) {
-  return /^(CP_META|CP_SAFEZONE_|CP_UI_MOCK|CP_NOTE)/.test(name || "");
+  return /^(CP_META|CP_SAFEZONE_|CP_UI_MOCK|CP_NOTE|CP_SCRIM)/.test(name || "");
+}
+
+function shouldExportArtboard(name, includeMaster) {
+  if (!isArtboardName(name)) return false;
+  if (name === MASTER) return Boolean(includeMaster);
+  return true;
 }
 
 if (typeof module !== "undefined") {
@@ -55,6 +67,7 @@ if (typeof module !== "undefined") {
     ACCENT,
     META,
     NOTE,
+    SCRIM,
     SHAPE_CTA,
     ADJ_PALETTE,
     TXT,
@@ -62,8 +75,10 @@ if (typeof module !== "undefined") {
     frameName,
     safezoneName,
     parseFrameIndex,
+    parsePresetId,
     isManaged,
     isArtboardName,
-    exportSkip
+    exportSkip,
+    shouldExportArtboard
   };
 }
