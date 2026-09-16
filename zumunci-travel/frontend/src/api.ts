@@ -16,10 +16,15 @@ export type User = {
   emergency_contact_name: string | null;
   emergency_contact_phone: string | null;
   is_suspended: boolean;
+  id_document_type?: string | null;
+  id_document_number?: string | null;
+  id_full_name?: string | null;
+  verification_notes?: string | null;
 };
 
 export type SafetyReport = {
   id: number;
+  reporter_id: number;
   reported_user_id: number;
   reason: string;
   details: string;
@@ -74,6 +79,7 @@ export type Booking = {
   created_at: string;
   driver_phone?: string | null;
   passenger_phone?: string | null;
+  passenger_name?: string | null;
   driver_whatsapp_url?: string | null;
   ride?: Ride;
   payment?: {
@@ -103,6 +109,7 @@ export type ProductConfig = {
   night_end_hour: number;
   default_locale: string;
   payment_providers: string[];
+  booking_pending_ttl_minutes?: number;
 };
 
 export type SafetyCharter = {
@@ -197,6 +204,7 @@ export const api = {
     }),
   myBookings: () => request<Booking[]>("/me/bookings"),
   myRides: () => request<Ride[]>("/me/rides"),
+  myIncomingBookings: () => request<Booking[]>("/me/incoming-bookings"),
   confirmPayment: (paymentId: number, success = true) =>
     request(`/payments/${paymentId}/confirm`, {
       method: "POST",
@@ -212,6 +220,13 @@ export const api = {
     request<{ booking_id: number; share_text: string; emergency_whatsapp_url: string | null }>(
       `/bookings/${bookingId}/share`,
     ),
+  rateBooking: (bookingId: number, score: number, comment?: string) =>
+    request<{ id: number; score: number }>(`/bookings/${bookingId}/rate`, {
+      method: "POST",
+      body: JSON.stringify({ score, comment }),
+    }),
+  deactivateRide: (rideId: number) =>
+    request<{ message: string }>(`/rides/${rideId}`, { method: "DELETE" }),
   report: (body: Record<string, unknown>) =>
     request("/safety/reports", { method: "POST", body: JSON.stringify(body) }),
   providers: () => request<string[]>("/payments/providers"),
@@ -233,6 +248,15 @@ export const MODE_LABELS: Record<Ride["mode"], string> = {
   carpool: "Covoiturage",
   bush_taxi: "Taxi brousse",
   bus: "Bus",
+};
+
+export const REPORT_REASON_LABELS: Record<string, string> = {
+  scam: "Arnaque",
+  inappropriate_behavior: "Comportement déplacé",
+  harassment: "Harcèlement",
+  off_platform_payment: "Paiement hors plateforme",
+  fake_profile: "Faux profil",
+  other: "Autre",
 };
 
 export const VERIF_LABELS: Record<VerificationStatus, string> = {

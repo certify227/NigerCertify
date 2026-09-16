@@ -16,6 +16,7 @@ import {
   formatXof,
   getToken,
   MODE_LABELS,
+  REPORT_REASON_LABELS,
   setToken,
   VERIF_LABELS,
 } from "./api";
@@ -384,6 +385,8 @@ function RideDetailPage({ user }: { user: User | null }) {
   const [provider, setProvider] = useState("orange_money");
   const [providers, setProviders] = useState<string[]>([]);
   const [config, setConfig] = useState<ProductConfig | null>(null);
+  const [acceptWomen, setAcceptWomen] = useState(false);
+  const [pendingBooking, setPendingBooking] = useState<Booking | null>(null);
   const [message, setMessage] = useState("");
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -408,33 +411,59 @@ function RideDetailPage({ user }: { user: User | null }) {
     }
   }, [allowedProviders, provider]);
 
-  const book = async () => {
+  const ensureReady = () => {
     if (!user) {
       navigate("/login");
-      return;
+      return false;
     }
-    if (user.verification_status !== "verified") {
+    if (!user.phone_verified || user.verification_status !== "verified" || !user.accepted_safety_charter) {
       navigate("/verify");
-      return;
+      return false;
     }
-    if (!ride) return;
+    return true;
+  };
+
+  const book = async () => {
+    if (!ensureReady() || !ride || !user) return;
     setError("");
+    setMessage("");
     try {
       const booking = await api.book(ride.id, {
         seats,
         payment_provider: provider,
         payment_phone: user.phone,
+        accept_women_priority_rules: acceptWomen,
       });
-      if (booking.payment) {
-        await api.confirmPayment(booking.payment.id, true);
-      }
-      const contact = await api.revealContact(booking.id);
-      setWhatsappUrl(contact.driver_whatsapp_url);
+      setPendingBooking(booking);
       setMessage(
-        `Réservation confirmée (${formatXof(booking.total_amount)}, dont commission ${formatXof(booking.platform_fee)}). ` +
-          `Contact : ${contact.driver_phone}. ${contact.warning}`,
+        `Réservation créée (${formatXof(booking.total_amount)}). ` +
+          `Confirmez le paiement ${provider.replaceAll("_", " ")} pour débloquer le contact ` +
+          `(expire sous ${config?.booking_pending_ttl_minutes ?? 30} min).`,
       );
       setRide(await api.ride(ride.id));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+
+  const confirmPay = async (success: boolean) => {
+    if (!pendingBooking?.payment) return;
+    setError("");
+    try {
+      await api.confirmPayment(pendingBooking.payment.id, success);
+      if (!success) {
+        setPendingBooking(null);
+        setMessage("Paiement annulé. Les places ont été libérées.");
+        if (ride) setRide(await api.ride(ride.id));
+        return;
+      }
+      const contact = await api.revealContact(pendingBooking.id);
+      setWhatsappUrl(contact.driver_whatsapp_url);
+      setMessage(
+        `Paiement confirmé. Contact : ${contact.driver_phone}. ${contact.warning}`,
+      );
+      setPendingBooking(null);
+      if (ride) setRide(await api.ride(ride.id));
     } catch (e) {
       setError((e as Error).message);
     }
@@ -492,31 +521,59 @@ function RideDetailPage({ user }: { user: User | null }) {
         Contact (appel/WhatsApp) débloqué après paiement Mobile Money. En covoiturage, le cash est
         interdit. Commission plateforme {(config ? config.commission_rate * 100 : 10).toFixed(0)} %.
       </div>
-      <div className="book-box">
-        <label>
-          Places
-          <input
-            type="number"
-            min={1}
-            max={ride.seats_available}
-            value={seats}
-            onChange={(e) => setSeats(Number(e.target.value))}
-          />
-        </label>
-        <label>
-          Paiement
-          <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-            {allowedProviders.map((p) => (
-              <option key={p} value={p}>
-                {p.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className="btn btn-primary" type="button" onClick={() => void book()}>
-          Réserver · {formatXof(seats * ride.price_per_seat)}
-        </button>
-      </div>
+      {!pendingBooking ? (
+        <div className="book-box">
+          <label>
+            Places
+            <input
+              type="number"
+              min={1}
+              max={ride.seats_available}
+              value={seats}
+              onChange={(e) => setSeats(Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Paiement
+            <select value={provider} onChange={(e) => setProvider(e.target.value)}>
+              {allowedProviders.map((p) => (
+                <option key={p} value={p}>
+                  {p.replaceAll("_", " ")}
+                </option>
+              ))}
+            </select>
+          </label>
+          {ride.women_priority && (
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={acceptWomen}
+                onChange={(e) => setAcceptWomen(e.target.checked)}
+              />
+              J’accepte les règles « priorité femmes » (transport uniquement)
+            </label>
+          )}
+          {provider === "cash" && (
+            <div className="notice">Cash autorisé uniquement pour taxi brousse / bus.</div>
+          )}
+          <button className="btn btn-primary" type="button" onClick={() => void book()}>
+            Réserver · {formatXof(seats * ride.price_per_seat)}
+          </button>
+        </div>
+      ) : (
+        <div className="book-box">
+          <p>
+            Paiement en attente · {formatXof(pendingBooking.total_amount)} via{" "}
+            {pendingBooking.payment?.provider.replaceAll("_", " ")}
+          </p>
+          <button className="btn btn-primary" type="button" onClick={() => void confirmPay(true)}>
+            Confirmer le paiement (démo)
+          </button>
+          <button className="btn btn-small danger" type="button" onClick={() => void confirmPay(false)}>
+            Échec / annuler
+          </button>
+        </div>
+      )}
       {message && <p className="success">{message}</p>}
       {whatsappUrl && (
         <a className="btn btn-primary" href={whatsappUrl} target="_blank" rel="noreferrer">
@@ -794,7 +851,19 @@ function PublishPage({ user }: { user: User | null }) {
   }, []);
 
   if (!user) return <Navigate to="/login" replace />;
-  if (user.verification_status !== "verified") return <Navigate to="/verify" replace />;
+  if (
+    user.verification_status !== "verified" ||
+    !user.phone_verified ||
+    !user.accepted_safety_charter
+  ) {
+    return <Navigate to="/verify" replace />;
+  }
+
+  const nightWarn =
+    (() => {
+      const hour = Number(form.departure_time.split(":")[0]);
+      return hour >= 20 || hour < 5;
+    })();
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -813,6 +882,11 @@ function PublishPage({ user }: { user: User | null }) {
       <p className="muted">
         Toutes les régions du Niger sont ouvertes. Numéro masqué jusqu’au paiement.
       </p>
+      {nightWarn && (
+        <div className="notice">
+          Départ soir/nuit détecté : rappellez aux passagers les consignes de prudence.
+        </div>
+      )}
       <form className="form" onSubmit={(e) => void submit(e)}>
         <label>
           De
@@ -920,14 +994,21 @@ function AccountPage({
   onRefresh: () => Promise<void>;
 }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [incoming, setIncoming] = useState<Booking[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
   const [reportMsg, setReportMsg] = useState("");
+  const [reportReason, setReportReason] = useState("inappropriate_behavior");
   const [emName, setEmName] = useState(user?.emergency_contact_name || "");
   const [emPhone, setEmPhone] = useState(user?.emergency_contact_phone || "");
 
   const reload = async () => {
     setBookings(await api.myBookings());
     setRides(await api.myRides());
+    try {
+      setIncoming(await api.myIncomingBookings());
+    } catch {
+      setIncoming([]);
+    }
   };
 
   useEffect(() => {
@@ -945,9 +1026,8 @@ function AccountPage({
       await api.report({
         reported_user_id: booking.ride.driver.id,
         booking_id: booking.id,
-        reason: "inappropriate_behavior",
-        details:
-          "Signalement depuis le compte : comportement inapproprié ou tentative hors plateforme.",
+        reason: reportReason,
+        details: `Signalement (${REPORT_REASON_LABELS[reportReason] || reportReason}) depuis le compte ZumunciTravel.`,
       });
       setReportMsg("Signalement envoyé à ZumunciTravel. Merci de protéger la communauté.");
     } catch (e) {
@@ -974,6 +1054,26 @@ function AccountPage({
         await navigator.clipboard.writeText(res.share_text);
         setReportMsg("Texte de partage copié. Ajoutez un contact d’urgence pour WhatsApp direct.");
       }
+    } catch (e) {
+      setReportMsg((e as Error).message);
+    }
+  };
+
+  const rate = async (booking: Booking) => {
+    try {
+      await api.rateBooking(booking.id, 5, "Trajet correct — notation rapide depuis mon compte.");
+      setReportMsg("Merci pour votre note !");
+      await reload();
+    } catch (e) {
+      setReportMsg((e as Error).message);
+    }
+  };
+
+  const unpublish = async (ride: Ride) => {
+    try {
+      await api.deactivateRide(ride.id);
+      setReportMsg("Trajet désactivé.");
+      await reload();
     } catch (e) {
       setReportMsg((e as Error).message);
     }
@@ -1020,6 +1120,16 @@ function AccountPage({
       </form>
 
       <h3>Mes réservations</h3>
+      <label className="narrow">
+        Motif de signalement
+        <select value={reportReason} onChange={(e) => setReportReason(e.target.value)}>
+          {Object.entries(REPORT_REASON_LABELS).map(([k, label]) => (
+            <option key={k} value={k}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </label>
       <div className="ride-list">
         {bookings.length === 0 && <div className="empty">Aucune réservation pour l’instant.</div>}
         {bookings.map((b) => (
@@ -1050,6 +1160,11 @@ function AccountPage({
                   Annuler
                 </button>
               )}
+              {b.status === "paid" && (
+                <button type="button" className="btn btn-small" onClick={() => void rate(b)}>
+                  Noter 5★
+                </button>
+              )}
               {(b.status === "paid" || b.status === "completed") && (
                 <button type="button" className="btn btn-small" onClick={() => void share(b)}>
                   Partager / urgence
@@ -1062,12 +1177,57 @@ function AccountPage({
           </article>
         ))}
       </div>
+
+      <h3>Réservations reçues (conducteur)</h3>
+      <div className="ride-list">
+        {incoming.length === 0 && <div className="empty">Aucune réservation reçue.</div>}
+        {incoming.map((b) => (
+          <article key={`in-${b.id}`} className="ride-card static">
+            <div className="ride-top">
+              <span className="badge">{b.status}</span>
+              <strong>{formatXof(b.driver_amount || b.total_amount)}</strong>
+            </div>
+            <h3>
+              {b.ride
+                ? `${b.ride.origin_city} → ${b.ride.destination_city}`
+                : `Trajet #${b.ride_id}`}
+            </h3>
+            <p>
+              Passager : {b.passenger_name || "—"}
+              {b.passenger_phone ? ` · ${b.passenger_phone}` : " · contact masqué"}
+            </p>
+          </article>
+        ))}
+      </div>
+
       {reportMsg && <p className="success">{reportMsg}</p>}
       <h3>Mes trajets publiés</h3>
       <div className="ride-list">
         {rides.length === 0 && <div className="empty">Aucun trajet publié.</div>}
         {rides.map((ride) => (
-          <RideCard key={ride.id} ride={ride} />
+          <article key={ride.id} className="ride-card static">
+            <div className="ride-top">
+              <span className="badge">{MODE_LABELS[ride.mode]}</span>
+              <strong>{formatXof(ride.price_per_seat)}</strong>
+            </div>
+            <h3>
+              {ride.origin_city} → {ride.destination_city}
+            </h3>
+            <p className="muted">
+              {ride.departure_date} · {ride.departure_time} · {ride.seats_available}/{ride.seats_total}{" "}
+              places · {ride.is_active ? "actif" : "désactivé"}
+            </p>
+            <div className="row-actions">
+              <Link className="btn btn-small" to={`/rides/${ride.id}`}>
+                Voir
+              </Link>
+              {ride.is_active && (
+                <button type="button" className="btn btn-small danger" onClick={() => void unpublish(ride)}>
+                  Désactiver
+                </button>
+              )}
+            </div>
+          </article>
         ))}
       </div>
     </section>
@@ -1093,7 +1253,7 @@ function AdminPage({ user }: { user: User | null }) {
 
   const review = async (id: number, approve: boolean) => {
     await api.reviewVerification(id, approve, approve ? "Validé" : "Rejeté");
-    setMsg(approve ? "Identité validée" : "Dossier rejeté");
+    setMsg(approve ? "Identité validée (OTP téléphone reste requis)" : "Dossier rejeté");
     await load();
   };
 
@@ -1109,6 +1269,20 @@ function AdminPage({ user }: { user: User | null }) {
               {u.full_name} · {u.phone}
             </h3>
             <p className="muted">{VERIF_LABELS[u.verification_status]}</p>
+            <ul className="facts">
+              <li>
+                <strong>Pièce :</strong> {u.id_document_type || "—"} · {u.id_document_number || "—"}
+              </li>
+              <li>
+                <strong>Nom pièce :</strong> {u.id_full_name || "—"}
+              </li>
+              <li>
+                <strong>Notes :</strong> {u.verification_notes || "—"}
+              </li>
+              <li>
+                <strong>OTP :</strong> {u.phone_verified ? "vérifié" : "non vérifié"}
+              </li>
+            </ul>
             <div className="row-actions">
               <button type="button" className="btn btn-small" onClick={() => void review(u.id, true)}>
                 Approuver
@@ -1132,12 +1306,19 @@ function AdminPage({ user }: { user: User | null }) {
           <article key={r.id} className="ride-card static">
             <div className="ride-top">
               <span className="badge">{r.status}</span>
-              <strong>{r.reason}</strong>
+              <strong>{REPORT_REASON_LABELS[r.reason] || r.reason}</strong>
             </div>
             <p>
-              User #{r.reported_user_id} · {r.details}
+              Reporter #{r.reporter_id} → User #{r.reported_user_id} · {r.details}
             </p>
             <div className="row-actions">
+              <button
+                type="button"
+                className="btn btn-small"
+                onClick={() => void api.reviewReport(r.id, "dismissed").then(load)}
+              >
+                Classer
+              </button>
               <button
                 type="button"
                 className="btn btn-small"
