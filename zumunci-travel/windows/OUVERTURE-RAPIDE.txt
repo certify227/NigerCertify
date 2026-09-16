@@ -1,0 +1,15 @@
+ZUMUNCITRAVEL — OUVERTURE RAPIDE (WINDOWS)
+==========================================
+
+1) Installez Python 3.10+ et Node.js LTS (avec PATH).
+2) Double-cliquez : windows\INSTALLER.bat   (une seule fois)
+3) Double-cliquez : DEMARRER.bat
+4) Le navigateur s'ouvre sur http://127.0.0.1:5173
+
+Comptes demo :
+  Voyageuse : 90000002 / zumunci123
+  Admin     : 90000099 / zumunci123
+
+Pour arreter : ARRETER.bat
+
+Aide detaillee : windows\README.md

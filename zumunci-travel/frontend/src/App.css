@@ -2,6 +2,21 @@
   min-height: 100vh;
 }
 
+.api-banner {
+  background: #7a1f1f;
+  color: #fff7f7;
+  text-align: center;
+  padding: 0.55rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.api-banner code {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+}
+
 .app-shell {
   max-width: 980px;
   margin: 0 auto;

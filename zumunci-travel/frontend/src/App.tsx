@@ -66,14 +66,38 @@ function Shell({
 }) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [apiOk, setApiOk] = useState<boolean | null>(null);
 
   useEffect(() => {
     // Ferme le menu mobile dès qu'on change de page.
     setMenuOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const ping = async () => {
+      try {
+        await api.health();
+        if (!cancelled) setApiOk(true);
+      } catch {
+        if (!cancelled) setApiOk(false);
+      }
+    };
+    void ping();
+    const id = window.setInterval(() => void ping(), 15000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, []);
+
   return (
     <div className="app-frame">
+      {apiOk === false && (
+        <div className="api-banner" role="status">
+          API hors ligne — lancez <code>DEMARRER.bat</code> (Windows) ou le backend sur le port 8000.
+        </div>
+      )}
       <header className={`topbar${menuOpen ? " topbar-open" : ""}`}>
         <div className="topbar-inner">
           <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>

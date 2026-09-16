@@ -25,13 +25,29 @@ Voir [`docs/PRODUCT_DECISIONS.md`](docs/PRODUCT_DECISIONS.md) et [`docs/TRUST_AN
 
 ```
 zumunci-travel/
+├── DEMARRER.bat      # Windows : démarrage 1 clic
+├── ARRETER.bat       # Windows : arrêt
+├── windows/          # Scripts instance Windows
 ├── backend/          # FastAPI + SQLAlchemy
 ├── frontend/         # React + Vite (PWA)
 ├── docs/
 └── docker-compose.yml
 ```
 
-## Démarrage local
+## Démarrage Windows (recommandé)
+
+1. Installez **Python 3.10+** et **Node.js LTS** (avec PATH).
+2. Double-cliquez `windows\INSTALLER.bat` (première fois).
+3. Double-cliquez **`DEMARRER.bat`**.
+
+- App : http://127.0.0.1:5173  
+- API docs : http://127.0.0.1:8000/docs  
+
+Guide détaillé : [`windows/README.md`](windows/README.md).
+
+Pour arrêter : double-cliquez `ARRETER.bat`.
+
+## Démarrage local (Linux / macOS)
 
 ```bash
 cd backend
@@ -43,6 +59,8 @@ uvicorn app.main:app --reload --port 8000
 cd frontend
 npm install && npm run dev
 ```
+
+Ou : `./scripts/dev.sh`
 
 - App : http://127.0.0.1:5173  
 - API docs : http://127.0.0.1:8000/docs  
