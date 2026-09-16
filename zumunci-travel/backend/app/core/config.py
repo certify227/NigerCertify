@@ -65,6 +65,10 @@ class Settings(BaseSettings):
     night_start_hour: int = 20
     night_end_hour: int = 5
     default_locale: str = "fr-FR"
+    # Réservations pending non confirmées : libération automatique des places
+    booking_pending_ttl_minutes: int = 30
+    # En development, drop_all uniquement si true (évite d'effacer le volume Docker)
+    reset_db_on_start: bool = False
 
     @property
     def cors_origin_list(self) -> list[str]:

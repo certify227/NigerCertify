@@ -70,6 +70,15 @@ class UserOut(BaseModel):
     created_at: datetime
 
 
+class AdminUserOut(UserOut):
+    """Profil admin avec détails KYC pour revue manuelle."""
+
+    id_document_type: IdDocumentType | None = None
+    id_document_number: str | None = None
+    id_full_name: str | None = None
+    verification_notes: str | None = None
+
+
 class OtpSendOut(BaseModel):
     message: str
     demo_code: str | None = None
@@ -162,6 +171,7 @@ class BookingCreate(BaseModel):
     seats: int = Field(default=1, ge=1, le=10)
     payment_provider: PaymentProvider = PaymentProvider.ORANGE_MONEY
     payment_phone: str | None = None
+    accept_women_priority_rules: bool = False
 
 
 class PaymentOut(BaseModel):
@@ -194,6 +204,7 @@ class BookingOut(BaseModel):
     driver_phone: str | None = None
     passenger_phone: str | None = None
     driver_whatsapp_url: str | None = None
+    passenger_name: str | None = None
 
 
 class PaymentConfirm(BaseModel):
@@ -242,6 +253,7 @@ class SafetyReportOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    reporter_id: int
     reported_user_id: int
     reason: ReportReason
     details: str
@@ -296,3 +308,4 @@ class ProductConfigOut(BaseModel):
     night_end_hour: int
     default_locale: str
     payment_providers: list[str]
+    booking_pending_ttl_minutes: int = 30

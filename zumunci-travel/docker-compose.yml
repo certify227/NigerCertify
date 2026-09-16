@@ -5,6 +5,7 @@ services:
       - "8000:8000"
     environment:
       APP_ENV: development
+      RESET_DB_ON_START: "false"
       SECRET_KEY: zumunci-dev-secret-change-me
       DATABASE_URL: sqlite:////data/zumunci.db
       CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080

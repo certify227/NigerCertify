@@ -42,7 +42,7 @@ def test_unverified_cannot_book(client):
     booking = client.post(
         f"/api/rides/{ride_id}/book",
         headers={"Authorization": f"Bearer {token}"},
-        json={"seats": 1, "payment_provider": "orange_money"},
+        json={"seats": 1, "payment_provider": "orange_money", "accept_women_priority_rules": True},
     )
     assert booking.status_code == 403
 
@@ -62,7 +62,7 @@ def test_verified_book_unlocks_contact(client):
     booking = client.post(
         f"/api/rides/{ride_id}/book",
         headers=headers,
-        json={"seats": 1, "payment_provider": "orange_money"},
+        json={"seats": 1, "payment_provider": "orange_money", "accept_women_priority_rules": True},
     )
     assert booking.status_code == 201
     body = booking.json()
@@ -125,6 +125,8 @@ def test_verification_and_admin_approve(client):
     assert review.status_code == 200
     assert review.json()["verification_status"] == "verified"
     assert review.json()["is_verified"] is True
+    assert review.json()["phone_verified"] is False
+    assert review.json()["id_document_number"] == "NE-CNI-998877"
 
 
 def test_publish_ride_verified(client):
@@ -244,7 +246,7 @@ def test_commission_and_whatsapp_after_payment(client):
     booking = client.post(
         f"/api/rides/{ride['id']}/book",
         headers=headers,
-        json={"seats": 1, "payment_provider": "orange_money"},
+        json={"seats": 1, "payment_provider": "orange_money", "accept_women_priority_rules": True},
     )
     assert booking.status_code == 201
     body = booking.json()
@@ -255,3 +257,121 @@ def test_commission_and_whatsapp_after_payment(client):
     contact = client.get(f"/api/bookings/{body['id']}/contact", headers=headers)
     assert contact.status_code == 200
     assert contact.json()["driver_whatsapp_url"].startswith("https://wa.me/22790000001")
+
+def test_payment_confirm_is_idempotent(client):
+    login = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride = rides.json()[0]
+    seats_before = ride["seats_available"]
+    booking = client.post(
+        f"/api/rides/{ride['id']}/book",
+        headers=headers,
+        json={"seats": 1, "payment_provider": "orange_money", "accept_women_priority_rules": True},
+    )
+    assert booking.status_code == 201
+    payment_id = booking.json()["payment"]["id"]
+    booking_id = booking.json()["id"]
+
+    fail = client.post(f"/api/payments/{payment_id}/confirm", headers=headers, json={"success": False})
+    assert fail.status_code == 200
+    assert fail.json()["status"] == "failed"
+
+    # Rejouer success après échec ne doit pas rouvrir le contact / re-payer.
+    replay = client.post(f"/api/payments/{payment_id}/confirm", headers=headers, json={"success": True})
+    assert replay.status_code == 400
+
+    contact = client.get(f"/api/bookings/{booking_id}/contact", headers=headers)
+    assert contact.json()["contact_unlocked"] is False
+
+    ride_after = client.get(f"/api/rides/{ride['id']}").json()
+    assert ride_after["seats_available"] == seats_before
+
+
+def test_incoming_bookings_for_driver(client):
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {passenger.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride_id = rides.json()[0]["id"]
+    booking = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=p_headers,
+        json={"seats": 1, "payment_provider": "orange_money", "accept_women_priority_rules": True},
+    )
+    assert booking.status_code == 201
+    payment_id = booking.json()["payment"]["id"]
+    client.post(f"/api/payments/{payment_id}/confirm", headers=p_headers, json={"success": True})
+
+    driver = client.post("/api/auth/login", json={"phone": "90000001", "password": "zumunci123"})
+    d_headers = {"Authorization": f"Bearer {driver.json()['access_token']}"}
+    incoming = client.get("/api/me/incoming-bookings", headers=d_headers)
+    assert incoming.status_code == 200
+    assert any(b["id"] == booking.json()["id"] for b in incoming.json())
+    match = next(b for b in incoming.json() if b["id"] == booking.json()["id"])
+    assert match["passenger_name"]
+    assert match["passenger_phone"]
+
+
+def test_rate_booking(client):
+    login = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride_id = rides.json()[0]["id"]
+    booking = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=headers,
+        json={"seats": 1, "payment_provider": "orange_money", "accept_women_priority_rules": True},
+    )
+    booking_id = booking.json()["id"]
+    client.post(
+        f"/api/payments/{booking.json()['payment']['id']}/confirm",
+        headers=headers,
+        json={"success": True},
+    )
+    rating = client.post(
+        f"/api/bookings/{booking_id}/rate",
+        headers=headers,
+        json={"score": 5, "comment": "Trajet impeccable et ponctuel."},
+    )
+    assert rating.status_code == 201
+    assert rating.json()["score"] == 5
+
+
+def test_women_priority_requires_accept(client):
+    driver = client.post("/api/auth/login", json={"phone": "90000001", "password": "zumunci123"})
+    d_headers = {"Authorization": f"Bearer {driver.json()['access_token']}"}
+    pub = client.post(
+        "/api/rides",
+        headers=d_headers,
+        json={
+            "origin_city": "Niamey",
+            "destination_city": "Dosso",
+            "departure_date": str(date.today() + timedelta(days=8)),
+            "departure_time": "08:00",
+            "seats_total": 2,
+            "price_per_seat": 3000,
+            "mode": "carpool",
+            "women_priority": True,
+        },
+    )
+    assert pub.status_code == 201
+    ride_id = pub.json()["id"]
+
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {passenger.json()['access_token']}"}
+    denied = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=p_headers,
+        json={"seats": 1, "payment_provider": "orange_money"},
+    )
+    assert denied.status_code == 400
+    ok = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=p_headers,
+        json={
+            "seats": 1,
+            "payment_provider": "orange_money",
+            "accept_women_priority_rules": True,
+        },
+    )
+    assert ok.status_code == 201

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app import __version__
 from app.api.routes import router
 from app.core.config import get_settings
 from app.core.database import Base, SessionLocal, engine
@@ -13,8 +14,9 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # En développement, on recrée le schéma pour intégrer KYC / sécurité.
-    if settings.app_env == "development":
+    cfg = get_settings()
+    # drop_all seulement si demandé explicitement (tests / reset manuel).
+    if cfg.reset_db_on_start:
         Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -31,7 +33,7 @@ app = FastAPI(
         "Marketplace sécurisée de covoiturage, taxi brousse et bus au Niger. "
         "Vérification d'identité obligatoire avant mise en relation."
     ),
-    version="0.2.0",
+    version=__version__,
     lifespan=lifespan,
 )
 

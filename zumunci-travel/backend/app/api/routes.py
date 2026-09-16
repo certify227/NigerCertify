@@ -28,6 +28,7 @@ from app.models.entities import (
 )
 from app.schemas.schemas import (
     AcceptCharterIn,
+    AdminUserOut,
     BookingCreate,
     BookingOut,
     CancelBookingIn,
@@ -132,8 +133,41 @@ def serialize_booking(booking: Booking, viewer: User) -> dict:
         "payment": booking.payment,
         "driver_phone": ride.driver.phone if show_contact else None,
         "passenger_phone": booking.passenger.phone if show_contact and booking.passenger else None,
+        "passenger_name": booking.passenger.full_name if is_party and booking.passenger else None,
         "driver_whatsapp_url": whatsapp_link(ride.driver.phone, wa_msg) if show_contact else None,
     }
+
+
+def expire_stale_pending_bookings(db: Session) -> int:
+    """Libère les places des réservations pending non payées après TTL."""
+    ttl = timedelta(minutes=max(settings.booking_pending_ttl_minutes, 1))
+    cutoff = datetime.now(timezone.utc) - ttl
+    stale = (
+        db.query(Booking)
+        .options(joinedload(Booking.payment), joinedload(Booking.ride))
+        .filter(Booking.status == BookingStatus.PENDING)
+        .all()
+    )
+    released = 0
+    for booking in stale:
+        created = booking.created_at
+        if created.tzinfo is None:
+            created = created.replace(tzinfo=timezone.utc)
+        if created > cutoff:
+            continue
+        ride = booking.ride
+        if ride:
+            ride.seats_available = min(ride.seats_total, ride.seats_available + booking.seats)
+        booking.status = BookingStatus.CANCELLED
+        booking.contact_unlocked = False
+        booking.cancelled_at = datetime.now(timezone.utc)
+        booking.cancel_reason = "Expiration automatique — paiement non confirmé"
+        if booking.payment and booking.payment.status == PaymentStatus.PENDING:
+            booking.payment.status = PaymentStatus.FAILED
+        released += 1
+    if released:
+        db.commit()
+    return released
 
 
 def user_can_see_driver_phone(db: Session, viewer: User | None, ride: Ride) -> bool:
@@ -185,6 +219,7 @@ def product_config() -> ProductConfigOut:
         night_end_hour=settings.night_end_hour,
         default_locale=settings.default_locale,
         payment_providers=settings.payment_provider_list,
+        booking_pending_ttl_minutes=settings.booking_pending_ttl_minutes,
     )
 
 
@@ -329,7 +364,7 @@ def submit_verification(
     return user
 
 
-@router.get("/admin/verifications/pending", response_model=list[UserOut])
+@router.get("/admin/verifications/pending", response_model=list[AdminUserOut])
 def pending_verifications(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -344,7 +379,7 @@ def pending_verifications(
     )
 
 
-@router.post("/admin/verifications/{user_id}/review", response_model=UserOut)
+@router.post("/admin/verifications/{user_id}/review", response_model=AdminUserOut)
 def review_verification(
     user_id: int,
     payload: VerificationReview,
@@ -362,7 +397,7 @@ def review_verification(
     if payload.approve:
         target.verification_status = VerificationStatus.VERIFIED
         target.is_verified = True
-        target.phone_verified = True
+        # Ne pas bypasser l'OTP : le téléphone doit rester à vérifier séparément.
         target.verification_notes = payload.notes or "Identité validée par ZumunciTravel"
     else:
         target.verification_status = VerificationStatus.REJECTED
@@ -389,6 +424,7 @@ def search_rides(
     db: Session = Depends(get_db),
     viewer: User | None = Depends(get_optional_user),
 ) -> list[dict]:
+    expire_stale_pending_bookings(db)
     q = (
         db.query(Ride)
         .options(joinedload(Ride.driver))
@@ -500,6 +536,7 @@ def book_ride(
     db: Session = Depends(get_db),
 ) -> dict:
     ensure_can_transact(user)
+    expire_stale_pending_bookings(db)
     ride = db.query(Ride).options(joinedload(Ride.driver)).filter(Ride.id == ride_id).first()
     if not ride or not ride.is_active:
         raise HTTPException(status_code=404, detail="Trajet introuvable")
@@ -509,6 +546,14 @@ def book_ride(
         raise HTTPException(status_code=400, detail="Vous ne pouvez pas réserver votre propre trajet")
     if payload.seats > ride.seats_available:
         raise HTTPException(status_code=400, detail="Pas assez de places disponibles")
+    if ride.women_priority and not payload.accept_women_priority_rules:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Ce trajet est « priorité femmes ». "
+                "Confirmez le respect des règles (ambiance professionnelle uniquement)."
+            ),
+        )
 
     assert_payment_allowed(ride.mode, payload.payment_provider.value)
 
@@ -584,6 +629,28 @@ def my_rides(user: User = Depends(get_current_user), db: Session = Depends(get_d
     return [serialize_ride(r, reveal_phone=True) for r in rides]
 
 
+@router.get("/me/incoming-bookings", response_model=list[BookingOut])
+def my_incoming_bookings(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    """Réservations reçues sur les trajets du conducteur."""
+    expire_stale_pending_bookings(db)
+    rows = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.payment),
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+        )
+        .join(Ride, Booking.ride_id == Ride.id)
+        .filter(Ride.driver_id == user.id)
+        .order_by(Booking.created_at.desc())
+        .all()
+    )
+    return [serialize_booking(b, user) for b in rows]
+
+
 @router.post("/payments/{payment_id}/confirm", response_model=PaymentOut)
 def confirm_payment(
     payment_id: int,
@@ -604,6 +671,17 @@ def confirm_payment(
     if booking.passenger_id != user.id and ride.driver_id != user.id:
         raise HTTPException(status_code=403, detail="Accès refusé")
 
+    # Idempotence : ne pas rejouer un paiement déjà tranché.
+    if payment.status in {PaymentStatus.SUCCESS, PaymentStatus.REFUNDED}:
+        return payment
+    if payment.status == PaymentStatus.FAILED and booking.status != BookingStatus.PENDING:
+        raise HTTPException(status_code=400, detail="Ce paiement est déjà clôturé")
+    if booking.status != BookingStatus.PENDING:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Réservation non confirmable (statut : {booking.status.value})",
+        )
+
     if payload.success:
         payment.status = PaymentStatus.SUCCESS
         booking.status = BookingStatus.PAID
@@ -612,10 +690,11 @@ def confirm_payment(
             payment.external_ref = payload.external_ref
     else:
         payment.status = PaymentStatus.FAILED
-        if booking.status == BookingStatus.PENDING:
-            ride.seats_available += booking.seats
-            booking.status = BookingStatus.CANCELLED
-            booking.contact_unlocked = False
+        ride.seats_available = min(ride.seats_total, ride.seats_available + booking.seats)
+        booking.status = BookingStatus.CANCELLED
+        booking.contact_unlocked = False
+        booking.cancelled_at = datetime.now(timezone.utc)
+        booking.cancel_reason = "Paiement échoué"
     db.commit()
     db.refresh(payment)
     return payment
@@ -712,7 +791,7 @@ def cancel_booking(
     booking.cancelled_at = datetime.now(timezone.utc)
     booking.cancel_reason = (payload.reason or "Annulation utilisateur").strip()
     if booking.payment and booking.payment.status == PaymentStatus.SUCCESS:
-        booking.payment.status = PaymentStatus.FAILED  # marque remboursement à traiter (MVP)
+        booking.payment.status = PaymentStatus.REFUNDED
     db.commit()
     db.refresh(booking)
     booking = (

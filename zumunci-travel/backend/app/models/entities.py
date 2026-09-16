@@ -46,6 +46,7 @@ class PaymentStatus(str, Enum):
     PENDING = "pending"
     SUCCESS = "success"
     FAILED = "failed"
+    REFUNDED = "refunded"
 
 
 class PaymentProvider(str, Enum):
