@@ -244,11 +244,11 @@ def build_pdf() -> None:
     ]
     rows = [
         [
-            p("<b>DÉSIGNATION</b>", "CenterNoto"),
-            p("<b>QTÉ</b>", "CenterNoto"),
-            p("<b>UNITÉ</b>", "CenterNoto"),
-            p("<b>PU (FCFA)</b>", "CenterNoto"),
-            p("<b>MONTANT (FCFA)</b>", "CenterNoto"),
+            p("<font color='white'><b>DÉSIGNATION</b></font>", "CenterNoto"),
+            p("<font color='white'><b>QTÉ</b></font>", "CenterNoto"),
+            p("<font color='white'><b>UNITÉ</b></font>", "CenterNoto"),
+            p("<font color='white'><b>PU (FCFA)</b></font>", "CenterNoto"),
+            p("<font color='white'><b>MONTANT (FCFA)</b></font>", "CenterNoto"),
         ]
     ]
     for description, quantity, unit_price in zip(
