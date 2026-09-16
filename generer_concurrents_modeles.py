@@ -35,7 +35,7 @@ DESC4 = "Jalabia kaki / Ensemble à poches avec logo OPVN\nChauffeurs (jalabia k
 
 # ============ MODELE A : bandeau vert ============
 def generer_A(output):
-    lignes = [(DESC1, 200, 32500), (DESC2, 108, 37500), (DESC3, 24, 22500), (DESC4, 80, 29500)]
+    lignes = [(DESC1, 200, 33000), (DESC2, 108, 38250), (DESC3, 24, 22750), (DESC4, 80, 30500)]
     total = sum(q*pu for _, q, pu in lignes)
     numero, dj, dv = "PF-2026-0914-002", "14/09/2026", "14/10/2026"
     doc = Document()
@@ -93,7 +93,7 @@ def generer_A(output):
     para(tt.rows[1].cells[0], "TVA", 8.5, False, None, WD_ALIGN_PARAGRAPH.RIGHT)
     para(tt.rows[1].cells[1], "Non applicable", 8.5, False, (0x66,0x70,0x85), WD_ALIGN_PARAGRAPH.RIGHT)
     p = doc.add_paragraph()
-    rr = p.add_run(f"Arrêté à : Treize millions quatre cent cinquante mille ({fmt(total)}) francs CFA.")
+    rr = p.add_run(f"Arrêté à : Treize millions sept cent dix-sept mille ({fmt(total)}) francs CFA.")
     rr.bold = True; rr.font.size = Pt(8.5)
     doc.add_paragraph("Répartition : Planton vert/noir/casquette + contre-veste marron • Manœuvre vert/noir/casquette + bleu • Chauffeur orange/noir/casquette + jalabia kaki/poches • Gardiens bleu marine/noir + contre-veste marron • Mécaniciens bleu/bleu • Tous avec logo OPVN. Paiement : à convenir. Délai : à convenir.", style="List Bullet")
     doc.add_paragraph("")
@@ -108,7 +108,7 @@ def generer_A(output):
 
 # ============ MODELE B : style bordeaux / carte ============
 def generer_B(output):
-    lignes = [(DESC1, 200, 31500), (DESC2, 108, 38000), (DESC3, 24, 23000), (DESC4, 80, 30000)]
+    lignes = [(DESC1, 200, 32000), (DESC2, 108, 38500), (DESC3, 24, 24500), (DESC4, 80, 30500)]
     total = sum(q*pu for _, q, pu in lignes)
     numero, dj, dv = "PF-2026-0915-007", "15/09/2026", "15/10/2026"
     doc = Document()
@@ -161,7 +161,7 @@ def generer_B(output):
             for cc in row: bg(cc, "FDF5F5")
     doc.add_paragraph("")
     tt = doc.add_table(rows=1, cols=2); tt.style = "Table Grid"; tt.alignment = WD_TABLE_ALIGNMENT.CENTER
-    para(tt.rows[0].cells[0], f"TOTAL NET À PAYER : {fmt(total)} FCFA\nTreize millions trois cent cinquante-six mille francs CFA", 9, True, (0xFF,0xFF,0xFF), WD_ALIGN_PARAGRAPH.CENTER)
+    para(tt.rows[0].cells[0], f"TOTAL NET À PAYER : {fmt(total)} FCFA\nTreize millions cinq cent quatre-vingt-six mille francs CFA", 9, True, (0xFF,0xFF,0xFF), WD_ALIGN_PARAGRAPH.CENTER)
     bg(tt.rows[0].cells[0], "7A1C1C")
     para(tt.rows[0].cells[1], "TVA : —\nPaiement : espèces / virement / chèque\nDélai de confection : à convenir", 8, False, None, WD_ALIGN_PARAGRAPH.LEFT)
     p = doc.add_paragraph()

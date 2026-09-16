@@ -169,10 +169,10 @@ DESC2 = "Contre-veste marron avec logo OPVN\nPlanton (2ème complet) + Gardiens 
 DESC3 = "Bleu de travail mécanicien avec logo OPVN (les deux complets bleus)\nManœuvre + Mécaniciens"
 DESC4 = "Jalabia kaki / Ensemble à poches avec logo OPVN\nChauffeurs (jalabia kaki) + Chauffeurs et Graisseurs"
 
-# Concurrent A : Ets Sahel Confection — total 13 450 000
-lignes_A = [(DESC1, 200, 32500), (DESC2, 108, 37500), (DESC3, 24, 22500), (DESC4, 80, 29500)]
-# Concurrent B : Niger Textile Pro — total 13 356 000
-lignes_B = [(DESC1, 200, 31500), (DESC2, 108, 38000), (DESC3, 24, 23000), (DESC4, 80, 30000)]
+# Concurrent A : Ets Sahel Confection — total 13 717 000 (+267 000)
+lignes_A = [(DESC1, 200, 33000), (DESC2, 108, 38250), (DESC3, 24, 22750), (DESC4, 80, 30500)]
+# Concurrent B : Niger Textile Pro — total 13 586 000 (+230 000)
+lignes_B = [(DESC1, 200, 32000), (DESC2, 108, 38500), (DESC3, 24, 24500), (DESC4, 80, 30500)]
 
 tA = generer(
     "/workspace/Facture_Proforma_OPVN_Concurrent_A.docx",

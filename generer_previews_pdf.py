@@ -51,8 +51,8 @@ D1="Ensemble T-shirt + Pantalon + Casquette, logo OPVN"; D2="Contre-veste marron
 build("/workspace/Facture_Proforma_OPVN_Concurrent_A.pdf", {"primary":"#1B7A3D","light":"#EAF5EC"},
       {"nom":"ETS SAHEL CONFECTION & SERVICES","lignes":"Lazaret, Niamey — +227 90 12 34 56 — NIF 45210/S"},
       "PF-2026-0914-002","14/09/2026","14/10/2026",
-      [(D1,200,32500),(D2,108,37500),(D3,24,22500),(D4,80,29500)], "Treize millions quatre cent cinquante mille")
+      [(D1,200,33000),(D2,108,38250),(D3,24,22750),(D4,80,30500)], "Treize millions sept cent dix-sept mille")
 build("/workspace/Facture_Proforma_OPVN_Concurrent_B.pdf", {"primary":"#7A1C1C","light":"#FDF0F0"},
       {"nom":"NIGER TEXTILE PRO – NTP","lignes":"Av. de l'Indépendance, Niamey — +227 96 78 45 12 — NIF 38902/R"},
       "PF-2026-0915-007","15/09/2026","15/10/2026",
-      [(D1,200,31500),(D2,108,38000),(D3,24,23000),(D4,80,30000)], "Treize millions trois cent cinquante-six mille")
+      [(D1,200,32000),(D2,108,38500),(D3,24,24500),(D4,80,30500)], "Treize millions cinq cent quatre-vingt-six mille")
