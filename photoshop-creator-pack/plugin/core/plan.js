@@ -28,10 +28,11 @@ function planCanvas(master, presetIds, cropMode, subject) {
   });
 }
 
-function planType(slots, presetIds, density, variantIndex, templateId) {
+function planType(slots, presetIds, density, variantIndex, templateId, applyVariant) {
   const applied = copy.applyTemplate(slots, templateId || "hook_proof_cta");
   const variants = copy.hookVariants(applied.hook);
-  const hook = variants[variantIndex || 0] || applied.hook;
+  const hook =
+    applyVariant === true ? variants[variantIndex || 0] || applied.hook : applied.hook;
   const result = [];
   for (const id of presetIds) {
     const preset = getPreset(id);

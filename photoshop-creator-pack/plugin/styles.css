@@ -80,8 +80,19 @@ h1 {
   flex-wrap: wrap;
 }
 
-.grow { flex: 1 1 120px; min-width: 0; }
-.mt { margin-top: 10px; display: block; }
+.ver {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.between { justify-content: space-between; }
+.tight { gap: 4px; }
 
 sp-label, .preset-list, .chips, .beats, .report { width: 100%; }
 sp-textfield, sp-textarea, sp-picker, sp-radio-group { width: 100%; margin: 4px 0 8px; }

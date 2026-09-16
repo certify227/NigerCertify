@@ -32,10 +32,16 @@ test("préfixe et artboards", () => {
   assert.strictEqual(naming.artboardName("ig_story"), "CP_AB_ig_story");
   assert.strictEqual(naming.frameName(3), "CP_FR_03");
   assert.strictEqual(naming.parseFrameIndex("CP_FR_03"), 3);
+  assert.strictEqual(naming.parsePresetId("CP_AB_tiktok"), "tiktok");
   assert.strictEqual(naming.isArtboardName("CP_MASTER"), true);
   assert.strictEqual(naming.isArtboardName("Logo"), false);
   assert.strictEqual(naming.exportSkip("CP_NOTE"), true);
+  assert.strictEqual(naming.exportSkip("CP_SCRIM"), true);
   assert.strictEqual(naming.exportSkip("CP_TXT_HOOK"), false);
+  assert.strictEqual(naming.shouldExportArtboard("CP_MASTER", false), false);
+  assert.strictEqual(naming.shouldExportArtboard("CP_MASTER", true), true);
+  assert.strictEqual(naming.shouldExportArtboard("CP_AB_ig_story", false), true);
+  assert.strictEqual(naming.shouldExportArtboard("Logo", true), false);
 });
 
 console.log("presets");
@@ -97,6 +103,20 @@ test("safeRect Stories laisse 14% / 20%", () => {
   assert.strictEqual(box.top, Math.round(1920 * 0.14));
   assert.strictEqual(box.bottom, 1920 - Math.round(1920 * 0.2));
   assert.ok(box.height < 1920 * 0.7);
+});
+
+test("crop cover reste dans l’image scalée", () => {
+  const t = crop.computeCoverTransform(
+    { width: 1080, height: 1350 },
+    { width: 1280, height: 720 },
+    { left: 100, top: 200, right: 500, bottom: 900, width: 400, height: 700 },
+    "subject"
+  );
+  assert.ok(t.crop.left >= 0);
+  assert.ok(t.crop.top >= 0);
+  assert.ok(t.crop.right <= t.scaledW + 1);
+  assert.ok(t.crop.bottom <= t.scaledH + 1);
+  assert.strictEqual(t.mode, "subject");
 });
 
 test("typeBoxes restent dans la safe zone", () => {
@@ -190,7 +210,7 @@ test("planCanvas 4 formats", () => {
   assert.ok(items[1].transform.scalePercent > 100);
 });
 
-test("planType : Story plus grand que miniature, hook variant raccourci", () => {
+test("planType : Story plus grand que miniature, texte utilisateur conservé", () => {
   const short = plan.planType(
     { hook: "Plus légère", proof: "Amorti +20%", cta: "Shop now" },
     ["yt_thumb", "ig_story"],
@@ -202,19 +222,15 @@ test("planType : Story plus grand que miniature, hook variant raccourci", () => 
   const story = short.items.find((i) => i.presetId === "ig_story");
   assert.ok(story.hook.fit.size > thumb.hook.fit.size);
 
+  const longHook = "Voici une accroche beaucoup trop longue qui ne rentrera jamais dans une miniature YouTube";
   const long = plan.planType(
-    {
-      hook: "Voici une accroche beaucoup trop longue qui ne rentrera jamais dans une miniature YouTube",
-      proof: "Amorti",
-      cta: "Shop now"
-    },
+    { hook: longHook, proof: "Amorti", cta: "Shop now" },
     ["yt_thumb"],
     "compact",
     0,
     "hook_proof_cta"
   );
-  assert.ok(long.slots.hook.length <= 42);
-  assert.strictEqual(long.items[0].overflow, false);
+  assert.strictEqual(long.slots.hook, longHook);
 });
 
 test("planStory PAS nomme CP_FR_01..05", () => {
@@ -248,7 +264,9 @@ test("manifest UXP v5 Photoshop 26+", () => {
   const html = fs.readFileSync(path.join(__dirname, "../plugin/index.html"), "utf8");
   assert.ok(html.includes("main.js"));
   assert.ok(fs.existsSync(path.join(__dirname, "../plugin/icons/plugin.png")));
-  assert.ok(fs.existsSync(path.join(__dirname, "../plugin/main.js")));
+  assert.ok(fs.existsSync(path.join(__dirname, "../plugin/core/text.js")));
+  assert.ok(html.includes("chk-replace"));
+  assert.strictEqual(manifest.version, "1.1.0");
 });
 
 console.log("");

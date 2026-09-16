@@ -1,6 +1,7 @@
 const { entrypoints } = require("uxp");
 const { PLATFORM_PRESETS, defaultPresetIds } = require("./data/presets.js");
 const { getNarrative, buildBeats } = require("./data/narratives.js");
+const naming = require("./core/naming.js");
 const copy = require("./core/copy.js");
 const ps = require("./core/ps.js");
 const canvas = require("./modules/canvas.js");
@@ -34,11 +35,26 @@ function radioValue(id, fallback) {
 
 function isChecked(id) {
   const el = $(id);
-  return Boolean(el && el.checked);
+  if (!el) return false;
+  if (el.checked === true || el.checked === "true") return true;
+  if (el.hasAttribute("checked")) {
+    const v = el.getAttribute("checked");
+    return v !== "false";
+  }
+  return false;
+}
+
+function setChecked(id, value) {
+  const el = $(id);
+  if (!el) return;
+  el.checked = value;
+  if (value) el.setAttribute("checked", "true");
+  else el.removeAttribute("checked");
 }
 
 function setStatus(message, kind) {
   const el = $("status");
+  if (!el) return;
   el.textContent = message;
   el.classList.remove("error", "ok");
   if (kind) el.classList.add(kind);
@@ -55,16 +71,13 @@ async function withBusy(label, fn) {
   busy(true);
   setStatus(label);
   try {
-    const result = await fn();
-    return result;
+    return await fn();
   } catch (err) {
-    const msg = ps.errorMessage(err);
-    setStatus(msg, "error");
-    try {
-      await ps.photoshop().app.showAlert(msg);
-    } catch (_) {
-      /* panel-only */
+    if (err && err.cancelled) {
+      setStatus("Annulé.");
+      return null;
     }
+    setStatus(ps.errorMessage(err), "error");
     throw err;
   } finally {
     busy(false);
@@ -73,6 +86,7 @@ async function withBusy(label, fn) {
 
 function renderPresets() {
   const root = $("preset-list");
+  if (!root) return;
   root.innerHTML = "";
   const defaults = new Set(defaultPresetIds());
   PLATFORM_PRESETS.forEach((preset) => {
@@ -95,13 +109,18 @@ function selectedPresetIds() {
   return PLATFORM_PRESETS.filter((p) => isChecked(`preset-${p.id}`)).map((p) => p.id);
 }
 
+function setAllPresets(on) {
+  PLATFORM_PRESETS.forEach((p) => setChecked(`preset-${p.id}`, on));
+}
+
 function renderBeats() {
   const id = pickerValue("story-template", "pas");
   const tpl = getNarrative(id);
-  const raw = parseInt($("frame-count").value, 10);
+  const raw = parseInt(fieldValue("frame-count"), 10);
   const n = Number.isFinite(raw) ? raw : tpl.defaultFrames;
   const beats = buildBeats(id, n);
   const root = $("beat-list");
+  if (!root) return;
   root.innerHTML = "";
   beats.forEach((beat) => {
     const el = document.createElement("div");
@@ -113,6 +132,7 @@ function renderBeats() {
 
 function renderVariants(hook) {
   const root = $("hook-variants");
+  if (!root) return;
   root.innerHTML = "";
   const variants = copy.hookVariants(hook);
   variants.forEach((text, i) => {
@@ -124,7 +144,7 @@ function renderVariants(hook) {
     chip.onclick = () => {
       state.variantIndex = i;
       $("txt-hook").value = text;
-      renderVariants(text);
+      renderVariants(hook);
     };
     root.appendChild(chip);
   });
@@ -133,12 +153,12 @@ function renderVariants(hook) {
 function parseBrief() {
   const slots = copy.splitBrief($("brief").value);
   const templated = copy.applyTemplate(slots, pickerValue("type-template", "hook_proof_cta"));
-  $("txt-hook").setAttribute("value", templated.hook);
-  $("txt-proof").setAttribute("value", templated.proof);
-  $("txt-cta").setAttribute("value", templated.cta);
   $("txt-hook").value = templated.hook;
   $("txt-proof").value = templated.proof;
   $("txt-cta").value = templated.cta;
+  $("txt-hook").setAttribute("value", templated.hook);
+  $("txt-proof").setAttribute("value", templated.proof);
+  $("txt-cta").setAttribute("value", templated.cta);
   state.variantIndex = 0;
   renderVariants(templated.hook);
 }
@@ -192,13 +212,18 @@ async function onSubject() {
 async function onCanvas() {
   await withBusy("Génération des artboards…", async () => {
     await ps.ensureDocument();
+    const ids = selectedPresetIds();
+    if (!ids.length) throw new Error("Coche au moins un format.");
     const result = await canvas.applyCanvas({
-      presetIds: selectedPresetIds(),
+      presetIds: ids,
       cropMode: radioValue("crop-mode", "subject"),
-      showSafezone: isChecked("chk-safezone")
+      showSafezone: isChecked("chk-safezone"),
+      replace: isChecked("chk-replace"),
+      onProgress: (id, i, n) => setStatus(`Format ${i + 1}/${n} · ${id}`)
     });
     const parts = [];
     if (result.created.length) parts.push(`créés: ${result.created.join(", ")}`);
+    if (result.replaced && result.replaced.length) parts.push(`remplacés: ${result.replaced.join(", ")}`);
     if (result.skipped.length) parts.push(`déjà là: ${result.skipped.join(", ")}`);
     setStatus(parts.join(" · ") || "Aucun artboard à créer.", "ok");
     syncDocLabel();
@@ -217,23 +242,25 @@ async function onSafeToggle() {
 async function onType() {
   await withBusy("Type Rhythm…", async () => {
     if (!fieldValue("txt-hook") && fieldValue("brief")) parseBrief();
+    if (!fieldValue("txt-hook")) throw new Error("Renseigne un hook ou un brief.");
     const result = await type.applyType({
       hook: fieldValue("txt-hook"),
       proof: fieldValue("txt-proof"),
       cta: fieldValue("txt-cta") || "En savoir plus",
       templateId: pickerValue("type-template", "hook_proof_cta"),
       density: pickerValue("type-density", "normal"),
-      variantIndex: state.variantIndex,
       scrim: isChecked("chk-scrim"),
       scope: isChecked("chk-type-all") ? "all" : "active",
-      fallbackPresetId: selectedPresetIds()[0] || "ig_feed_45"
+      skipFrames: true,
+      fallbackPresetId: selectedPresetIds()[0] || pickerValue("story-preset", "ig_feed_45")
     });
     const overflows = (result.report || []).filter((r) => r.overflow);
     const host = $("type-report");
     host.innerHTML = (result.report || [])
       .map((r) => {
         const cls = r.overflow ? "warn" : "ok";
-        return `<div class="${cls}">${r.artboard} — hook ${r.slots.hook ? r.slots.hook.size + " pt" : "—"}${r.overflow ? " · overflow" : ""}</div>`;
+        const size = r.slots.hook ? `${r.slots.hook.size} pt` : "—";
+        return `<div class="${cls}">${r.artboard} — hook ${size}${r.overflow ? " · overflow" : ""}</div>`;
       })
       .join("");
     setStatus(
@@ -249,16 +276,17 @@ async function onStory() {
   await withBusy("Storyboard…", async () => {
     await ps.ensureDocument();
     const tpl = pickerValue("story-template", "pas");
-    const result = await story.applyStory({
-      templateId: tpl,
-      frameCount: parseInt(fieldValue("frame-count"), 10) || getNarrative(tpl).defaultFrames,
-      showNotes: isChecked("chk-notes"),
-      continuity: {
-        background: isChecked("chk-cont-bg"),
-        subject: isChecked("chk-cont-subject"),
-        type: isChecked("chk-cont-type")
-      }
-    });
+    const presetId = pickerValue("story-preset", "ig_feed_45");
+    const abName = naming.artboardName(presetId);
+    const { app } = ps.photoshop();
+    if (!ps.findLayerByName(app.activeDocument, abName)) {
+      await canvas.applyCanvas({
+        presetIds: [presetId],
+        cropMode: radioValue("crop-mode", "subject"),
+        showSafezone: false,
+        replace: false
+      });
+    }
     if (isChecked("chk-cont-type") && (fieldValue("txt-hook") || fieldValue("brief"))) {
       if (!fieldValue("txt-hook")) parseBrief();
       await type.applyType({
@@ -267,13 +295,27 @@ async function onStory() {
         cta: fieldValue("txt-cta") || "En savoir plus",
         templateId: pickerValue("type-template", "hook_proof_cta"),
         density: pickerValue("type-density", "normal"),
-        variantIndex: state.variantIndex,
         scrim: isChecked("chk-scrim"),
         scope: "all",
-        fallbackPresetId: pickerValue("story-preset", "ig_feed_45")
+        skipFrames: true,
+        fallbackPresetId: presetId
       });
     }
-    setStatus(`Frames ${result.frames.join(", ")} (${result.created.length} nouvelles).`, "ok");
+    const result = await story.applyStory({
+      templateId: tpl,
+      frameCount: parseInt(fieldValue("frame-count"), 10) || getNarrative(tpl).defaultFrames,
+      showNotes: isChecked("chk-notes"),
+      presetId,
+      continuity: {
+        background: isChecked("chk-cont-bg"),
+        subject: isChecked("chk-cont-subject"),
+        type: isChecked("chk-cont-type")
+      }
+    });
+    setStatus(
+      `Source ${result.source} → ${result.frames.join(", ")} (${result.created.length} nouvelles).`,
+      "ok"
+    );
   });
 }
 
@@ -282,12 +324,14 @@ async function onExport() {
     const result = await exporter.exportPack({
       presetIds: selectedPresetIds(),
       includeNotes: isChecked("chk-notes"),
+      includeMaster: isChecked("chk-export-master"),
       type: {
         density: pickerValue("type-density", "normal"),
         template: pickerValue("type-template", "hook_proof_cta")
       },
       story: { template: pickerValue("story-template", "pas") }
     });
+    if (!result) return;
     setStatus(`Exporté dans ${result.folder} (${result.files.length} fichiers).`, "ok");
   });
 }
@@ -296,17 +340,7 @@ function reloadPlugin() {
   window.location.reload();
 }
 
-function init() {
-  if (state.ready) {
-    syncDocLabel();
-    return;
-  }
-  state.ready = true;
-  renderPresets();
-  renderBeats();
-  setupTabs();
-  syncDocLabel();
-
+function bindUi() {
   $("btn-refresh").onclick = syncDocLabel;
   $("btn-master").onclick = () => onMaster().catch(() => {});
   $("btn-subject").onclick = () => onSubject().catch(() => {});
@@ -316,6 +350,8 @@ function init() {
   $("btn-type").onclick = () => onType().catch(() => {});
   $("btn-story").onclick = () => onStory().catch(() => {});
   $("btn-export").onclick = () => onExport().catch(() => {});
+  $("btn-presets-all").onclick = () => setAllPresets(true);
+  $("btn-presets-none").onclick = () => setAllPresets(false);
   $("story-template").addEventListener("change", () => {
     const tpl = getNarrative(pickerValue("story-template", "pas"));
     $("frame-count").value = String(tpl.defaultFrames);
@@ -329,6 +365,20 @@ function init() {
   $("type-template").addEventListener("change", () => {
     if (fieldValue("brief") || fieldValue("txt-hook")) parseBrief();
   });
+}
+
+function init() {
+  if (state.ready) {
+    syncDocLabel();
+    return;
+  }
+  if (!$("preset-list")) return;
+  renderPresets();
+  renderBeats();
+  setupTabs();
+  bindUi();
+  syncDocLabel();
+  state.ready = true;
 
   try {
     const { action } = ps.photoshop();
@@ -355,7 +405,7 @@ entrypoints.setup({
         if (id === "reload") reloadPlugin();
         if (id === "about") {
           ps.photoshop().app.showAlert(
-            "Creator Pack 1.0 — Social Canvas, Type Rhythm, Storyboard Frames.\nPhotoshop 2025+ (26.0). Calques CP_*."
+            "Creator Pack 1.1 — Social Canvas, Type Rhythm, Storyboard Frames.\nPhotoshop 2025+ (26.0). Calques CP_*."
           );
         }
       }
