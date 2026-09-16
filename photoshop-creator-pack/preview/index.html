@@ -42,14 +42,21 @@
         <div class="tab" data-tab="story">Story</div>
       </div>
       <section class="page visible" id="page-canvas">
-        <sp-label>Formats cochés par défaut</sp-label>
+        <sp-label>Master · CP_MASTER</sp-label>
+        <div class="row">
+          <sp-button variant="secondary" size="s">Définir CP_MASTER</sp-button>
+          <sp-button variant="secondary" size="s">Détecter le sujet</sp-button>
+        </div>
+        <sp-label class="mt">Formats (Tout / Aucun)</sp-label>
         <div class="preset-list">
           <div class="preset-row"><span>IG 4:5 · Instagram Feed</span><span class="preset-dim">1080×1350</span></div>
           <div class="preset-row"><span>Story 9:16</span><span class="preset-dim">1080×1920</span></div>
           <div class="preset-row"><span>TikTok</span><span class="preset-dim">1080×1920</span></div>
           <div class="preset-row"><span>YT 16:9</span><span class="preset-dim">1280×720</span></div>
         </div>
-        <sp-label>Recadrage : Subject lock</sp-label>
+        <sp-label>Recadrage : Ancrage sujet</sp-label>
+        <sp-checkbox checked>Overlays zones de sécurité</sp-checkbox>
+        <sp-checkbox>Remplacer les artboards existants</sp-checkbox>
         <div class="row mt">
           <sp-button variant="cta">Générer les artboards</sp-button>
         </div>
