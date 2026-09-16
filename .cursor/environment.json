@@ -1,0 +1,27 @@
+{
+  "name": "Niger Certify Monorepo",
+  "install": "bash .cursor/install.sh",
+  "terminals": [
+    {
+      "name": "scanners-web",
+      "command": "cd /workspace && ./.venv/bin/python scanners/agent_commercial_web.py --host 0.0.0.0 --port 8765 --offers scanners/offers.example.json"
+    },
+    {
+      "name": "zumunci-api",
+      "command": "cd /workspace/zumunci-travel/backend && ./.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    },
+    {
+      "name": "zumunci-web",
+      "command": "cd /workspace/zumunci-travel/frontend && npm run dev -- --host 0.0.0.0 --port 5173"
+    },
+    {
+      "name": "codely-api",
+      "command": "cd /workspace/codely/backend && DJANGO_DEBUG=true ./.venv/bin/python manage.py runserver 0.0.0.0:8100"
+    },
+    {
+      "name": "wifizone-api",
+      "command": "cd /workspace/wifizone/backend && DJANGO_DEBUG=true MIKROTIK_MOCK_MODE=true ./.venv/bin/python manage.py runserver 0.0.0.0:8080"
+    }
+  ],
+  "ports": [8765, 8000, 5173, 8100, 8080]
+}
