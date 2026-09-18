@@ -33,7 +33,22 @@ Ce dossier regroupe les deux offres de prix concurrentes (Facture A et Facture B
 
 ---
 
-## 3. Fichiers Livrés
+## 3. Paramètres d'Impression & Calibration A4 dans les Fichiers Excel
+
+Chaque classeur Excel a été minutieusement paramétré pour garantir un rendu d'impression parfait dès l'ouverture dans Microsoft Excel / LibreOffice :
+- **Format de papier :** A4 standard (210 × 297 mm).
+- **Ajustement (Fit to page) :** Forcé à **1 page en largeur et 1 page en hauteur** (`fitToWidth = 1`, `fitToHeight = 1`, `fitToPage = True`).
+- **Centrage :** Centrage horizontal automatique sur la page (`horizontalCentered = True`).
+- **Zone d'impression définie :** `print_area` bornée exactement aux cellules du document, évitant toute page blanche inutile.
+- **Marges :** Marges étroites (0,35 pouce / ~9 mm) pour maximiser la lisibilité sans débordement.
+- **Orientation :**
+  - `Proforma_Anper.xlsx` : **Portrait A4** (1 seule page complète, tableau sans coupure de colonnes).
+  - `Pro_forma_GIZ.xlsx` : **Portrait A4** (1 seule page complète, tableau sans coupure de colonnes).
+  - `Tableau_Comparatif_Offres_ANMC.xlsx` : **Paysage A4** (1 seule page panoramique, parfait pour la présentation en commission).
+
+---
+
+## 4. Fichiers Disponibles
 
 1. **Classeurs Excel (`.xlsx`) :**
    - `Proforma_Anper.xlsx` (Facture A : template typé ANPER / Entreprise A, total 4 738 500 FCFA HT avec formules `SUM` et `C*D`)
