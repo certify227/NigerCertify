@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Facture Proforma N° 2026-09/OPVN-001 — Dotation Tenues de Travail OPVN</title>
+  <style>
+    :root {
+      --orange: #ff7900;
+      --orange-title: #d95d00;
+      --orange-bar: #e46c0a;
+      --blue: #0055d2;
+      --blue-footer: #0055d2;
+      --navy: #00224b;
+      --ink: #1a1a1a;
+      --bg-alt: #f8f9fa;
+      --border-gray: #d0d7de;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    html, body {
+      background: #eef1f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      font-size: 8.5pt;
+      line-height: 1.25;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      margin: 10px auto;
+      background: #ffffff;
+      padding: 10mm 12mm 8mm 12mm;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    @media print {
+      body, html {
+        background: #fff;
+        margin: 0;
+        padding: 0;
+      }
+      .page {
+        margin: 0;
+        padding: 10mm 12mm 8mm 12mm;
+        width: 210mm;
+        height: 297mm;
+        max-height: 297mm;
+        box-shadow: none;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+      .no-print { display: none !important; }
+    }
+    .toolbar {
+      max-width: 210mm;
+      margin: 10px auto;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .toolbar button {
+      background: var(--navy);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* HEADER */
+    header.header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--orange);
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+    .brand-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .logo {
+      width: 58px;
+      height: auto;
+      object-fit: contain;
+    }
+    .brand-info h2 {
+      font-size: 13pt;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+    .brand-info h2 .o { color: var(--orange); }
+    .brand-info h2 .b { color: var(--blue); }
+    .brand-info p {
+      font-size: 7.5pt;
+      color: #444;
+      line-height: 1.2;
+    }
+    .meta-box {
+      text-align: right;
+      font-size: 8pt;
+      background: #fdfaf6;
+      border: 1px solid #fae2cf;
+      border-left: 3px solid var(--orange);
+      padding: 6px 10px;
+      border-radius: 4px;
+      min-width: 180px;
+    }
+    .meta-box p {
+      margin-bottom: 2px;
+    }
+    .meta-box strong {
+      color: var(--navy);
+    }
+
+    /* CLIENT & PROFORMA INFO */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .card {
+      border: 1px solid var(--border-gray);
+      border-radius: 4px;
+      padding: 7px 9px;
+      background: #fff;
+    }
+    .card-title {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 2px;
+    }
+    .card-content p {
+      font-size: 7.8pt;
+      margin-bottom: 2px;
+      color: #333;
+      line-height: 1.25;
+    }
+    .badge-opvn {
+      display: inline-block;
+      background: #eaf3ff;
+      color: var(--blue);
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 7.5pt;
+    }
+
+    /* TITLE */
+    .document-title {
+      text-align: center;
+      margin: 4px 0 8px;
+    }
+    .document-title h1 {
+      font-size: 13pt;
+      font-weight: 800;
+      color: var(--orange-title);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+    .document-title .subtitle {
+      font-size: 8pt;
+      color: #555;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    /* TABLE ITEMS */
+    table.table-items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      font-size: 8pt;
+    }
+    table.table-items th {
+      background: var(--orange-bar);
+      color: #fff;
+      font-weight: 700;
+      text-align: left;
+      padding: 5px 6px;
+      border: 1px solid #b85400;
+      font-size: 7.8pt;
+      letter-spacing: 0.3px;
+    }
+    table.table-items th.center { text-align: center; }
+    table.table-items th.right { text-align: right; }
+    table.table-items td {
+      border: 1px solid var(--border-gray);
+      padding: 5px 6px;
+      vertical-align: top;
+    }
+    table.table-items tbody tr:nth-child(even) {
+      background: #fafbfc;
+    }
+    .item-desc {
+      font-weight: 700;
+      color: var(--navy);
+      display: block;
+      margin-bottom: 1px;
+    }
+    .item-sub {
+      font-size: 7.2pt;
+      color: #555;
+      line-height: 1.2;
+    }
+    .tag-corps {
+      display: inline-block;
+      font-size: 7pt;
+      background: #eef2f7;
+      color: #2c3e50;
+      padding: 0.5px 4px;
+      border-radius: 2px;
+      margin-right: 3px;
+      font-weight: 600;
+    }
+    .qty, .unit-price, .total-price {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .total-price {
+      font-weight: 700;
+    }
+
+    /* RECAP & TOTALS */
+    .recap-container {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 10px;
+      margin-bottom: 6px;
+      align-items: start;
+    }
+    .specs-box {
+      font-size: 7.2pt;
+      border: 1px solid #d8e2ec;
+      background: #f8fafc;
+      border-radius: 4px;
+      padding: 5px 8px;
+    }
+    .specs-box h4 {
+      color: var(--navy);
+      font-size: 7.6pt;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .specs-box ul {
+      margin-left: 13px;
+      color: #444;
+      line-height: 1.25;
+    }
+    table.table-totals {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8pt;
+    }
+    table.table-totals td {
+      padding: 4px 8px;
+      border: 1px solid var(--border-gray);
+    }
+    table.table-totals td.label {
+      font-weight: 600;
+      background: #f8f9fa;
+      width: 50%;
+    }
+    table.table-totals td.val {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    table.table-totals tr.net-to-pay td {
+      background: #fff4ea;
+      border: 1.5px solid var(--orange-bar);
+      color: var(--orange-title);
+      font-weight: 800;
+      font-size: 9pt;
+    }
+
+    /* AMOUNT IN WORDS */
+    .amount-words-box {
+      background: #fdfaf6;
+      border-left: 3px solid var(--orange);
+      padding: 5px 8px;
+      font-size: 7.5pt;
+      margin-bottom: 6px;
+      border-radius: 0 4px 4px 0;
+      line-height: 1.25;
+    }
+    .amount-words-box strong {
+      color: var(--navy);
+    }
+
+    /* BANK / SIGNATURE */
+    .bottom-section {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 10px;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+    .bank-card {
+      border: 1px solid var(--border-gray);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 7.2pt;
+    }
+    .bank-card h4 {
+      font-size: 7.6pt;
+      color: var(--navy);
+      margin-bottom: 3px;
+      text-transform: uppercase;
+    }
+    table.rib-mini {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      margin: 3px 0;
+    }
+    table.rib-mini th {
+      background: #eef2f7;
+      font-weight: 600;
+      font-size: 6.8pt;
+      padding: 2px;
+      border: 1px solid #d0d7de;
+    }
+    table.rib-mini td {
+      padding: 3px 2px;
+      border: 1px solid #d0d7de;
+      font-family: monospace;
+      font-size: 7.8pt;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .conditions {
+      font-size: 6.8pt;
+      color: #666;
+      line-height: 1.2;
+    }
+
+    .sign-card {
+      text-align: center;
+      padding: 2px 6px;
+    }
+    .sign-card .sign-title {
+      font-size: 7.8pt;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .sign-images {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 58px;
+    }
+    .sign-images .cachet {
+      max-height: 60px;
+      width: auto;
+    }
+    .sign-images .signature {
+      max-height: 42px;
+      width: auto;
+    }
+
+    /* FOOTER */
+    footer.legal-stripe {
+      background: var(--orange);
+      color: white;
+      font-size: 7pt;
+      padding: 4px 8px;
+      text-align: center;
+      position: relative;
+      border-radius: 3px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar no-print">
+    <button onclick="window.print()">Télécharger / Imprimer en PDF</button>
+  </div>
+
+  <article class="page">
+    <div class="content-wrapper">
+      <!-- ENTÊTE -->
+      <header class="header">
+        <div class="brand-left">
+          <img class="logo" src="assets/logo-niger-certify.png" alt="Logo Niger Certify" />
+          <div class="brand-info">
+            <h2><span class="o">NIGER</span><span class="b"> CERTIFY</span></h2>
+            <p><strong>Expertise, Fournitures &amp; Services aux Entreprises</strong></p>
+            <p>Niamey SONUCI, République du Niger | Tél : +227 94 10 70 74 | Email : contact@nigercertify.com</p>
+            <p>NIF : 48512/P | RCCM : NI-NIA-2023-A-001</p>
+          </div>
+        </div>
+        <div class="meta-box">
+          <p><strong>FACTURE PROFORMA</strong></p>
+          <p>N° : <strong>2026-09/OPVN-001</strong></p>
+          <p>Date : <strong>16/09/2026</strong></p>
+          <p>Validité : <strong>30 jours</strong></p>
+        </div>
+      </header>
+
+      <!-- IDENTIFICATION CLIENT -->
+      <div class="info-grid">
+        <div class="card">
+          <div class="card-title">Client / Donneur d'Ordre</div>
+          <div class="card-content">
+            <p><strong>OFFICE DES PRODUITS VIVRIERS DU NIGER (OPVN)</strong> <span class="badge-opvn">Établissement Public</span></p>
+            <p>Direction Générale / Direction des Ressources Humaines &amp; Logistique</p>
+            <p>BP 474, Niamey — République du Niger | Contact : M. Tilli Tella (Réf. 14/09/2026)</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Détails de l'Offre</div>
+          <div class="card-content">
+            <p><strong>Objet :</strong> Confection &amp; fourniture de tenues de travail avec broderie/sérigraphie</p>
+            <p><strong>Personnalisation :</strong> <strong>Logo officiel de l'OPVN</strong> apposé sur chaque tenue</p>
+            <p><strong>Monnaie :</strong> Franc CFA (XOF / FCFA)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TITRE DOCUMENT -->
+      <div class="document-title">
+        <h1>FACTURE PROFORMA</h1>
+        <div class="subtitle">Fourniture de tenues de travail, uniformes réglementaires et équipements — Dotation OPVN</div>
+      </div>
+
+      <!-- TABLEAU DES PRESTATIONS -->
+      <table class="table-items">
+        <thead>
+          <tr>
+            <th style="width: 5%;">N°</th>
+            <th style="width: 55%;">Désignation &amp; Spécifications des Fournitures</th>
+            <th class="center" style="width: 10%;">Qté</th>
+            <th class="right" style="width: 15%;">P.U. (FCFA)</th>
+            <th class="right" style="width: 15%;">Montant Total (FCFA)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center">1</td>
+            <td>
+              <span class="item-desc">Pack Tenue Complète (T-shirt + Pantalon + Casquette) — Logo OPVN</span>
+              <div class="item-sub">
+                • <span class="tag-corps">Plantons</span> T-shirt vert, pantalon noir et casquette noire<br />
+                • <span class="tag-corps">Manœuvres</span> T-shirt vert, pantalon noir, casquette noire et bleue (mécaniciens)<br />
+                • <span class="tag-corps">Gardiens</span> T-shirt bleu marine, pantalon noir et casquette noire<br />
+                <em>Finition : Coton peigné 100%, coutures renforcées, marquage broderie/sérigraphie logo OPVN</em>
+              </div>
+            </td>
+            <td class="qty">200</td>
+            <td class="unit-price">30 000</td>
+            <td class="total-price">6 000 000</td>
+          </tr>
+          <tr>
+            <td class="center">2</td>
+            <td>
+              <span class="item-desc">Contre-Veste de Protection Marron (Deuxième complet / Surveste) — Logo OPVN</span>
+              <div class="item-sub">
+                • <span class="tag-corps">Plantons</span> Deuxième complet : contre-veste marron de travail intérieur/extérieur<br />
+                • <span class="tag-corps">Gardiens</span> Deuxième complet : contre-veste marron de protection<br />
+                <em>Finition : Tissu lourd anti-poussière, poches zippées, écusson brodé logo OPVN</em>
+              </div>
+            </td>
+            <td class="qty">108</td>
+            <td class="unit-price">35 000</td>
+            <td class="total-price">3 780 000</td>
+          </tr>
+          <tr>
+            <td class="center">3</td>
+            <td>
+              <span class="item-desc">Bleu de Travail Mécanicien (Double complet professionnel) — Logo OPVN</span>
+              <div class="item-sub">
+                • <span class="tag-corps">Mécaniciens</span> 2 complets bleus de travail haute résistance (renforts coudes et genoux)<br />
+                <em>Finition : Tissu résistant aux hydrocarbures, multi-poches outillage, marquage officiel logo OPVN</em>
+              </div>
+            </td>
+            <td class="qty">24</td>
+            <td class="unit-price">20 000</td>
+            <td class="total-price">480 000</td>
+          </tr>
+          <tr>
+            <td class="center">4</td>
+            <td>
+              <span class="item-desc">Tenue de Travail avec Poches Spécifiques &amp; Jalabia Khaki — Logo OPVN</span>
+              <div class="item-sub">
+                • <span class="tag-corps">Chauffeurs</span> T-shirt orange, pantalon noir à poches, casquette noire + 2ᵉ tenue Jalabia khaki<br />
+                • <span class="tag-corps">Graisseurs</span> Tenue d'atelier renforcée avec poches spécialisées pour outillage et graissage<br />
+                <em>Finition : Confort mobilité longue distance &amp; manutention, marquage logo officiel OPVN</em>
+              </div>
+            </td>
+            <td class="qty">80</td>
+            <td class="unit-price">27 000</td>
+            <td class="total-price">2 160 000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- RÉCAPITULATIF ET TOTAUX -->
+      <div class="recap-container">
+        <div class="specs-box">
+          <h4>Récapitulatif des dotations par corps de métier (OPVN)</h4>
+          <ul>
+            <li><strong>Plantons :</strong> T-shirt vert + pantalon noir + casquette noire + contre-veste marron.</li>
+            <li><strong>Manœuvres :</strong> T-shirt vert + pantalon noir + casquette bicolore noire et bleue.</li>
+            <li><strong>Gardiens :</strong> T-shirt bleu marine + pantalon noir + 2ᵉ tenue contre-veste marron.</li>
+            <li><strong>Chauffeurs :</strong> T-shirt orange + pantalon poches noir + casquette + 2ᵉ complet jalabia khaki.</li>
+            <li><strong>Graisseurs :</strong> Tenues techniques renforcées avec poches utilitaires.</li>
+            <li><strong>Mécaniciens :</strong> Bleus de travail double complet haute résistance.</li>
+            <li><em>NB : L'ensemble des pièces intègre le logo brodé ou sérigraphié de l'OPVN.</em></li>
+          </ul>
+        </div>
+
+        <div>
+          <table class="table-totals">
+            <tr>
+              <td class="label">Total Brut HT</td>
+              <td class="val">12 420 000 FCFA</td>
+            </tr>
+            <tr>
+              <td class="label">Remise commerciale</td>
+              <td class="val">0 FCFA</td>
+            </tr>
+            <tr>
+              <td class="label">ISB (2% retenue source)</td>
+              <td class="val">248 400 FCFA</td>
+            </tr>
+            <tr class="net-to-pay">
+              <td class="label">NET À PAYER TTC</td>
+              <td class="val">12 420 000 FCFA</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- MONTANT EN TOUTES LETTRES -->
+      <div class="amount-words-box">
+        Arrêtée la présente facture proforma à la somme totale de :<br />
+        <strong>DOUZE MILLIONS QUATRE CENT VINGT MILLE FRANCS CFA (12 420 000 FCFA) TTC</strong>,
+        incluant la retenue d'ISB (2% soit 248 400 FCFA) prélevée à la source conformément au Code Général des Impôts du Niger.
+      </div>
+
+      <!-- COORDONNÉES BANCAIRES ET SIGNATURE -->
+      <div class="bottom-section">
+        <div class="bank-card">
+          <h4>Virement Bancaire — SONIBANK | Titulaire : NIGER CERTIFY</h4>
+          <table class="rib-mini">
+            <thead>
+              <tr>
+                <th>Code Banque</th>
+                <th>Code Guichet</th>
+                <th>N° Compte</th>
+                <th>Clé RIB</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>NE064</td>
+                <td>01001</td>
+                <td>25112911331</td>
+                <td>35</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="conditions">
+            • <strong>Paiement :</strong> 50% à la commande (confection &amp; marquage), 50% à la réception.<br />
+            • <strong>Délai :</strong> 15 à 21 jours ouvrables après BAT | <strong>Livraison :</strong> Siège OPVN Niamey.
+          </div>
+        </div>
+
+        <div class="sign-card">
+          <div class="sign-title">Pour NIGER CERTIFY — La Direction Générale</div>
+          <div class="sign-images">
+            <img class="cachet" src="assets/cachet-niger-certify.png" alt="Cachet Niger Certify" />
+            <img class="signature" src="assets/signature-dg.png" alt="Signature Directeur Général" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANDEAU LÉGAL PIED DE PAGE -->
+    <footer class="legal-stripe">
+      <span>« Facture proforma sous régime fiscal nigérien — Soumis à l'ISB 2% selon la réglementation en vigueur. »</span>
+    </footer>
+  </article>
+</body>
+</html>

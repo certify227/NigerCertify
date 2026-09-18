@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Facture Proforma B — Sahel Graphique & Sécurité Industrielle (SGSI SA)</title>
+  <style>
+    :root {
+      --primary: #006633;
+      --secondary: #2e7d32;
+      --light: #e8f5e9;
+      --border: #c8e6c9;
+      --text: #222;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @page { size: A4 portrait; margin: 0; }
+    body {
+      background: #eef1f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      font-size: 8.5pt;
+      line-height: 1.25;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      margin: 10px auto;
+      background: #fff;
+      padding: 10mm 12mm 8mm 12mm;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; box-shadow: none; width: 210mm; height: 297mm; }
+      .no-print { display: none !important; }
+    }
+    header.header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+    .brand h2 {
+      font-size: 13pt;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+    .brand p {
+      font-size: 7.5pt;
+      color: #555;
+    }
+    .meta-box {
+      text-align: right;
+      font-size: 8pt;
+      background: var(--light);
+      border: 1px solid #a5d6a7;
+      border-left: 3px solid var(--primary);
+      padding: 6px 10px;
+      border-radius: 4px;
+      min-width: 190px;
+    }
+    .meta-box p { margin-bottom: 2px; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .card {
+      border: 1px solid #c0c0c0;
+      border-radius: 4px;
+      padding: 6px 9px;
+      background: #fafbfc;
+    }
+    .card-title {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 2px;
+      margin-bottom: 3px;
+    }
+    .card p { font-size: 7.8pt; margin-bottom: 2px; }
+    .document-title {
+      text-align: center;
+      margin: 4px 0 8px;
+    }
+    .document-title h1 {
+      font-size: 13pt;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .document-title .subtitle {
+      font-size: 8pt;
+      color: #666;
+      font-weight: 600;
+    }
+    table.table-items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 8px;
+      font-size: 7.8pt;
+    }
+    table.table-items th {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      text-align: left;
+      padding: 5px 6px;
+      border: 1px solid #004d26;
+    }
+    table.table-items td {
+      border: 1px solid #c0c0c0;
+      padding: 4px 6px;
+      vertical-align: middle;
+    }
+    table.table-items tbody tr:nth-child(even) { background: #f7faf8; }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    tr.total-row td {
+      background: #e2efda;
+      font-weight: 800;
+      font-size: 8.5pt;
+      color: var(--primary);
+      border-top: 2px solid var(--primary);
+      border-bottom: 2px double var(--primary);
+    }
+    .amount-words-box {
+      background: #fdfaf6;
+      border-left: 3px solid #2e7d32;
+      padding: 5px 8px;
+      font-size: 7.5pt;
+      margin-bottom: 6px;
+      border-radius: 0 4px 4px 0;
+    }
+    .bottom-section {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 10px;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+    .bank-card {
+      border: 1px solid #c0c0c0;
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 7.2pt;
+    }
+    .bank-card h4 {
+      font-size: 7.6pt;
+      color: var(--primary);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+    .conditions {
+      font-size: 6.8pt;
+      color: #555;
+      line-height: 1.2;
+      margin-top: 4px;
+    }
+    .sign-card {
+      text-align: center;
+      padding: 4px 8px;
+    }
+    .sign-card .sign-title {
+      font-size: 7.8pt;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stamp-box {
+      border: 1.5px dashed #006633;
+      color: #006633;
+      border-radius: 4px;
+      padding: 8px;
+      margin-top: 4px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      background: #f4faf6;
+    }
+    footer.legal-stripe {
+      background: var(--primary);
+      color: white;
+      font-size: 7pt;
+      padding: 4px 8px;
+      text-align: center;
+      border-radius: 3px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <article class="page">
+    <div>
+      <header class="header">
+        <div class="brand">
+          <h2>SAHEL GRAPHIQUE &amp; SÉCURITÉ INDUSTRIELLE (SGSI SA)</h2>
+          <p>Étiquetage Technique, Marquage de Contrôle Métrologique &amp; Systèmes de Scellement Haute Sécurité</p>
+          <p>Zone Industrielle Yantala, Rue ZI-14, BP 12 850 Niamey (Niger) | Tél: (+227) 20 75 18 90 / 90 22 34 56</p>
+          <p>NIF: 52189/S | RCCM: NI-NIA-2019-B-0895 | Email: commercial@sahel-graphique.ne</p>
+        </div>
+        <div class="meta-box">
+          <p><strong>PROFORMA INVOICE B</strong></p>
+          <p>Réf : <strong>SGSI/2026/PF-091</strong></p>
+          <p>Date : <strong>16/09/2026</strong></p>
+          <p>Validité : <strong>90 jours</strong></p>
+        </div>
+      </header>
+
+      <div class="info-grid">
+        <div class="card">
+          <div class="card-title">Organisme Destinataire</div>
+          <p><strong>AGENCE NATIONALE DE LA MÉTROLOGIE ET DE LA CONFORMITÉ (ANMC)</strong></p>
+          <p>Direction Générale | BP 10 700 Niamey — République du Niger</p>
+          <p>Identifiant Fiscal NIF : <strong>82397/P</strong></p>
+        </div>
+        <div class="card">
+          <div class="card-title">Objet du Marché</div>
+          <p>Confection et fourniture de consommables métrologiques : étiquettes et scellés de sécurité (Campagnes 2027/2028).</p>
+          <p>Devise : Franc CFA (XOF / FCFA)</p>
+        </div>
+      </div>
+
+      <div class="document-title">
+        <h1>FACTURE PROFORMA</h1>
+        <div class="subtitle">Offre de prix concurrente B (+35%) — Procédure de mise en concurrence ANMC</div>
+      </div>
+
+      <table class="table-items">
+        <thead>
+          <tr>
+            <th class="center" style="width: 4%;">Item</th>
+            <th style="width: 56%;">Description Technique Détaillée</th>
+            <th class="right" style="width: 10%;">Quantité</th>
+            <th class="right" style="width: 15%;">P.U. HT (FCFA)</th>
+            <th class="right" style="width: 15%;">Total HT (FCFA)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center">1</td>
+            <td>Conception/Impression étiquette verte 9cm X 9cm (année 2027, n°6001 à 11000)</td>
+            <td class="right">5 000</td>
+            <td class="right">200</td>
+            <td class="right">1 000 000</td>
+          </tr>
+          <tr>
+            <td class="center">2</td>
+            <td>Conception/Impression étiquette verte 9cm X 9cm (année 2028, n°0001 à 8000)</td>
+            <td class="right">8 000</td>
+            <td class="right">200</td>
+            <td class="right">1 600 000</td>
+          </tr>
+          <tr>
+            <td class="center">3</td>
+            <td>Conception/Impression étiquette orange 9cm X 9cm (n°2001 à 4000)</td>
+            <td class="right">1 000</td>
+            <td class="right">200</td>
+            <td class="right">200 000</td>
+          </tr>
+          <tr>
+            <td class="center">4</td>
+            <td>Conception/Impression étiquette rouge 9cm X 9cm (n°3001 à 4000)</td>
+            <td class="right">1 000</td>
+            <td class="right">200</td>
+            <td class="right">200 000</td>
+          </tr>
+          <tr>
+            <td class="center">5</td>
+            <td>Conception/Impression étiquette verte 5,5cm X 5,5cm (année 2027, n°2501 à 3000)</td>
+            <td class="right">500</td>
+            <td class="right">140</td>
+            <td class="right">70 000</td>
+          </tr>
+          <tr>
+            <td class="center">6</td>
+            <td>Conception/Impression étiquette verte 5,5cm X 5,5cm (année 2028, n°0001 à 1000)</td>
+            <td class="right">1 000</td>
+            <td class="right">140</td>
+            <td class="right">140 000</td>
+          </tr>
+          <tr>
+            <td class="center">7</td>
+            <td>Conception/Impression étiquette orange 5,5cm X 5,5cm (n°2001 à 3000)</td>
+            <td class="right">1 000</td>
+            <td class="right">140</td>
+            <td class="right">140 000</td>
+          </tr>
+          <tr>
+            <td class="center">8</td>
+            <td>Conception/Impression étiquette rouge 5,5cm X 5,5cm (n°2001 à 3000)</td>
+            <td class="right">1 000</td>
+            <td class="right">140</td>
+            <td class="right">140 000</td>
+          </tr>
+          <tr>
+            <td class="center">9</td>
+            <td>Conception/Impression étiquette verte 5cm X 2cm (année 2027, n°401 à 650)</td>
+            <td class="right">250</td>
+            <td class="right">120</td>
+            <td class="right">30 000</td>
+          </tr>
+          <tr>
+            <td class="center">10</td>
+            <td>Conception/Impression étiquette verte 5cm X 2cm (année 2028, n°1 à 250)</td>
+            <td class="right">250</td>
+            <td class="right">120</td>
+            <td class="right">30 000</td>
+          </tr>
+          <tr>
+            <td class="center">11</td>
+            <td>Scellé de sécurité personnalisés (câble acier &amp; corps polycarbonate inviolable)</td>
+            <td class="right">1 000</td>
+            <td class="right">1 370</td>
+            <td class="right">1 370 000</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="4" class="right">TOTAL GÉNÉRAL HORS TAXES (HT) FCFA :</td>
+            <td class="right">4 920 000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="amount-words-box">
+        Arrêtée la présente facture proforma à la somme de :<br />
+        <strong>QUATRE MILLIONS NEUF CENT VINGT MILLE (4 920 000) FRANCS CFA HORS TAXES.</strong>
+      </div>
+
+      <div class="bottom-section">
+        <div class="bank-card">
+          <h4>Termes d'Exécution &amp; Domiciliation Bancaire</h4>
+          <p><strong>Banque :</strong> BANK OF AFRICA (BOA NIGER) Niamey | <strong>Titulaire :</strong> SGSI SA</p>
+          <p>Code Banque: NE045 | Guichet: 01001 | Compte: 00125478901-54 | Clé: 18</p>
+          <div class="conditions">
+            • <strong>Délai de fabrication :</strong> 35 à 50 jours calendaires après BAT.<br />
+            • <strong>Règlement :</strong> 50% d'acompte à la commande, solde à la livraison.<br />
+            • <strong>Qualité :</strong> Polyester indéchirable certifié résistant aux solvants et aux UV.
+          </div>
+        </div>
+
+        <div class="sign-card">
+          <div class="sign-title">Pour SGSI SA<br />Le Directeur Général</div>
+          <div class="stamp-box">
+            SAHEL GRAPHIQUE &amp; SÉCURITÉ SA<br />
+            Direction Générale Niamey<br />
+            [Signature &amp; Cachet Officiel]
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="legal-stripe">
+      <span>« SGSI SA — Société Anonyme au capital de 25 000 000 FCFA — Niamey, Niger »</span>
+    </footer>
+  </article>
+</body>
+</html>
