@@ -64,6 +64,9 @@ from app.schemas.schemas import (
     RideCreate,
     RideModerationIn,
     RideOut,
+    BookingReceiptOut,
+    DriverEarningsOut,
+    AdminKpiOut,
     SafetyCharterOut,
     SafetyReportCreate,
     SafetyReportOut,
@@ -585,6 +588,7 @@ def search_rides(
     women_priority: bool | None = Query(default=None),
     region: str | None = Query(default=None),
     company_id: int | None = Query(default=None),
+    max_price: int | None = Query(default=None, ge=500, le=200_000),
     db: Session = Depends(get_db),
     viewer: User | None = Depends(get_optional_user),
 ) -> list[dict]:
@@ -611,6 +615,8 @@ def search_rides(
         q = q.filter(Ride.women_priority.is_(True))
     if company_id is not None:
         q = q.filter(Ride.company_id == company_id)
+    if max_price is not None:
+        q = q.filter(Ride.price_per_seat <= max_price)
     rides = q.order_by(Ride.departure_date, Ride.departure_time).all()
     if settings.national_coverage or settings.pilot_mode:
         rides = [r for r in rides if corridor_allowed(r.origin_city, r.destination_city)]
@@ -1465,6 +1471,133 @@ def delete_alert(
     alert.is_active = False
     db.commit()
     return MessageOut(message="Alerte désactivée")
+
+
+@router.get("/bookings/{booking_id}/receipt", response_model=BookingReceiptOut)
+def booking_receipt(
+    booking_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.payment),
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+            joinedload(Booking.ride).joinedload(Ride.company),
+        )
+        .filter(Booking.id == booking_id)
+        .first()
+    )
+    if not booking:
+        raise HTTPException(status_code=404, detail="Réservation introuvable")
+    ride = booking.ride
+    if user.id not in {booking.passenger_id, ride.driver_id} and user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    paid = booking.status in {BookingStatus.PAID, BookingStatus.COMPLETED}
+    company = ride.company.name if getattr(ride, "company", None) else "Indépendant"
+    lines = [
+        "=== RECU ZumunciTravel ===",
+        f"Reservation #{booking.id}",
+        f"Statut: {booking.status.value}",
+        f"Trajet: {ride.origin_city} -> {ride.destination_city}",
+        f"Depart: {ride.departure_date} {ride.departure_time}",
+        f"Mode: {ride.mode.value} · {company}",
+        f"Places: {booking.seats}",
+        f"Passager: {booking.passenger.full_name if booking.passenger else '—'}",
+        f"Convoyeur: {ride.driver.full_name}",
+        f"Sous-total places: {booking.total_amount - (booking.insurance_fee or 0)} {settings.currency}",
+        f"Assurance: {booking.insurance_fee or 0} {settings.currency}",
+        f"Commission plateforme: {booking.platform_fee} {settings.currency}",
+        f"Reversement convoyeur: {booking.driver_amount} {settings.currency}",
+        f"TOTAL: {booking.total_amount} {settings.currency}",
+    ]
+    if booking.payment:
+        lines.append(
+            f"Paiement: {booking.payment.provider.value} · {booking.payment.status.value}"
+            + (f" · ref {booking.payment.external_ref}" if booking.payment.external_ref else "")
+        )
+    lines.append("Merci de voyager en confiance.")
+    return {
+        "booking_id": booking.id,
+        "status": booking.status,
+        "title": f"Reçu #{booking.id} — {ride.origin_city} → {ride.destination_city}",
+        "receipt_text": "\n".join(lines),
+        "total_amount": booking.total_amount,
+        "currency": settings.currency,
+        "insurance_fee": booking.insurance_fee or 0,
+        "platform_fee": booking.platform_fee,
+        "driver_amount": booking.driver_amount,
+        "paid": paid,
+    }
+
+
+@router.get("/me/earnings", response_model=DriverEarningsOut)
+def my_earnings(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
+    rides_published = db.query(Ride).filter(Ride.driver_id == user.id).count()
+    paid_statuses = [BookingStatus.PAID, BookingStatus.COMPLETED]
+    rows = (
+        db.query(Booking)
+        .join(Ride, Booking.ride_id == Ride.id)
+        .filter(Ride.driver_id == user.id, Booking.status.in_(paid_statuses))
+        .all()
+    )
+    gross = sum(b.driver_amount for b in rows)
+    seats = sum(b.seats for b in rows)
+    completed = sum(1 for b in rows if b.status == BookingStatus.COMPLETED)
+    return {
+        "rides_published": rides_published,
+        "bookings_paid": len(rows),
+        "bookings_completed": completed,
+        "gross_driver_amount": gross,
+        "seats_sold": seats,
+        "currency": settings.currency,
+    }
+
+
+@router.get("/admin/kpi", response_model=AdminKpiOut)
+def admin_kpi(
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+    users_total = db.query(User).count()
+    drivers_verified = (
+        db.query(User)
+        .filter(
+            User.verification_status == VerificationStatus.VERIFIED,
+            User.role.in_([UserRole.DRIVER, UserRole.BOTH, UserRole.ADMIN]),
+        )
+        .count()
+    )
+    rides_active = db.query(Ride).filter(Ride.is_active.is_(True)).count()
+    bookings_total = db.query(Booking).count()
+    paid = (
+        db.query(Booking)
+        .filter(Booking.status.in_([BookingStatus.PAID, BookingStatus.COMPLETED]))
+        .all()
+    )
+    bookings_paid = len(paid)
+    bookings_completed = sum(1 for b in paid if b.status == BookingStatus.COMPLETED)
+    gmv = sum(b.total_amount for b in paid)
+    fees = sum(b.platform_fee for b in paid)
+    conversion = round((bookings_paid / bookings_total), 3) if bookings_total else 0.0
+    open_reports = db.query(SafetyReport).filter(SafetyReport.status == ReportStatus.OPEN).count()
+    return {
+        "users_total": users_total,
+        "drivers_verified": drivers_verified,
+        "rides_active": rides_active,
+        "bookings_total": bookings_total,
+        "bookings_paid": bookings_paid,
+        "bookings_completed": bookings_completed,
+        "gmv_xof": gmv,
+        "platform_fees_xof": fees,
+        "conversion_rate": conversion,
+        "open_reports": open_reports,
+        "currency": settings.currency,
+    }
 
 
 @router.get("/payments/providers", response_model=list[str])

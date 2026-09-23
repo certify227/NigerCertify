@@ -21,8 +21,11 @@ import {
   VERIF_LABELS,
 } from "./api";
 import type {
+  AdminKpi,
   Booking,
+  BookingReceipt,
   City,
+  DriverEarnings,
   FieldAgent,
   FraudOverview,
   ProductConfig,
@@ -409,6 +412,7 @@ function SearchPage() {
   const [mode, setMode] = useState(params.get("mode") || "");
   const [womenOnly, setWomenOnly] = useState(params.get("women_priority") === "true");
   const [region, setRegion] = useState(params.get("region") || "");
+  const [maxPrice, setMaxPrice] = useState(params.get("max_price") || "");
 
   useEffect(() => {
     setLoading(true);
@@ -428,6 +432,8 @@ function SearchPage() {
     else next.delete("women_priority");
     if (region) next.set("region", region);
     else next.delete("region");
+    if (maxPrice) next.set("max_price", maxPrice);
+    else next.delete("max_price");
     setParams(next);
   };
 
@@ -459,6 +465,16 @@ function SearchPage() {
               ),
             )}
           </select>
+        </label>
+        <label>
+          Prix max / place
+          <input
+            type="number"
+            min={500}
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="ex. 8000"
+          />
         </label>
         <label className="check">
           <input
@@ -1218,6 +1234,8 @@ function AccountPage({
     { id: number; title: string; body: string; channel: string; created_at: string }[]
   >([]);
   const [alerts, setAlerts] = useState<RideAlert[]>([]);
+  const [earnings, setEarnings] = useState<DriverEarnings | null>(null);
+  const [receipt, setReceipt] = useState<BookingReceipt | null>(null);
   const [alertOrigin, setAlertOrigin] = useState("Niamey");
   const [alertDest, setAlertDest] = useState("Maradi");
   const [alertMax, setAlertMax] = useState("");
@@ -1243,6 +1261,11 @@ function AccountPage({
       setAlerts(await api.myAlerts());
     } catch {
       setAlerts([]);
+    }
+    try {
+      setEarnings(await api.myEarnings());
+    } catch {
+      setEarnings(null);
     }
   };
 
@@ -1360,6 +1383,15 @@ function AccountPage({
     }
   };
 
+  const showReceipt = async (booking: Booking) => {
+    try {
+      setReceipt(await api.bookingReceipt(booking.id));
+      setReportMsg("Reçu chargé.");
+    } catch (err) {
+      setReportMsg((err as Error).message);
+    }
+  };
+
   return (
     <section className="stack">
       <h2>Bonjour, {user.full_name}</h2>
@@ -1368,6 +1400,30 @@ function AccountPage({
         {VERIF_LABELS[user.verification_status]}
         {user.accepted_safety_charter ? " · charte acceptée" : ""}
       </p>
+
+      {earnings && (
+        <>
+          <h3>Gains conducteur</h3>
+          <div className="fraud-grid">
+            <div className="fraud-stat">
+              <strong>{formatXof(earnings.gross_driver_amount)}</strong>
+              <span>reversé (brut)</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{earnings.bookings_paid}</strong>
+              <span>réservations payées</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{earnings.seats_sold}</strong>
+              <span>places vendues</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{earnings.rides_published}</strong>
+              <span>trajets publiés</span>
+            </div>
+          </div>
+        </>
+      )}
 
       <h3>Alertes trajets</h3>
       <p className="muted">Recevez un SMS / notification quand un trajet matching est publié.</p>
@@ -1502,6 +1558,11 @@ function AccountPage({
                   Noter 5★
                 </button>
               )}
+              {(b.status === "paid" || b.status === "completed" || b.status === "pending") && (
+                <button type="button" className="btn btn-small" onClick={() => void showReceipt(b)}>
+                  Reçu
+                </button>
+              )}
               {(b.status === "paid" || b.status === "completed") && (
                 <button type="button" className="btn btn-small" onClick={() => void share(b)}>
                   Partager / urgence
@@ -1514,6 +1575,16 @@ function AccountPage({
           </article>
         ))}
       </div>
+
+      {receipt && (
+        <div className="ussd-phone">
+          <h3>{receipt.title}</h3>
+          <pre className="ussd-screen">{receipt.receipt_text}</pre>
+          <button type="button" className="btn btn-small" onClick={() => setReceipt(null)}>
+            Fermer le reçu
+          </button>
+        </div>
+      )}
 
       <h3>Réservations reçues (conducteur)</h3>
       <div className="ride-list">
@@ -1588,6 +1659,7 @@ function AdminPage({ user }: { user: User | null }) {
   const [reports, setReports] = useState<import("./api").SafetyReport[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
   const [fraud, setFraud] = useState<FraudOverview | null>(null);
+  const [kpi, setKpi] = useState<AdminKpi | null>(null);
   const [msg, setMsg] = useState("");
 
   const load = async () => {
@@ -1598,6 +1670,11 @@ function AdminPage({ user }: { user: User | null }) {
       setFraud(await api.fraudOverview());
     } catch {
       setFraud(null);
+    }
+    try {
+      setKpi(await api.adminKpi());
+    } catch {
+      setKpi(null);
     }
   };
 
@@ -1622,8 +1699,46 @@ function AdminPage({ user }: { user: User | null }) {
 
   return (
     <section className="stack">
-      <h2>Admin — anti-fraude</h2>
+      <h2>Admin — KPI pilote</h2>
       {msg && <p className="success">{msg}</p>}
+      {kpi && (
+        <div className="fraud-grid">
+          <div className="fraud-stat">
+            <strong>{kpi.users_total}</strong>
+            <span>utilisateurs</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.drivers_verified}</strong>
+            <span>convoyeurs vérifiés</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.rides_active}</strong>
+            <span>trajets actifs</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.bookings_paid}</strong>
+            <span>réservations payées</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{formatXof(kpi.gmv_xof)}</strong>
+            <span>GMV</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{formatXof(kpi.platform_fees_xof)}</strong>
+            <span>commissions</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{(kpi.conversion_rate * 100).toFixed(1)}%</strong>
+            <span>conversion paiement</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.open_reports}</strong>
+            <span>signalements ouverts</span>
+          </div>
+        </div>
+      )}
+
+      <h2>Admin — anti-fraude</h2>
       {fraud && (
         <>
           <div className="fraud-grid">

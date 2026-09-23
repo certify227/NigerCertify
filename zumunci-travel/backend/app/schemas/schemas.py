@@ -452,3 +452,39 @@ class FraudOverviewOut(BaseModel):
     active_alerts: int
     flags: list[FraudFlagOut]
     uemoa_coming_soon: list[str]
+
+
+class BookingReceiptOut(BaseModel):
+    booking_id: int
+    status: BookingStatus
+    title: str
+    receipt_text: str
+    total_amount: int
+    currency: str = "XOF"
+    insurance_fee: int = 0
+    platform_fee: int = 0
+    driver_amount: int = 0
+    paid: bool
+
+
+class DriverEarningsOut(BaseModel):
+    rides_published: int
+    bookings_paid: int
+    bookings_completed: int
+    gross_driver_amount: int
+    seats_sold: int
+    currency: str = "XOF"
+
+
+class AdminKpiOut(BaseModel):
+    users_total: int
+    drivers_verified: int
+    rides_active: int
+    bookings_total: int
+    bookings_paid: int
+    bookings_completed: int
+    gmv_xof: int
+    platform_fees_xof: int
+    conversion_rate: float
+    open_reports: int
+    currency: str = "XOF"

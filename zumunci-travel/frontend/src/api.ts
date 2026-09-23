@@ -172,6 +172,42 @@ export type FraudOverview = {
   uemoa_coming_soon: string[];
 };
 
+export type BookingReceipt = {
+  booking_id: number;
+  status: string;
+  title: string;
+  receipt_text: string;
+  total_amount: number;
+  currency: string;
+  insurance_fee: number;
+  platform_fee: number;
+  driver_amount: number;
+  paid: boolean;
+};
+
+export type DriverEarnings = {
+  rides_published: number;
+  bookings_paid: number;
+  bookings_completed: number;
+  gross_driver_amount: number;
+  seats_sold: number;
+  currency: string;
+};
+
+export type AdminKpi = {
+  users_total: number;
+  drivers_verified: number;
+  rides_active: number;
+  bookings_total: number;
+  bookings_paid: number;
+  bookings_completed: number;
+  gmv_xof: number;
+  platform_fees_xof: number;
+  conversion_rate: number;
+  open_reports: number;
+  currency: string;
+};
+
 export type SafetyCharter = {
   title: string;
   version: string;
@@ -234,6 +270,9 @@ export const api = {
   deleteAlert: (id: number) =>
     request<{ message: string }>(`/me/alerts/${id}`, { method: "DELETE" }),
   fraudOverview: () => request<FraudOverview>("/admin/fraud/overview"),
+  adminKpi: () => request<AdminKpi>("/admin/kpi"),
+  myEarnings: () => request<DriverEarnings>("/me/earnings"),
+  bookingReceipt: (bookingId: number) => request<BookingReceipt>(`/bookings/${bookingId}/receipt`),
   charter: () => request<SafetyCharter>("/safety/charter"),
   rides: (params: URLSearchParams) => request<Ride[]>(`/rides?${params}`),
   ride: (id: number) => request<Ride>(`/rides/${id}`),
