@@ -78,6 +78,8 @@ class Settings(BaseSettings):
     insurance_partner_name: str = "Zumunci Protect (pilote)"
     # Code USSD démo (inclusion feature phone)
     ussd_service_code: str = "*789#"
+    # Expansion UEMOA annoncée (villes bientôt)
+    uemoa_coming_soon: str = "Ouagadougou,Bamako,Dakar,Bobodioulasso"
 
     @property
     def cors_origin_list(self) -> list[str]:
@@ -98,6 +100,10 @@ class Settings(BaseSettings):
     @property
     def service_city_list(self) -> list[str]:
         return [c.strip() for c in self.service_cities.split(",") if c.strip()]
+
+    @property
+    def uemoa_coming_soon_list(self) -> list[str]:
+        return [c.strip() for c in self.uemoa_coming_soon.split(",") if c.strip()]
 
     @property
     def pilot_corridor_pairs(self) -> list[tuple[str, str]]:

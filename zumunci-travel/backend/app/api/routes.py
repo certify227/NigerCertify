@@ -24,6 +24,7 @@ from app.models.entities import (
     ReportReason,
     ReportStatus,
     Ride,
+    RideAlert,
     RideMode,
     SafetyReport,
     TransportCompany,
@@ -43,6 +44,7 @@ from app.schemas.schemas import (
     ContactRevealOut,
     EmergencyContactIn,
     FieldAgentOut,
+    FraudOverviewOut,
     HealthOut,
     MessageOut,
     OtpSendOut,
@@ -57,9 +59,14 @@ from app.schemas.schemas import (
     RatingCreate,
     RatingOut,
     ReportStatusUpdate,
+    RideAlertCreate,
+    RideAlertOut,
     RideCreate,
     RideModerationIn,
     RideOut,
+    BookingReceiptOut,
+    DriverEarningsOut,
+    AdminKpiOut,
     SafetyCharterOut,
     SafetyReportCreate,
     SafetyReportOut,
@@ -278,6 +285,7 @@ def product_config() -> ProductConfigOut:
         insurance_fee_xof=settings.insurance_fee_xof,
         insurance_partner_name=settings.insurance_partner_name,
         ussd_service_code=settings.ussd_service_code,
+        uemoa_coming_soon=settings.uemoa_coming_soon_list,
     )
 
 
@@ -580,6 +588,7 @@ def search_rides(
     women_priority: bool | None = Query(default=None),
     region: str | None = Query(default=None),
     company_id: int | None = Query(default=None),
+    max_price: int | None = Query(default=None, ge=500, le=200_000),
     db: Session = Depends(get_db),
     viewer: User | None = Depends(get_optional_user),
 ) -> list[dict]:
@@ -606,6 +615,8 @@ def search_rides(
         q = q.filter(Ride.women_priority.is_(True))
     if company_id is not None:
         q = q.filter(Ride.company_id == company_id)
+    if max_price is not None:
+        q = q.filter(Ride.price_per_seat <= max_price)
     rides = q.order_by(Ride.departure_date, Ride.departure_time).all()
     if settings.national_coverage or settings.pilot_mode:
         rides = [r for r in rides if corridor_allowed(r.origin_city, r.destination_city)]
@@ -690,6 +701,39 @@ def publish_ride(
         women_priority=payload.women_priority,
     )
     db.add(ride)
+    db.flush()
+
+    # Notifier les alertes matching (SMS simulé / inbox)
+    alerts = (
+        db.query(RideAlert)
+        .filter(
+            RideAlert.is_active.is_(True),
+            RideAlert.origin_city.ilike(origin),
+            RideAlert.destination_city.ilike(destination),
+            RideAlert.user_id != user.id,
+        )
+        .all()
+    )
+    for alert in alerts:
+        if alert.max_price is not None and ride.price_per_seat > alert.max_price:
+            continue
+        body = (
+            f"Alerte ZumunciTravel: nouveau trajet {origin}->{destination} "
+            f"le {ride.departure_date} a {ride.departure_time} — {ride.price_per_seat} XOF/place."
+        )
+        db.add(
+            Notification(
+                user_id=alert.user_id,
+                channel="sms",
+                title="Nouveau trajet correspondant",
+                body=body,
+                booking_id=None,
+            )
+        )
+        subscriber = db.get(User, alert.user_id)
+        if subscriber:
+            subscriber.last_sms_at = datetime.now(timezone.utc)
+
     db.commit()
     db.refresh(ride)
     ride = (
@@ -1300,6 +1344,260 @@ def admin_moderate_ride(
     db.refresh(ride)
     ride = db.query(Ride).options(joinedload(Ride.driver)).filter(Ride.id == ride_id).one()
     return serialize_ride(ride, reveal_phone=True, db=db)
+
+
+@router.get("/admin/fraud/overview", response_model=FraudOverviewOut)
+def admin_fraud_overview(
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+
+    since = datetime.now(timezone.utc) - timedelta(hours=24)
+    suspended = db.query(User).filter(User.is_suspended.is_(True)).count()
+    open_reports = db.query(SafetyReport).filter(SafetyReport.status == ReportStatus.OPEN).count()
+    failed_pay = (
+        db.query(Payment)
+        .filter(Payment.status == PaymentStatus.FAILED, Payment.updated_at >= since)
+        .count()
+    )
+    night = 0
+    for r in db.query(Ride).filter(Ride.is_active.is_(True)).all():
+        if is_night_departure(r.departure_time):
+            night += 1
+    pending_kyc = (
+        db.query(User).filter(User.verification_status == VerificationStatus.PENDING).count()
+    )
+    active_alerts = db.query(RideAlert).filter(RideAlert.is_active.is_(True)).count()
+
+    flags = []
+    # Utilisateurs avec ≥2 signalements ouverts
+    multi = (
+        db.query(SafetyReport.reported_user_id, func.count(SafetyReport.id))
+        .filter(SafetyReport.status == ReportStatus.OPEN)
+        .group_by(SafetyReport.reported_user_id)
+        .having(func.count(SafetyReport.id) >= 2)
+        .all()
+    )
+    for uid, cnt in multi:
+        u = db.get(User, uid)
+        flags.append(
+            {
+                "kind": "multi_report",
+                "severity": "high" if cnt >= settings.auto_suspend_report_threshold else "medium",
+                "label": f"{u.full_name if u else uid} — {cnt} signalements ouverts",
+                "ref_id": uid,
+            }
+        )
+    # Paiements échoués récents groupés
+    if failed_pay >= 3:
+        flags.append(
+            {
+                "kind": "payment_failures",
+                "severity": "medium",
+                "label": f"{failed_pay} paiements échoués (24 h)",
+                "ref_id": None,
+            }
+        )
+    for r in db.query(Ride).filter(Ride.is_active.is_(True)).all():
+        if is_night_departure(r.departure_time) and r.price_per_seat < 1500:
+            flags.append(
+                {
+                    "kind": "suspicious_night_price",
+                    "severity": "low",
+                    "label": f"Trajet nuit #{r.id} prix bas ({r.price_per_seat} XOF)",
+                    "ref_id": r.id,
+                }
+            )
+
+    return {
+        "suspended_users": suspended,
+        "open_reports": open_reports,
+        "failed_payments_24h": failed_pay,
+        "night_rides_active": night,
+        "unverified_pending": pending_kyc,
+        "active_alerts": active_alerts,
+        "flags": flags[:30],
+        "uemoa_coming_soon": settings.uemoa_coming_soon_list,
+    }
+
+
+@router.get("/me/alerts", response_model=list[RideAlertOut])
+def my_alerts(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> list[RideAlert]:
+    return (
+        db.query(RideAlert)
+        .filter(RideAlert.user_id == user.id)
+        .order_by(RideAlert.created_at.desc())
+        .all()
+    )
+
+
+@router.post("/me/alerts", response_model=RideAlertOut, status_code=status.HTTP_201_CREATED)
+def create_alert(
+    payload: RideAlertCreate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> RideAlert:
+    ensure_active(user)
+    origin = payload.origin_city.strip().title()
+    destination = payload.destination_city.strip().title()
+    if origin.casefold() == destination.casefold():
+        raise HTTPException(status_code=400, detail="Départ et arrivée doivent être différents")
+    if not corridor_allowed(origin, destination):
+        raise HTTPException(status_code=400, detail="Corridor hors couverture Niger actuelle")
+    alert = RideAlert(
+        user_id=user.id,
+        origin_city=origin,
+        destination_city=destination,
+        max_price=payload.max_price,
+        is_active=True,
+    )
+    db.add(alert)
+    db.commit()
+    db.refresh(alert)
+    return alert
+
+
+@router.delete("/me/alerts/{alert_id}", response_model=MessageOut)
+def delete_alert(
+    alert_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MessageOut:
+    alert = db.get(RideAlert, alert_id)
+    if not alert or alert.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Alerte introuvable")
+    alert.is_active = False
+    db.commit()
+    return MessageOut(message="Alerte désactivée")
+
+
+@router.get("/bookings/{booking_id}/receipt", response_model=BookingReceiptOut)
+def booking_receipt(
+    booking_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.payment),
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+            joinedload(Booking.ride).joinedload(Ride.company),
+        )
+        .filter(Booking.id == booking_id)
+        .first()
+    )
+    if not booking:
+        raise HTTPException(status_code=404, detail="Réservation introuvable")
+    ride = booking.ride
+    if user.id not in {booking.passenger_id, ride.driver_id} and user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    paid = booking.status in {BookingStatus.PAID, BookingStatus.COMPLETED}
+    company = ride.company.name if getattr(ride, "company", None) else "Indépendant"
+    lines = [
+        "=== RECU ZumunciTravel ===",
+        f"Reservation #{booking.id}",
+        f"Statut: {booking.status.value}",
+        f"Trajet: {ride.origin_city} -> {ride.destination_city}",
+        f"Depart: {ride.departure_date} {ride.departure_time}",
+        f"Mode: {ride.mode.value} · {company}",
+        f"Places: {booking.seats}",
+        f"Passager: {booking.passenger.full_name if booking.passenger else '—'}",
+        f"Convoyeur: {ride.driver.full_name}",
+        f"Sous-total places: {booking.total_amount - (booking.insurance_fee or 0)} {settings.currency}",
+        f"Assurance: {booking.insurance_fee or 0} {settings.currency}",
+        f"Commission plateforme: {booking.platform_fee} {settings.currency}",
+        f"Reversement convoyeur: {booking.driver_amount} {settings.currency}",
+        f"TOTAL: {booking.total_amount} {settings.currency}",
+    ]
+    if booking.payment:
+        lines.append(
+            f"Paiement: {booking.payment.provider.value} · {booking.payment.status.value}"
+            + (f" · ref {booking.payment.external_ref}" if booking.payment.external_ref else "")
+        )
+    lines.append("Merci de voyager en confiance.")
+    return {
+        "booking_id": booking.id,
+        "status": booking.status,
+        "title": f"Reçu #{booking.id} — {ride.origin_city} → {ride.destination_city}",
+        "receipt_text": "\n".join(lines),
+        "total_amount": booking.total_amount,
+        "currency": settings.currency,
+        "insurance_fee": booking.insurance_fee or 0,
+        "platform_fee": booking.platform_fee,
+        "driver_amount": booking.driver_amount,
+        "paid": paid,
+    }
+
+
+@router.get("/me/earnings", response_model=DriverEarningsOut)
+def my_earnings(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
+    rides_published = db.query(Ride).filter(Ride.driver_id == user.id).count()
+    paid_statuses = [BookingStatus.PAID, BookingStatus.COMPLETED]
+    rows = (
+        db.query(Booking)
+        .join(Ride, Booking.ride_id == Ride.id)
+        .filter(Ride.driver_id == user.id, Booking.status.in_(paid_statuses))
+        .all()
+    )
+    gross = sum(b.driver_amount for b in rows)
+    seats = sum(b.seats for b in rows)
+    completed = sum(1 for b in rows if b.status == BookingStatus.COMPLETED)
+    return {
+        "rides_published": rides_published,
+        "bookings_paid": len(rows),
+        "bookings_completed": completed,
+        "gross_driver_amount": gross,
+        "seats_sold": seats,
+        "currency": settings.currency,
+    }
+
+
+@router.get("/admin/kpi", response_model=AdminKpiOut)
+def admin_kpi(
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+    users_total = db.query(User).count()
+    drivers_verified = (
+        db.query(User)
+        .filter(
+            User.verification_status == VerificationStatus.VERIFIED,
+            User.role.in_([UserRole.DRIVER, UserRole.BOTH, UserRole.ADMIN]),
+        )
+        .count()
+    )
+    rides_active = db.query(Ride).filter(Ride.is_active.is_(True)).count()
+    bookings_total = db.query(Booking).count()
+    paid = (
+        db.query(Booking)
+        .filter(Booking.status.in_([BookingStatus.PAID, BookingStatus.COMPLETED]))
+        .all()
+    )
+    bookings_paid = len(paid)
+    bookings_completed = sum(1 for b in paid if b.status == BookingStatus.COMPLETED)
+    gmv = sum(b.total_amount for b in paid)
+    fees = sum(b.platform_fee for b in paid)
+    conversion = round((bookings_paid / bookings_total), 3) if bookings_total else 0.0
+    open_reports = db.query(SafetyReport).filter(SafetyReport.status == ReportStatus.OPEN).count()
+    return {
+        "users_total": users_total,
+        "drivers_verified": drivers_verified,
+        "rides_active": rides_active,
+        "bookings_total": bookings_total,
+        "bookings_paid": bookings_paid,
+        "bookings_completed": bookings_completed,
+        "gmv_xof": gmv,
+        "platform_fees_xof": fees,
+        "conversion_rate": conversion,
+        "open_reports": open_reports,
+        "currency": settings.currency,
+    }
 
 
 @router.get("/payments/providers", response_model=list[str])

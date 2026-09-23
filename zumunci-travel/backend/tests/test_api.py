@@ -599,3 +599,110 @@ def test_ussd_search_niamey_maradi(client):
     body = search.json()["response"]
     assert "Niamey" in body and "Maradi" in body
     assert body.startswith("CON") or body.startswith("END")
+
+
+def test_fraud_overview_admin(client):
+    admin = client.post("/api/auth/login", json={"phone": "90000099", "password": "zumunci123"})
+    headers = {"Authorization": f"Bearer {admin.json()['access_token']}"}
+    r = client.get("/api/admin/fraud/overview", headers=headers)
+    assert r.status_code == 200
+    data = r.json()
+    assert "suspended_users" in data
+    assert "flags" in data
+    assert "Ouagadougou" in data["uemoa_coming_soon"]
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    denied = client.get(
+        "/api/admin/fraud/overview",
+        headers={"Authorization": f"Bearer {passenger.json()['access_token']}"},
+    )
+    assert denied.status_code == 403
+
+
+def test_ride_alerts_notify_on_publish(client):
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {passenger.json()['access_token']}"}
+    alert = client.post(
+        "/api/me/alerts",
+        headers=p_headers,
+        json={"origin_city": "Niamey", "destination_city": "Dosso", "max_price": 10000},
+    )
+    assert alert.status_code == 201
+    assert alert.json()["is_active"] is True
+
+    driver = client.post("/api/auth/login", json={"phone": "90000001", "password": "zumunci123"})
+    d_headers = {"Authorization": f"Bearer {driver.json()['access_token']}"}
+    from datetime import date, timedelta
+
+    pub = client.post(
+        "/api/rides",
+        headers=d_headers,
+        json={
+            "origin_city": "Niamey",
+            "destination_city": "Dosso",
+            "departure_date": str(date.today() + timedelta(days=6)),
+            "departure_time": "09:15",
+            "seats_total": 2,
+            "price_per_seat": 3500,
+            "mode": "carpool",
+        },
+    )
+    assert pub.status_code == 201
+    notes = client.get("/api/me/notifications", headers=p_headers)
+    assert notes.status_code == 200
+    assert any("Dosso" in n["body"] for n in notes.json())
+
+    listed = client.get("/api/me/alerts", headers=p_headers)
+    assert listed.status_code == 200
+    aid = alert.json()["id"]
+    off = client.delete(f"/api/me/alerts/{aid}", headers=p_headers)
+    assert off.status_code == 200
+
+
+def test_max_price_filter(client):
+    cheap = client.get("/api/rides", params={"origin": "Niamey", "max_price": 4000})
+    assert cheap.status_code == 200
+    assert all(r["price_per_seat"] <= 4000 for r in cheap.json())
+
+
+def test_receipt_and_earnings_and_kpi(client):
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {passenger.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride = rides.json()[0]
+    book = client.post(
+        f"/api/rides/{ride['id']}/book",
+        headers=p_headers,
+        json={
+            "seats": 1,
+            "payment_provider": "orange_money",
+            "accept_women_priority_rules": True,
+        },
+    )
+    assert book.status_code == 201
+    booking_id = book.json()["id"]
+    pay_id = book.json()["payment"]["id"]
+    confirm = client.post(
+        f"/api/payments/{pay_id}/confirm",
+        headers=p_headers,
+        json={"success": True},
+    )
+    assert confirm.status_code == 200
+
+    receipt = client.get(f"/api/bookings/{booking_id}/receipt", headers=p_headers)
+    assert receipt.status_code == 200
+    assert "RECU ZumunciTravel" in receipt.json()["receipt_text"]
+    assert receipt.json()["paid"] is True
+
+    driver = client.post("/api/auth/login", json={"phone": "90000001", "password": "zumunci123"})
+    d_headers = {"Authorization": f"Bearer {driver.json()['access_token']}"}
+    earn = client.get("/api/me/earnings", headers=d_headers)
+    assert earn.status_code == 200
+    assert earn.json()["bookings_paid"] >= 1
+    assert earn.json()["gross_driver_amount"] >= 1
+
+    admin = client.post("/api/auth/login", json={"phone": "90000099", "password": "zumunci123"})
+    a_headers = {"Authorization": f"Bearer {admin.json()['access_token']}"}
+    kpi = client.get("/api/admin/kpi", headers=a_headers)
+    assert kpi.status_code == 200
+    assert kpi.json()["bookings_paid"] >= 1
+    assert kpi.json()["gmv_xof"] >= 1

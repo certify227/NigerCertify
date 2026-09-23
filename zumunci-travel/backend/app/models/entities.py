@@ -281,3 +281,19 @@ class FieldAgent(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class RideAlert(Base):
+    """Alerte passager : notifier quand un trajet matching est publié."""
+
+    __tablename__ = "ride_alerts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    origin_city: Mapped[str] = mapped_column(String(80), index=True)
+    destination_city: Mapped[str] = mapped_column(String(80), index=True)
+    max_price: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    user: Mapped[User] = relationship()

@@ -661,3 +661,50 @@ textarea:focus {
   align-items: end;
   margin-bottom: 1rem;
 }
+
+.fraud-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.fraud-stat {
+  background: rgba(26, 92, 58, 0.06);
+  border: 1px solid rgba(26, 92, 58, 0.12);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.fraud-stat strong {
+  font-size: 1.45rem;
+  font-family: var(--font-display);
+  color: var(--brand-deep, #0f3d2e);
+}
+
+.fraud-stat span {
+  font-size: 0.82rem;
+  color: var(--muted, #5a6b63);
+}
+
+.badge.sev-high {
+  background: #7a1f1f;
+  color: #fff;
+}
+
+.badge.sev-medium {
+  background: #8a5a12;
+  color: #fff;
+}
+
+.badge.sev-low {
+  background: #3a5a7a;
+  color: #fff;
+}
+
+.form.inline-filter {
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)) auto;
+}

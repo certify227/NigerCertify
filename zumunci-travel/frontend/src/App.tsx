@@ -21,11 +21,16 @@ import {
   VERIF_LABELS,
 } from "./api";
 import type {
+  AdminKpi,
   Booking,
+  BookingReceipt,
   City,
+  DriverEarnings,
   FieldAgent,
+  FraudOverview,
   ProductConfig,
   Ride,
+  RideAlert,
   SafetyCharter,
   TransportCompany,
   User,
@@ -357,6 +362,12 @@ function HomePage() {
           <strong>Couverture nationale</strong> — {config.regions.length} régions ·{" "}
           {config.service_cities.length} villes · commission{" "}
           {(config.commission_rate * 100).toFixed(0)} % · KYC ≤ {config.kyc_sla_hours}h
+          {config.uemoa_coming_soon && config.uemoa_coming_soon.length > 0 && (
+            <>
+              <br />
+              <strong>Bientôt UEMOA (XOF) :</strong> {config.uemoa_coming_soon.join(" · ")}
+            </>
+          )}
         </div>
       )}
     </section>
@@ -401,6 +412,7 @@ function SearchPage() {
   const [mode, setMode] = useState(params.get("mode") || "");
   const [womenOnly, setWomenOnly] = useState(params.get("women_priority") === "true");
   const [region, setRegion] = useState(params.get("region") || "");
+  const [maxPrice, setMaxPrice] = useState(params.get("max_price") || "");
 
   useEffect(() => {
     setLoading(true);
@@ -420,6 +432,8 @@ function SearchPage() {
     else next.delete("women_priority");
     if (region) next.set("region", region);
     else next.delete("region");
+    if (maxPrice) next.set("max_price", maxPrice);
+    else next.delete("max_price");
     setParams(next);
   };
 
@@ -451,6 +465,16 @@ function SearchPage() {
               ),
             )}
           </select>
+        </label>
+        <label>
+          Prix max / place
+          <input
+            type="number"
+            min={500}
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            placeholder="ex. 8000"
+          />
         </label>
         <label className="check">
           <input
@@ -1209,6 +1233,12 @@ function AccountPage({
   const [notes, setNotes] = useState<
     { id: number; title: string; body: string; channel: string; created_at: string }[]
   >([]);
+  const [alerts, setAlerts] = useState<RideAlert[]>([]);
+  const [earnings, setEarnings] = useState<DriverEarnings | null>(null);
+  const [receipt, setReceipt] = useState<BookingReceipt | null>(null);
+  const [alertOrigin, setAlertOrigin] = useState("Niamey");
+  const [alertDest, setAlertDest] = useState("Maradi");
+  const [alertMax, setAlertMax] = useState("");
   const [reportMsg, setReportMsg] = useState("");
   const [reportReason, setReportReason] = useState("inappropriate_behavior");
   const [emName, setEmName] = useState(user?.emergency_contact_name || "");
@@ -1226,6 +1256,16 @@ function AccountPage({
       setNotes(await api.notifications());
     } catch {
       setNotes([]);
+    }
+    try {
+      setAlerts(await api.myAlerts());
+    } catch {
+      setAlerts([]);
+    }
+    try {
+      setEarnings(await api.myEarnings());
+    } catch {
+      setEarnings(null);
     }
   };
 
@@ -1318,6 +1358,40 @@ function AccountPage({
     }
   };
 
+  const addAlert = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.createAlert({
+        origin_city: alertOrigin,
+        destination_city: alertDest,
+        max_price: alertMax ? Number(alertMax) : null,
+      });
+      setReportMsg("Alerte créée — vous serez notifié·e à la publication.");
+      await reload();
+    } catch (err) {
+      setReportMsg((err as Error).message);
+    }
+  };
+
+  const removeAlert = async (id: number) => {
+    try {
+      await api.deleteAlert(id);
+      setReportMsg("Alerte désactivée.");
+      await reload();
+    } catch (err) {
+      setReportMsg((err as Error).message);
+    }
+  };
+
+  const showReceipt = async (booking: Booking) => {
+    try {
+      setReceipt(await api.bookingReceipt(booking.id));
+      setReportMsg("Reçu chargé.");
+    } catch (err) {
+      setReportMsg((err as Error).message);
+    }
+  };
+
   return (
     <section className="stack">
       <h2>Bonjour, {user.full_name}</h2>
@@ -1326,6 +1400,76 @@ function AccountPage({
         {VERIF_LABELS[user.verification_status]}
         {user.accepted_safety_charter ? " · charte acceptée" : ""}
       </p>
+
+      {earnings && (
+        <>
+          <h3>Gains conducteur</h3>
+          <div className="fraud-grid">
+            <div className="fraud-stat">
+              <strong>{formatXof(earnings.gross_driver_amount)}</strong>
+              <span>reversé (brut)</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{earnings.bookings_paid}</strong>
+              <span>réservations payées</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{earnings.seats_sold}</strong>
+              <span>places vendues</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{earnings.rides_published}</strong>
+              <span>trajets publiés</span>
+            </div>
+          </div>
+        </>
+      )}
+
+      <h3>Alertes trajets</h3>
+      <p className="muted">Recevez un SMS / notification quand un trajet matching est publié.</p>
+      <form className="form inline-filter" onSubmit={(e) => void addAlert(e)}>
+        <label>
+          De
+          <input value={alertOrigin} onChange={(e) => setAlertOrigin(e.target.value)} required />
+        </label>
+        <label>
+          Vers
+          <input value={alertDest} onChange={(e) => setAlertDest(e.target.value)} required />
+        </label>
+        <label>
+          Prix max (opt.)
+          <input
+            type="number"
+            min={500}
+            value={alertMax}
+            onChange={(e) => setAlertMax(e.target.value)}
+            placeholder="ex. 8000"
+          />
+        </label>
+        <button className="btn btn-small" type="submit">
+          Créer
+        </button>
+      </form>
+      <div className="ride-list">
+        {alerts.filter((a) => a.is_active).length === 0 && (
+          <div className="empty">Aucune alerte active.</div>
+        )}
+        {alerts
+          .filter((a) => a.is_active)
+          .map((a) => (
+            <article key={a.id} className="ride-card static">
+              <strong>
+                {a.origin_city} → {a.destination_city}
+              </strong>
+              <p className="muted">
+                {a.max_price ? `max ${formatXof(a.max_price)}` : "sans plafond"}
+              </p>
+              <button type="button" className="btn btn-small danger" onClick={() => void removeAlert(a.id)}>
+                Désactiver
+              </button>
+            </article>
+          ))}
+      </div>
       {(user.verification_status !== "verified" || !user.phone_verified) && (
         <div className="notice">
           Complétez <Link to="/verify">OTP + identité</Link> pour réserver ou publier.
@@ -1414,6 +1558,11 @@ function AccountPage({
                   Noter 5★
                 </button>
               )}
+              {(b.status === "paid" || b.status === "completed" || b.status === "pending") && (
+                <button type="button" className="btn btn-small" onClick={() => void showReceipt(b)}>
+                  Reçu
+                </button>
+              )}
               {(b.status === "paid" || b.status === "completed") && (
                 <button type="button" className="btn btn-small" onClick={() => void share(b)}>
                   Partager / urgence
@@ -1426,6 +1575,16 @@ function AccountPage({
           </article>
         ))}
       </div>
+
+      {receipt && (
+        <div className="ussd-phone">
+          <h3>{receipt.title}</h3>
+          <pre className="ussd-screen">{receipt.receipt_text}</pre>
+          <button type="button" className="btn btn-small" onClick={() => setReceipt(null)}>
+            Fermer le reçu
+          </button>
+        </div>
+      )}
 
       <h3>Réservations reçues (conducteur)</h3>
       <div className="ride-list">
@@ -1499,12 +1658,24 @@ function AdminPage({ user }: { user: User | null }) {
   const [pending, setPending] = useState<User[]>([]);
   const [reports, setReports] = useState<import("./api").SafetyReport[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
+  const [fraud, setFraud] = useState<FraudOverview | null>(null);
+  const [kpi, setKpi] = useState<AdminKpi | null>(null);
   const [msg, setMsg] = useState("");
 
   const load = async () => {
     setPending(await api.pendingVerifications());
     setReports(await api.adminReports());
     setRides(await api.adminRides());
+    try {
+      setFraud(await api.fraudOverview());
+    } catch {
+      setFraud(null);
+    }
+    try {
+      setKpi(await api.adminKpi());
+    } catch {
+      setKpi(null);
+    }
   };
 
   useEffect(() => {
@@ -1528,6 +1699,88 @@ function AdminPage({ user }: { user: User | null }) {
 
   return (
     <section className="stack">
+      <h2>Admin — KPI pilote</h2>
+      {msg && <p className="success">{msg}</p>}
+      {kpi && (
+        <div className="fraud-grid">
+          <div className="fraud-stat">
+            <strong>{kpi.users_total}</strong>
+            <span>utilisateurs</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.drivers_verified}</strong>
+            <span>convoyeurs vérifiés</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.rides_active}</strong>
+            <span>trajets actifs</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.bookings_paid}</strong>
+            <span>réservations payées</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{formatXof(kpi.gmv_xof)}</strong>
+            <span>GMV</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{formatXof(kpi.platform_fees_xof)}</strong>
+            <span>commissions</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{(kpi.conversion_rate * 100).toFixed(1)}%</strong>
+            <span>conversion paiement</span>
+          </div>
+          <div className="fraud-stat">
+            <strong>{kpi.open_reports}</strong>
+            <span>signalements ouverts</span>
+          </div>
+        </div>
+      )}
+
+      <h2>Admin — anti-fraude</h2>
+      {fraud && (
+        <>
+          <div className="fraud-grid">
+            <div className="fraud-stat">
+              <strong>{fraud.suspended_users}</strong>
+              <span>comptes suspendus</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{fraud.open_reports}</strong>
+              <span>signalements ouverts</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{fraud.failed_payments_24h}</strong>
+              <span>paiements échoués 24h</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{fraud.night_rides_active}</strong>
+              <span>trajets nuit actifs</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{fraud.unverified_pending}</strong>
+              <span>KYC en attente</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{fraud.active_alerts}</strong>
+              <span>alertes passagers</span>
+            </div>
+          </div>
+          {fraud.uemoa_coming_soon?.length > 0 && (
+            <p className="muted">Expansion UEMOA prévue : {fraud.uemoa_coming_soon.join(" · ")}</p>
+          )}
+          <div className="ride-list">
+            {fraud.flags.length === 0 && <div className="empty">Aucun drapeau fraude pour l’instant.</div>}
+            {fraud.flags.map((f, i) => (
+              <article key={`${f.kind}-${f.ref_id}-${i}`} className="ride-card static">
+                <span className={`badge sev-${f.severity}`}>{f.severity}</span> {f.label}
+              </article>
+            ))}
+          </div>
+        </>
+      )}
+
       <h2>Admin — vérifications en attente</h2>
       {msg && <p className="success">{msg}</p>}
       <div className="ride-list">

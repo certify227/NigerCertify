@@ -138,6 +138,7 @@ export type ProductConfig = {
   insurance_fee_xof?: number;
   insurance_partner_name?: string;
   ussd_service_code?: string;
+  uemoa_coming_soon?: string[];
 };
 
 export type FieldAgent = {
@@ -149,6 +150,62 @@ export type FieldAgent = {
   languages: string;
   is_active: boolean;
   notes: string | null;
+};
+
+export type RideAlert = {
+  id: number;
+  origin_city: string;
+  destination_city: string;
+  max_price: number | null;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type FraudOverview = {
+  suspended_users: number;
+  open_reports: number;
+  failed_payments_24h: number;
+  night_rides_active: number;
+  unverified_pending: number;
+  active_alerts: number;
+  flags: { kind: string; severity: string; label: string; ref_id: number | null }[];
+  uemoa_coming_soon: string[];
+};
+
+export type BookingReceipt = {
+  booking_id: number;
+  status: string;
+  title: string;
+  receipt_text: string;
+  total_amount: number;
+  currency: string;
+  insurance_fee: number;
+  platform_fee: number;
+  driver_amount: number;
+  paid: boolean;
+};
+
+export type DriverEarnings = {
+  rides_published: number;
+  bookings_paid: number;
+  bookings_completed: number;
+  gross_driver_amount: number;
+  seats_sold: number;
+  currency: string;
+};
+
+export type AdminKpi = {
+  users_total: number;
+  drivers_verified: number;
+  rides_active: number;
+  bookings_total: number;
+  bookings_paid: number;
+  bookings_completed: number;
+  gmv_xof: number;
+  platform_fees_xof: number;
+  conversion_rate: number;
+  open_reports: number;
+  currency: string;
 };
 
 export type SafetyCharter = {
@@ -207,6 +264,15 @@ export const api = {
       "/ussd",
       { method: "POST", body: JSON.stringify(body) },
     ),
+  myAlerts: () => request<RideAlert[]>("/me/alerts"),
+  createAlert: (body: { origin_city: string; destination_city: string; max_price?: number | null }) =>
+    request<RideAlert>("/me/alerts", { method: "POST", body: JSON.stringify(body) }),
+  deleteAlert: (id: number) =>
+    request<{ message: string }>(`/me/alerts/${id}`, { method: "DELETE" }),
+  fraudOverview: () => request<FraudOverview>("/admin/fraud/overview"),
+  adminKpi: () => request<AdminKpi>("/admin/kpi"),
+  myEarnings: () => request<DriverEarnings>("/me/earnings"),
+  bookingReceipt: (bookingId: number) => request<BookingReceipt>(`/bookings/${bookingId}/receipt`),
   charter: () => request<SafetyCharter>("/safety/charter"),
   rides: (params: URLSearchParams) => request<Ride[]>(`/rides?${params}`),
   ride: (id: number) => request<Ride>(`/rides/${id}`),
