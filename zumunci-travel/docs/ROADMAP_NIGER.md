@@ -26,15 +26,15 @@
 2. Système d’avis bi-directionnel — fait
 3. Signalement / blacklist — fait (auto-suspension après N signalements sérieux)
 4. Profil public conducteur — fait (`/users/{id}/public`, UI `/drivers/:id`)
-5. Notifications SMS simulées + inbox — fait (confirm paiement)
-6. Assurance partenariat (optionnel)
-7. Onboarding compagnies de bus (Sahel, Rimbo, etc.)
+5. Notifications SMS simulées + inbox — fait (confirm paiement + création réservation)
+6. Assurance trajet optionnelle — fait (`with_insurance`, partenaire mock)
+7. Onboarding compagnies de bus — fait (Rimbo / Sahel / Azawad, UI `/companies`)
 
 ## Phase 3 — Couverture nationale
 
-1. Ouverture Zinder, Maradi, Agadez, Tahoua
+1. Ouverture Zinder, Maradi, Agadez, Tahoua — fait (8 régions)
 2. Agents terrain (ambassadeurs gares routières)
-3. SMS de confirmation (bas débit)
+3. SMS de confirmation (bas débit) — fait (simulé)
 4. USSD `*XYZ#` pour recherche simple (inclusion)
 
 ## Phase 4 — Scale UEMOA

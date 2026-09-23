@@ -20,7 +20,7 @@ import {
   setToken,
   VERIF_LABELS,
 } from "./api";
-import type { Booking, City, ProductConfig, Ride, SafetyCharter, User } from "./api";
+import type { Booking, City, ProductConfig, Ride, SafetyCharter, TransportCompany, User } from "./api";
 import "./App.css";
 
 function useAuth() {
@@ -138,6 +138,12 @@ function Shell({
               className={location.pathname.startsWith("/publish") ? "is-active" : undefined}
             >
               Publier
+            </Link>
+            <Link
+              to="/companies"
+              className={location.pathname.startsWith("/companies") ? "is-active" : undefined}
+            >
+              Compagnies
             </Link>
             <Link
               to="/safety"
@@ -336,6 +342,7 @@ function RideCard({ ride }: { ride: Ride }) {
         {ride.seats_available > 1 ? "s" : ""}
       </p>
       <p className="muted">
+        {ride.company ? `${ride.company.name} · ` : ""}
         {ride.driver.full_name}
         {ride.driver.is_verified ? " · ✓ vérifié" : ""}
         {ride.driver.rating_avg
@@ -444,6 +451,7 @@ function RideDetailPage({ user }: { user: User | null }) {
   const [providers, setProviders] = useState<string[]>([]);
   const [config, setConfig] = useState<ProductConfig | null>(null);
   const [acceptWomen, setAcceptWomen] = useState(false);
+  const [withInsurance, setWithInsurance] = useState(false);
   const [pendingBooking, setPendingBooking] = useState<Booking | null>(null);
   const [message, setMessage] = useState("");
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
@@ -491,12 +499,17 @@ function RideDetailPage({ user }: { user: User | null }) {
         payment_provider: provider,
         payment_phone: user.phone,
         accept_women_priority_rules: acceptWomen,
+        with_insurance: withInsurance,
       });
       setPendingBooking(booking);
+      const ins =
+        booking.with_insurance && booking.insurance_fee
+          ? ` dont ${formatXof(booking.insurance_fee)} d’assurance`
+          : "";
       setMessage(
-        `Réservation créée (${formatXof(booking.total_amount)}). ` +
+        `Réservation créée (${formatXof(booking.total_amount)}${ins}). ` +
           `Confirmez le paiement ${provider.replaceAll("_", " ")} pour débloquer le contact ` +
-          `(expire sous ${config?.booking_pending_ttl_minutes ?? 30} min).`,
+          `(expire sous ${config?.booking_pending_ttl_minutes ?? 30} min). SMS de confirmation envoyé.`,
       );
       setRide(await api.ride(ride.id));
     } catch (e) {
@@ -545,6 +558,13 @@ function RideDetailPage({ user }: { user: User | null }) {
         <li>
           <strong>Places :</strong> {ride.seats_available}/{ride.seats_total}
         </li>
+        {ride.company && (
+          <li>
+            <strong>Compagnie :</strong>{" "}
+            <Link to="/companies">{ride.company.name}</Link>
+            {ride.company.is_verified ? " · partenaire vérifié" : ""}
+          </li>
+        )}
         <li>
           <strong>Convoyeur :</strong>{" "}
           <Link to={`/drivers/${ride.driver.id}`}>{ride.driver.full_name}</Link>{" "}
@@ -614,11 +634,23 @@ function RideDetailPage({ user }: { user: User | null }) {
               J’accepte les règles « priorité femmes » (transport uniquement)
             </label>
           )}
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={withInsurance}
+              onChange={(e) => setWithInsurance(e.target.checked)}
+            />
+            Assurance trajet {config?.insurance_partner_name || "Zumunci Protect"} (+
+            {formatXof(config?.insurance_fee_xof ?? 500)})
+          </label>
           {provider === "cash" && (
             <div className="notice">Cash autorisé uniquement pour taxi brousse / bus.</div>
           )}
           <button className="btn btn-primary" type="button" onClick={() => void book()}>
-            Réserver · {formatXof(seats * ride.price_per_seat)}
+            Réserver ·{" "}
+            {formatXof(
+              seats * ride.price_per_seat + (withInsurance ? config?.insurance_fee_xof ?? 500 : 0),
+            )}
           </button>
         </div>
       ) : (
@@ -916,6 +948,7 @@ function SafetyPage() {
 function PublishPage({ user }: { user: User | null }) {
   const navigate = useNavigate();
   const [cities, setCities] = useState<City[]>([]);
+  const [companies, setCompanies] = useState<TransportCompany[]>([]);
   const [form, setForm] = useState({
     origin_city: "Niamey",
     destination_city: "Maradi",
@@ -928,11 +961,13 @@ function PublishPage({ user }: { user: User | null }) {
     meeting_point: "",
     notes: "",
     women_priority: false,
+    company_id: "" as string | number,
   });
   const [error, setError] = useState("");
 
   useEffect(() => {
     void api.cities().then(setCities);
+    void api.companies().then(setCompanies).catch(() => setCompanies([]));
   }, []);
 
   if (!user) return <Navigate to="/login" replace />;
@@ -954,7 +989,15 @@ function PublishPage({ user }: { user: User | null }) {
     e.preventDefault();
     setError("");
     try {
-      const ride = await api.publishRide(form);
+      const payload: Record<string, unknown> = { ...form };
+      if (form.mode === "carpool" || !form.company_id) {
+        payload.company_id = null;
+      } else {
+        payload.company_id = Number(form.company_id);
+      }
+      delete payload.notes;
+      if (form.notes) payload.notes = form.notes;
+      const ride = await api.publishRide(payload);
       navigate(`/rides/${ride.id}`);
     } catch (err) {
       setError((err as Error).message);
@@ -1034,12 +1077,28 @@ function PublishPage({ user }: { user: User | null }) {
         </label>
         <label>
           Mode
-          <select value={form.mode} onChange={(e) => setForm({ ...form, mode: e.target.value })}>
+          <select value={form.mode} onChange={(e) => setForm({ ...form, mode: e.target.value, company_id: e.target.value === "carpool" ? "" : form.company_id })}>
             <option value="carpool">Covoiturage</option>
             <option value="bush_taxi">Taxi brousse</option>
             <option value="bus">Bus</option>
           </select>
         </label>
+        {form.mode !== "carpool" && (
+          <label>
+            Compagnie partenaire (optionnel)
+            <select
+              value={form.company_id}
+              onChange={(e) => setForm({ ...form, company_id: e.target.value })}
+            >
+              <option value="">Indépendant</option>
+              {companies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label>
           Point de rendez-vous
           <input
@@ -1578,6 +1637,76 @@ function DriverProfilePage() {
   );
 }
 
+function CompaniesPage() {
+  const [companies, setCompanies] = useState<TransportCompany[]>([]);
+  const [error, setError] = useState("");
+  const [rides, setRides] = useState<Ride[]>([]);
+  const [selected, setSelected] = useState<number | null>(null);
+
+  useEffect(() => {
+    void api
+      .companies()
+      .then(setCompanies)
+      .catch((e: Error) => setError(e.message));
+  }, []);
+
+  useEffect(() => {
+    if (!selected) {
+      setRides([]);
+      return;
+    }
+    const params = new URLSearchParams({ company_id: String(selected) });
+    void api
+      .rides(params)
+      .then(setRides)
+      .catch((e: Error) => setError(e.message));
+  }, [selected]);
+
+  return (
+    <section className="stack">
+      <h2>Compagnies partenaires</h2>
+      <p className="muted">
+        Bus et transporteurs onboards (Rimbo, Sahel, Azawad…). Filtrez leurs trajets publiés.
+      </p>
+      {error && <p className="error">{error}</p>}
+      <div className="ride-list">
+        {companies.map((c) => (
+          <article key={c.id} className="ride-card static">
+            <div className="ride-top">
+              <strong>{c.name}</strong>
+              {c.is_verified && <span className="badge">partenaire</span>}
+            </div>
+            <p className="muted">
+              Hub {c.city_hub || "Niger"} · {c.ride_count} trajet{c.ride_count > 1 ? "s" : ""} actif
+              {c.ride_count > 1 ? "s" : ""}
+            </p>
+            {c.description && <p>{c.description}</p>}
+            <button
+              type="button"
+              className="btn btn-small"
+              onClick={() => setSelected(selected === c.id ? null : c.id)}
+            >
+              {selected === c.id ? "Masquer les trajets" : "Voir les trajets"}
+            </button>
+          </article>
+        ))}
+        {companies.length === 0 && !error && <div className="empty">Aucune compagnie pour l’instant.</div>}
+      </div>
+      {selected && (
+        <>
+          <h3>Trajets de la compagnie</h3>
+          <div className="ride-list">
+            {rides.map((ride) => (
+              <RideCard key={ride.id} ride={ride} />
+            ))}
+            {rides.length === 0 && <div className="empty">Pas de trajets ouverts pour cette compagnie.</div>}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function App() {
   const auth = useAuth();
   const ready = useMemo(() => !auth.loading, [auth.loading]);
@@ -1593,6 +1722,7 @@ export default function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/rides/:id" element={<RideDetailPage user={auth.user} />} />
         <Route path="/drivers/:id" element={<DriverProfilePage />} />
+        <Route path="/companies" element={<CompaniesPage />} />
         <Route path="/publish" element={<PublishPage user={auth.user} />} />
         <Route
           path="/me"

@@ -12,6 +12,7 @@ from app.models.entities import (
     IdDocumentType,
     Ride,
     RideMode,
+    TransportCompany,
     User,
     UserRole,
     VerificationStatus,
@@ -140,6 +141,38 @@ def seed_database(db: Session) -> None:
     )
     db.commit()
 
+    def _ensure_company(slug: str, **kwargs) -> TransportCompany:
+        existing = db.query(TransportCompany).filter_by(slug=slug).first()
+        if existing:
+            return existing
+        company = TransportCompany(slug=slug, **kwargs)
+        db.add(company)
+        db.flush()
+        return company
+
+    rimbo = _ensure_company(
+        "rimbo",
+        name="Rimbo Transport",
+        city_hub="Niamey",
+        phone="+22720300001",
+        description="Compagnie de bus inter-régionale — axes Niamey, Maradi, Zinder.",
+    )
+    sahel = _ensure_company(
+        "sahel",
+        name="Sahel Lines",
+        city_hub="Zinder",
+        phone="+22720510002",
+        description="Liaisons Est : Zinder, Diffa, Agadez.",
+    )
+    azawad = _ensure_company(
+        "azawad",
+        name="Azawad Express",
+        city_hub="Agadez",
+        phone="+22720620003",
+        description="Nord Niger — Agadez / Arlit (partenariat pilote).",
+    )
+    db.commit()
+
     if db.query(Ride).count() == 0:
         ibrahim = db.query(User).filter_by(phone="+22790000001").one()
         moussa = db.query(User).filter_by(phone="+22790000003").one()
@@ -200,9 +233,10 @@ def seed_database(db: Session) -> None:
                 vehicle_info="Hyundai Tucson",
                 meeting_point="Terminus Wadata",
             ),
-            # Maradi / Zinder
+            # Maradi / Zinder — compagnies bus
             Ride(
                 driver_id=moussa.id,
+                company_id=rimbo.id,
                 origin_city="Maradi",
                 destination_city="Zinder",
                 departure_date=today + timedelta(days=1),
@@ -211,11 +245,12 @@ def seed_database(db: Session) -> None:
                 seats_available=10,
                 price_per_seat=4000,
                 mode=RideMode.BUS,
-                vehicle_info="Bus 30 places",
+                vehicle_info="Bus Rimbo 30 places",
                 meeting_point="Station Maradi centre",
             ),
             Ride(
                 driver_id=moussa.id,
+                company_id=sahel.id,
                 origin_city="Zinder",
                 destination_city="Diffa",
                 departure_date=today + timedelta(days=2),
@@ -224,12 +259,13 @@ def seed_database(db: Session) -> None:
                 seats_available=5,
                 price_per_seat=7000,
                 mode=RideMode.BUSH_TAXI,
-                vehicle_info="Hiace 14 places",
+                vehicle_info="Hiace Sahel Lines",
                 meeting_point="Gare de Zinder",
             ),
             # Agadez / Nord
             Ride(
                 driver_id=moussa.id,
+                company_id=sahel.id,
                 origin_city="Zinder",
                 destination_city="Agadez",
                 departure_date=today + timedelta(days=3),
@@ -238,12 +274,13 @@ def seed_database(db: Session) -> None:
                 seats_available=6,
                 price_per_seat=10000,
                 mode=RideMode.BUSH_TAXI,
-                vehicle_info="Hiace 14 places",
+                vehicle_info="Hiace Sahel Lines",
                 meeting_point="Gare de Zinder",
                 notes="Liaison Est–Nord.",
             ),
             Ride(
                 driver_id=moussa.id,
+                company_id=azawad.id,
                 origin_city="Agadez",
                 destination_city="Arlit",
                 departure_date=today + timedelta(days=4),
@@ -271,6 +308,7 @@ def seed_database(db: Session) -> None:
             ),
             Ride(
                 driver_id=ibrahim.id,
+                company_id=rimbo.id,
                 origin_city="Dosso",
                 destination_city="Gaya",
                 departure_date=today + timedelta(days=5),
@@ -278,7 +316,7 @@ def seed_database(db: Session) -> None:
                 seats_total=2,
                 seats_available=2,
                 price_per_seat=2500,
-                mode=RideMode.CARPOOL,
+                mode=RideMode.BUS,
                 meeting_point="Gare Dosso",
             ),
         ]

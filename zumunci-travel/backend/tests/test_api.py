@@ -533,3 +533,45 @@ def test_auto_suspend_after_reports(client):
 
     profile = client.get(f"/api/users/{target_id}/public")
     assert profile.status_code == 404
+
+
+def test_companies_seeded_and_filter(client):
+    r = client.get("/api/companies")
+    assert r.status_code == 200
+    names = {c["name"] for c in r.json()}
+    assert "Rimbo Transport" in names
+    assert "Sahel Lines" in names
+    rimbo = next(c for c in r.json() if c["slug"] == "rimbo")
+    assert rimbo["ride_count"] >= 1
+    rides = client.get("/api/rides", params={"company_id": rimbo["id"]})
+    assert rides.status_code == 200
+    assert len(rides.json()) >= 1
+    assert all(x["company"] and x["company"]["slug"] == "rimbo" for x in rides.json())
+
+
+def test_booking_with_insurance_and_sms(client):
+    login = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride_id = rides.json()[0]["id"]
+    price = rides.json()[0]["price_per_seat"]
+    cfg = client.get("/api/product/config").json()
+    fee = cfg["insurance_fee_xof"]
+    book = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=headers,
+        json={
+            "seats": 1,
+            "payment_provider": "orange_money",
+            "with_insurance": True,
+            "accept_women_priority_rules": True,
+        },
+    )
+    assert book.status_code == 201
+    body = book.json()
+    assert body["with_insurance"] is True
+    assert body["insurance_fee"] == fee
+    assert body["total_amount"] == price + fee
+    notes = client.get("/api/me/notifications", headers=headers)
+    assert notes.status_code == 200
+    assert any("reservation" in n["body"].lower() or "Réservation" in n["title"] or "Reservation" in n["title"] for n in notes.json())

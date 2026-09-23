@@ -73,6 +73,9 @@ class Settings(BaseSettings):
     auto_suspend_report_threshold: int = 3
     # Taille max image KYC (caractères data-URL)
     kyc_image_max_chars: int = 350_000
+    # Assurance trajet optionnelle (XOF / réservation, mock partenaire)
+    insurance_fee_xof: int = 500
+    insurance_partner_name: str = "Zumunci Protect (pilote)"
 
     @property
     def cors_origin_list(self) -> list[str]:

@@ -7,13 +7,16 @@ from sqlalchemy.engine import Engine
 
 
 def ensure_sqlite_columns(engine: Engine) -> None:
-    """Ajoute les colonnes manquantes sur SQLite (dev / demo)."""
+    """Ajoute les colonnes / tables manquantes sur SQLite (dev / demo)."""
     if not str(engine.url).startswith("sqlite"):
         return
 
     statements = [
         ("users", "id_document_image", "TEXT"),
         ("users", "last_sms_at", "DATETIME"),
+        ("rides", "company_id", "INTEGER"),
+        ("bookings", "insurance_fee", "INTEGER DEFAULT 0"),
+        ("bookings", "with_insurance", "BOOLEAN DEFAULT 0"),
     ]
     with engine.begin() as conn:
         for table, column, coltype in statements:
@@ -22,7 +25,6 @@ def ensure_sqlite_columns(engine: Engine) -> None:
             if column not in existing:
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}"))
 
-        # Table notifications si absente
         conn.execute(
             text(
                 """
@@ -35,6 +37,23 @@ def ensure_sqlite_columns(engine: Engine) -> None:
                     booking_id INTEGER,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY(user_id) REFERENCES users(id)
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS transport_companies (
+                    id INTEGER PRIMARY KEY,
+                    slug VARCHAR(64) NOT NULL UNIQUE,
+                    name VARCHAR(120) NOT NULL UNIQUE,
+                    city_hub VARCHAR(80),
+                    phone VARCHAR(20),
+                    description TEXT,
+                    is_verified BOOLEAN DEFAULT 1,
+                    is_active BOOLEAN DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
                 """
             )

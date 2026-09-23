@@ -133,6 +133,24 @@ class RideCreate(BaseModel):
     meeting_point: str | None = None
     notes: str | None = None
     women_priority: bool = False
+    company_id: int | None = None
+
+
+class CompanyBrief(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    slug: str
+    name: str
+    city_hub: str | None = None
+    is_verified: bool = True
+
+
+class CompanyOut(CompanyBrief):
+    phone: str | None = None
+    description: str | None = None
+    is_active: bool = True
+    ride_count: int = 0
 
 
 class DriverBrief(BaseModel):
@@ -169,6 +187,7 @@ class RideOut(BaseModel):
     night_departure: bool = False
     is_active: bool
     driver: DriverBrief
+    company: CompanyBrief | None = None
 
 
 class RideModerationIn(BaseModel):
@@ -185,6 +204,7 @@ class BookingCreate(BaseModel):
     payment_provider: PaymentProvider = PaymentProvider.ORANGE_MONEY
     payment_phone: str | None = None
     accept_women_priority_rules: bool = False
+    with_insurance: bool = False
 
 
 class PaymentOut(BaseModel):
@@ -209,6 +229,8 @@ class BookingOut(BaseModel):
     total_amount: int
     platform_fee: int = 0
     driver_amount: int = 0
+    insurance_fee: int = 0
+    with_insurance: bool = False
     status: BookingStatus
     contact_unlocked: bool
     created_at: datetime
@@ -364,3 +386,5 @@ class ProductConfigOut(BaseModel):
     default_locale: str
     payment_providers: list[str]
     booking_pending_ttl_minutes: int = 30
+    insurance_fee_xof: int = 500
+    insurance_partner_name: str = "Zumunci Protect (pilote)"

@@ -58,6 +58,13 @@ export type Ride = {
   women_priority: boolean;
   night_departure: boolean;
   is_active: boolean;
+  company?: {
+    id: number;
+    slug: string;
+    name: string;
+    city_hub: string | null;
+    is_verified: boolean;
+  } | null;
   driver: {
     id: number;
     full_name: string;
@@ -71,6 +78,18 @@ export type Ride = {
   };
 };
 
+export type TransportCompany = {
+  id: number;
+  slug: string;
+  name: string;
+  city_hub: string | null;
+  phone: string | null;
+  description: string | null;
+  is_verified: boolean;
+  is_active: boolean;
+  ride_count: number;
+};
+
 export type Booking = {
   id: number;
   ride_id: number;
@@ -78,6 +97,8 @@ export type Booking = {
   total_amount: number;
   platform_fee: number;
   driver_amount: number;
+  insurance_fee?: number;
+  with_insurance?: boolean;
   status: string;
   contact_unlocked: boolean;
   created_at: string;
@@ -114,6 +135,8 @@ export type ProductConfig = {
   default_locale: string;
   payment_providers: string[];
   booking_pending_ttl_minutes?: number;
+  insurance_fee_xof?: number;
+  insurance_partner_name?: string;
 };
 
 export type SafetyCharter = {
@@ -163,9 +186,27 @@ export const api = {
   health: () => request<{ status: string; app: string }>("/health"),
   productConfig: () => request<ProductConfig>("/product/config"),
   cities: () => request<City[]>("/cities"),
+  companies: () => request<TransportCompany[]>("/companies"),
+  company: (id: number) => request<TransportCompany>(`/companies/${id}`),
   charter: () => request<SafetyCharter>("/safety/charter"),
   rides: (params: URLSearchParams) => request<Ride[]>(`/rides?${params}`),
   ride: (id: number) => request<Ride>(`/rides/${id}`),
+  publishRide: (body: Record<string, unknown>) =>
+    request<Ride>("/rides", { method: "POST", body: JSON.stringify(body) }),
+  book: (
+    rideId: number,
+    body: {
+      seats: number;
+      payment_provider: string;
+      payment_phone?: string;
+      accept_women_priority_rules?: boolean;
+      with_insurance?: boolean;
+    },
+  ) =>
+    request<Booking>(`/rides/${rideId}/book`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
   register: (body: Record<string, unknown>) =>
     request<{ access_token: string }>("/auth/register", {
       method: "POST",
@@ -196,13 +237,6 @@ export const api = {
     }),
   submitVerification: (body: Record<string, unknown>) =>
     request<User>("/me/verification", {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-  publishRide: (body: Record<string, unknown>) =>
-    request<Ride>("/rides", { method: "POST", body: JSON.stringify(body) }),
-  book: (rideId: number, body: Record<string, unknown>) =>
-    request<Booking>(`/rides/${rideId}/book`, {
       method: "POST",
       body: JSON.stringify(body),
     }),
