@@ -388,3 +388,31 @@ class ProductConfigOut(BaseModel):
     booking_pending_ttl_minutes: int = 30
     insurance_fee_xof: int = 500
     insurance_partner_name: str = "Zumunci Protect (pilote)"
+    ussd_service_code: str = "*789#"
+
+
+class FieldAgentOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    full_name: str
+    phone: str
+    city: str
+    station: str
+    languages: str
+    is_active: bool
+    notes: str | None = None
+
+
+class UssdIn(BaseModel):
+    text: str = ""
+    phone: str | None = None
+    session_id: str | None = None
+    service_code: str | None = None
+
+
+class UssdOut(BaseModel):
+    response: str
+    action: str
+    phone: str | None = None
+    service_code: str

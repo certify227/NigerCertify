@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.security import hash_password
 from app.models.entities import (
     City,
+    FieldAgent,
     IdDocumentType,
     Ride,
     RideMode,
@@ -322,3 +323,27 @@ def seed_database(db: Session) -> None:
         ]
         db.add_all(rides)
         db.commit()
+
+    # Ambassadeurs gares (idempotent)
+    demo_agents = [
+        ("+22790110001", "Hadiza Ambassadeure", "Niamey", "Gare routière de Niamey", "fr,ha,dje", "Accueil KYC & Mobile Money"),
+        ("+22790110002", "Amadou Gare Maradi", "Maradi", "Station Maradi centre", "fr,ha", "Orientation Rimbo / covoiturage"),
+        ("+22790110003", "Fatima Zinder Hub", "Zinder", "Gare de Zinder", "fr,ha", "Liaisons Est Diffa / Agadez"),
+        ("+22790110004", "Issoufou Agadez", "Agadez", "Gare Agadez", "fr,ha,tuar", "Nord Arlit — prudence nuit"),
+        ("+22790110005", "Mariama Dosso", "Dosso", "Gare Dosso", "fr,dje", "Axe Niamey–Gaya"),
+    ]
+    for phone, name, city, station, langs, notes in demo_agents:
+        if db.query(FieldAgent).filter_by(phone=phone).first():
+            continue
+        db.add(
+            FieldAgent(
+                phone=phone,
+                full_name=name,
+                city=city,
+                station=station,
+                languages=langs,
+                notes=notes,
+                is_active=True,
+            )
+        )
+    db.commit()

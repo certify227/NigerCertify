@@ -58,3 +58,20 @@ def ensure_sqlite_columns(engine: Engine) -> None:
                 """
             )
         )
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS field_agents (
+                    id INTEGER PRIMARY KEY,
+                    full_name VARCHAR(120) NOT NULL,
+                    phone VARCHAR(20) NOT NULL UNIQUE,
+                    city VARCHAR(80) NOT NULL,
+                    station VARCHAR(160) NOT NULL,
+                    languages VARCHAR(120) DEFAULT 'fr,ha',
+                    is_active BOOLEAN DEFAULT 1,
+                    notes TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+        )

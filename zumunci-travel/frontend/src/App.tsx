@@ -20,7 +20,16 @@ import {
   setToken,
   VERIF_LABELS,
 } from "./api";
-import type { Booking, City, ProductConfig, Ride, SafetyCharter, TransportCompany, User } from "./api";
+import type {
+  Booking,
+  City,
+  FieldAgent,
+  ProductConfig,
+  Ride,
+  SafetyCharter,
+  TransportCompany,
+  User,
+} from "./api";
 import "./App.css";
 
 function useAuth() {
@@ -146,6 +155,18 @@ function Shell({
               Compagnies
             </Link>
             <Link
+              to="/agents"
+              className={location.pathname.startsWith("/agents") ? "is-active" : undefined}
+            >
+              Agents
+            </Link>
+            <Link
+              to="/ussd"
+              className={location.pathname.startsWith("/ussd") ? "is-active" : undefined}
+            >
+              USSD
+            </Link>
+            <Link
               to="/safety"
               className={location.pathname.startsWith("/safety") ? "is-active" : undefined}
             >
@@ -207,7 +228,7 @@ function HomePage() {
   const [origin, setOrigin] = useState("Niamey");
   const [destination, setDestination] = useState("Maradi");
   const [date, setDate] = useState("");
-  const [locale, setLocale] = useState<"fr" | "ha">("fr");
+  const [locale, setLocale] = useState<"fr" | "ha" | "dje">("fr");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -233,13 +254,21 @@ function HomePage() {
           lead: "An tabbatar da asali kafin haduwa. Lambar waya tana budewa bayan biyan Mobile Money kawai.",
           search: "Nemo",
         }
-      : {
-          eyebrow: "Transport sécurisé · Niger",
-          brand: "ZumunciTravel",
-          line: "Voyagez sans arnaque ni relation déplacée.",
-          lead: "Identité vérifiée avant mise en relation. Contact débloqué uniquement après paiement Mobile Money.",
-          search: "Rechercher",
-        };
+      : locale === "dje"
+        ? {
+            eyebrow: "Dabari kaani · Niger",
+            brand: "ZumunciTravel",
+            line: "Koyra nda zama si, nda alwaasi si.",
+            lead: "Asali ga tabatandi jina. Telefon ga feeri Mobile Money banda gaa.",
+            search: "Ceeci",
+          }
+        : {
+            eyebrow: "Transport sécurisé · Niger",
+            brand: "ZumunciTravel",
+            line: "Voyagez sans arnaque ni relation déplacée.",
+            lead: "Identité vérifiée avant mise en relation. Contact débloqué uniquement après paiement Mobile Money.",
+            search: "Rechercher",
+          };
 
   return (
     <section className="hero">
@@ -259,6 +288,13 @@ function HomePage() {
               onClick={() => setLocale("ha")}
             >
               HA
+            </button>
+            <button
+              type="button"
+              className={locale === "dje" ? "is-active" : undefined}
+              onClick={() => setLocale("dje")}
+            >
+              ZAR
             </button>
           </div>
           <p className="eyebrow">{copy.eyebrow}</p>
@@ -719,6 +755,20 @@ function AuthPage({
     }
   };
 
+  const quickLogin = async (demoPhone: string) => {
+    setPhone(demoPhone);
+    setPassword("zumunci123");
+    setError("");
+    try {
+      const data = await api.login({ phone: demoPhone, password: "zumunci123" });
+      setToken(data.access_token);
+      await onAuth();
+      navigate("/me");
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
+
   return (
     <section className="stack narrow">
       <h2>{mode === "login" ? "Connexion" : "Créer un compte"}</h2>
@@ -768,6 +818,22 @@ function AuthPage({
         </button>
       </form>
       {error && <p className="error">{error}</p>}
+      {mode === "login" && (
+        <div className="demo-logins">
+          <p className="muted">Connexion rapide démo :</p>
+          <div className="demo-login-row">
+            <button type="button" className="btn btn-small" onClick={() => void quickLogin("90000002")}>
+              Voyageuse
+            </button>
+            <button type="button" className="btn btn-small" onClick={() => void quickLogin("90000001")}>
+              Conducteur
+            </button>
+            <button type="button" className="btn btn-small" onClick={() => void quickLogin("90000099")}>
+              Admin
+            </button>
+          </div>
+        </div>
+      )}
       <p className="muted">
         Démo vérifiée : <code>90000002</code> / <code>zumunci123</code>
       </p>
@@ -1707,6 +1773,148 @@ function CompaniesPage() {
   );
 }
 
+function AgentsPage() {
+  const [agents, setAgents] = useState<FieldAgent[]>([]);
+  const [city, setCity] = useState("");
+  const [error, setError] = useState("");
+
+  const load = () => {
+    void api
+      .agents(city || undefined)
+      .then(setAgents)
+      .catch((e: Error) => setError(e.message));
+  };
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <section className="stack">
+      <h2>Agents terrain</h2>
+      <p className="muted">
+        Ambassadeurs aux gares routières : aide KYC, Mobile Money et orientation USSD.
+      </p>
+      <form
+        className="form inline-filter"
+        onSubmit={(e) => {
+          e.preventDefault();
+          load();
+        }}
+      >
+        <label>
+          Ville
+          <input
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Niamey, Maradi…"
+          />
+        </label>
+        <button className="btn btn-small" type="submit">
+          Filtrer
+        </button>
+      </form>
+      {error && <p className="error">{error}</p>}
+      <div className="ride-list">
+        {agents.map((a) => (
+          <article key={a.id} className="ride-card static">
+            <div className="ride-top">
+              <strong>{a.full_name}</strong>
+              <span className="badge">{a.city}</span>
+            </div>
+            <p>
+              {a.station}
+              <br />
+              <a href={`tel:${a.phone}`}>{a.phone}</a> · langues {a.languages}
+            </p>
+            {a.notes && <p className="muted">{a.notes}</p>}
+          </article>
+        ))}
+        {agents.length === 0 && !error && <div className="empty">Aucun agent pour ce filtre.</div>}
+      </div>
+    </section>
+  );
+}
+
+function UssdPage() {
+  const [config, setConfig] = useState<ProductConfig | null>(null);
+  const [sessionText, setSessionText] = useState("");
+  const [input, setInput] = useState("");
+  const [screen, setScreen] = useState("Composez pour démarrer…");
+  const [error, setError] = useState("");
+
+  const applyResponse = (res: { response: string }, nextSession: string) => {
+    const body = res.response.replace(/^CON\s*/, "").replace(/^END\s*/, "");
+    setScreen(body);
+    setSessionText(res.response.startsWith("END") ? "" : nextSession);
+    setInput("");
+  };
+
+  useEffect(() => {
+    void api.productConfig().then(setConfig).catch(() => setConfig(null));
+    void api
+      .ussd({ text: "" })
+      .then((r) => applyResponse(r, ""))
+      .catch((e: Error) => setError(e.message));
+  }, []);
+
+  const run = async (fullText: string) => {
+    setError("");
+    try {
+      const res = await api.ussd({ text: fullText, phone: "+22790000002" });
+      applyResponse(res, fullText);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+
+  return (
+    <section className="stack narrow">
+      <h2>Simulateur USSD</h2>
+      <p className="muted">
+        Inclusion feature phone — composez{" "}
+        <code>{config?.ussd_service_code || "*789#"}</code> pour chercher un trajet hors smartphone.
+      </p>
+      <div className="ussd-phone">
+        <pre className="ussd-screen">{screen}</pre>
+        <form
+          className="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const chunk = input.trim();
+            if (!chunk) return;
+            const text = sessionText ? `${sessionText}*${chunk}` : chunk;
+            void run(text);
+          }}
+        >
+          <label>
+            Saisie
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="1 puis 1*2…"
+              autoComplete="off"
+            />
+          </label>
+          <div className="demo-login-row">
+            <button className="btn btn-primary" type="submit">
+              Envoyer
+            </button>
+            <button className="btn btn-small" type="button" onClick={() => void run("")}>
+              Menu
+            </button>
+            <button className="btn btn-small" type="button" onClick={() => void run("1*1*2")}>
+              Ex. Niamey→Maradi
+            </button>
+          </div>
+        </form>
+      </div>
+      {error && <p className="error">{error}</p>}
+    </section>
+  );
+}
+
 export default function App() {
   const auth = useAuth();
   const ready = useMemo(() => !auth.loading, [auth.loading]);
@@ -1723,6 +1931,8 @@ export default function App() {
         <Route path="/rides/:id" element={<RideDetailPage user={auth.user} />} />
         <Route path="/drivers/:id" element={<DriverProfilePage />} />
         <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/agents" element={<AgentsPage />} />
+        <Route path="/ussd" element={<UssdPage />} />
         <Route path="/publish" element={<PublishPage user={auth.user} />} />
         <Route
           path="/me"

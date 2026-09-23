@@ -76,6 +76,8 @@ class Settings(BaseSettings):
     # Assurance trajet optionnelle (XOF / réservation, mock partenaire)
     insurance_fee_xof: int = 500
     insurance_partner_name: str = "Zumunci Protect (pilote)"
+    # Code USSD démo (inclusion feature phone)
+    ussd_service_code: str = "*789#"
 
     @property
     def cors_origin_list(self) -> list[str]:

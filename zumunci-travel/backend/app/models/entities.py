@@ -265,3 +265,19 @@ class Notification(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped[User] = relationship(back_populates="notifications")
+
+
+class FieldAgent(Base):
+    """Ambassadeurs terrain aux gares routières."""
+
+    __tablename__ = "field_agents"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    full_name: Mapped[str] = mapped_column(String(120))
+    phone: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    city: Mapped[str] = mapped_column(String(80), index=True)
+    station: Mapped[str] = mapped_column(String(160))
+    languages: Mapped[str] = mapped_column(String(120), default="fr,ha")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

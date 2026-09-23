@@ -575,3 +575,27 @@ def test_booking_with_insurance_and_sms(client):
     notes = client.get("/api/me/notifications", headers=headers)
     assert notes.status_code == 200
     assert any("reservation" in n["body"].lower() or "Réservation" in n["title"] or "Reservation" in n["title"] for n in notes.json())
+
+
+def test_field_agents_seeded(client):
+    r = client.get("/api/agents")
+    assert r.status_code == 200
+    assert len(r.json()) >= 3
+    cities = {a["city"] for a in r.json()}
+    assert "Niamey" in cities
+    filtered = client.get("/api/agents", params={"city": "Zinder"})
+    assert filtered.status_code == 200
+    assert all("Zinder" in a["city"] for a in filtered.json())
+
+
+def test_ussd_search_niamey_maradi(client):
+    menu = client.post("/api/ussd", json={"text": ""})
+    assert menu.status_code == 200
+    assert menu.json()["response"].startswith("CON")
+    assert "*789#" in menu.json()["service_code"] or "Zumunci" in menu.json()["response"]
+
+    search = client.post("/api/ussd", json={"text": "1*1*2", "phone": "+22790000002"})
+    assert search.status_code == 200
+    body = search.json()["response"]
+    assert "Niamey" in body and "Maradi" in body
+    assert body.startswith("CON") or body.startswith("END")

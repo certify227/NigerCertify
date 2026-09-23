@@ -16,6 +16,7 @@ from app.models.entities import (
     Booking,
     BookingStatus,
     City,
+    FieldAgent,
     Notification,
     Payment,
     PaymentStatus,
@@ -41,6 +42,7 @@ from app.schemas.schemas import (
     CompanyOut,
     ContactRevealOut,
     EmergencyContactIn,
+    FieldAgentOut,
     HealthOut,
     MessageOut,
     OtpSendOut,
@@ -63,6 +65,8 @@ from app.schemas.schemas import (
     SafetyReportOut,
     TokenOut,
     TripShareOut,
+    UssdIn,
+    UssdOut,
     UserCreate,
     UserLogin,
     UserOut,
@@ -82,6 +86,7 @@ from app.services.safety import (
     mask_phone,
     whatsapp_link,
 )
+from app.services.ussd import handle_ussd
 
 router = APIRouter()
 settings = get_settings()
@@ -272,6 +277,7 @@ def product_config() -> ProductConfigOut:
         booking_pending_ttl_minutes=settings.booking_pending_ttl_minutes,
         insurance_fee_xof=settings.insurance_fee_xof,
         insurance_partner_name=settings.insurance_partner_name,
+        ussd_service_code=settings.ussd_service_code,
     )
 
 
@@ -541,6 +547,27 @@ def get_company(company_id: int, db: Session = Depends(get_db)) -> dict:
         "is_verified": c.is_verified,
         "is_active": c.is_active,
         "ride_count": count,
+    }
+
+
+@router.get("/agents", response_model=list[FieldAgentOut])
+def list_field_agents(
+    city: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> list[FieldAgent]:
+    q = db.query(FieldAgent).filter(FieldAgent.is_active.is_(True))
+    if city:
+        q = q.filter(FieldAgent.city.ilike(f"%{city.strip()}%"))
+    return q.order_by(FieldAgent.city, FieldAgent.full_name).all()
+
+
+@router.post("/ussd", response_model=UssdOut)
+def ussd_session(payload: UssdIn, db: Session = Depends(get_db)) -> dict:
+    """Simulateur USSD inclusion (feature phone) — menu recherche trajets."""
+    result = handle_ussd(db, text=payload.text or "", phone=payload.phone)
+    return {
+        **result,
+        "service_code": payload.service_code or settings.ussd_service_code,
     }
 
 
