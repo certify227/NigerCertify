@@ -33,14 +33,14 @@
 ## Phase 3 — Couverture nationale
 
 1. Ouverture Zinder, Maradi, Agadez, Tahoua — fait (8 régions)
-2. Agents terrain (ambassadeurs gares routières)
+2. Agents terrain (ambassadeurs gares routières) — fait (`/agents`)
 3. SMS de confirmation (bas débit) — fait (simulé)
-4. USSD `*XYZ#` pour recherche simple (inclusion)
+4. USSD `*789#` pour recherche simple — fait (simulateur `/ussd`)
 
 ## Phase 4 — Scale UEMOA
 
 1. Burkina, Mali, Sénégal (même devise XOF)
-2. Multi-langue FR / HA / Zarma
+2. Multi-langue FR / HA / Zarma — partiel (hero FR/HA/ZAR)
 3. Data warehouse + fraude
 
 ## Organisation recommandée (équipe minimale)

@@ -137,6 +137,18 @@ export type ProductConfig = {
   booking_pending_ttl_minutes?: number;
   insurance_fee_xof?: number;
   insurance_partner_name?: string;
+  ussd_service_code?: string;
+};
+
+export type FieldAgent = {
+  id: number;
+  full_name: string;
+  phone: string;
+  city: string;
+  station: string;
+  languages: string;
+  is_active: boolean;
+  notes: string | null;
 };
 
 export type SafetyCharter = {
@@ -188,6 +200,13 @@ export const api = {
   cities: () => request<City[]>("/cities"),
   companies: () => request<TransportCompany[]>("/companies"),
   company: (id: number) => request<TransportCompany>(`/companies/${id}`),
+  agents: (city?: string) =>
+    request<FieldAgent[]>(city ? `/agents?city=${encodeURIComponent(city)}` : "/agents"),
+  ussd: (body: { text?: string; phone?: string; session_id?: string }) =>
+    request<{ response: string; action: string; phone: string | null; service_code: string }>(
+      "/ussd",
+      { method: "POST", body: JSON.stringify(body) },
+    ),
   charter: () => request<SafetyCharter>("/safety/charter"),
   rides: (params: URLSearchParams) => request<Ride[]>(`/rides?${params}`),
   ride: (id: number) => request<Ride>(`/rides/${id}`),
