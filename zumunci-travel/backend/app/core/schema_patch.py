@@ -75,3 +75,19 @@ def ensure_sqlite_columns(engine: Engine) -> None:
                 """
             )
         )
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS ride_alerts (
+                    id INTEGER PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    origin_city VARCHAR(80) NOT NULL,
+                    destination_city VARCHAR(80) NOT NULL,
+                    max_price INTEGER,
+                    is_active BOOLEAN DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES users(id)
+                )
+                """
+            )
+        )

@@ -24,6 +24,7 @@ from app.models.entities import (
     ReportReason,
     ReportStatus,
     Ride,
+    RideAlert,
     RideMode,
     SafetyReport,
     TransportCompany,
@@ -43,6 +44,7 @@ from app.schemas.schemas import (
     ContactRevealOut,
     EmergencyContactIn,
     FieldAgentOut,
+    FraudOverviewOut,
     HealthOut,
     MessageOut,
     OtpSendOut,
@@ -57,6 +59,8 @@ from app.schemas.schemas import (
     RatingCreate,
     RatingOut,
     ReportStatusUpdate,
+    RideAlertCreate,
+    RideAlertOut,
     RideCreate,
     RideModerationIn,
     RideOut,
@@ -278,6 +282,7 @@ def product_config() -> ProductConfigOut:
         insurance_fee_xof=settings.insurance_fee_xof,
         insurance_partner_name=settings.insurance_partner_name,
         ussd_service_code=settings.ussd_service_code,
+        uemoa_coming_soon=settings.uemoa_coming_soon_list,
     )
 
 
@@ -690,6 +695,39 @@ def publish_ride(
         women_priority=payload.women_priority,
     )
     db.add(ride)
+    db.flush()
+
+    # Notifier les alertes matching (SMS simulé / inbox)
+    alerts = (
+        db.query(RideAlert)
+        .filter(
+            RideAlert.is_active.is_(True),
+            RideAlert.origin_city.ilike(origin),
+            RideAlert.destination_city.ilike(destination),
+            RideAlert.user_id != user.id,
+        )
+        .all()
+    )
+    for alert in alerts:
+        if alert.max_price is not None and ride.price_per_seat > alert.max_price:
+            continue
+        body = (
+            f"Alerte ZumunciTravel: nouveau trajet {origin}->{destination} "
+            f"le {ride.departure_date} a {ride.departure_time} — {ride.price_per_seat} XOF/place."
+        )
+        db.add(
+            Notification(
+                user_id=alert.user_id,
+                channel="sms",
+                title="Nouveau trajet correspondant",
+                body=body,
+                booking_id=None,
+            )
+        )
+        subscriber = db.get(User, alert.user_id)
+        if subscriber:
+            subscriber.last_sms_at = datetime.now(timezone.utc)
+
     db.commit()
     db.refresh(ride)
     ride = (
@@ -1300,6 +1338,133 @@ def admin_moderate_ride(
     db.refresh(ride)
     ride = db.query(Ride).options(joinedload(Ride.driver)).filter(Ride.id == ride_id).one()
     return serialize_ride(ride, reveal_phone=True, db=db)
+
+
+@router.get("/admin/fraud/overview", response_model=FraudOverviewOut)
+def admin_fraud_overview(
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+
+    since = datetime.now(timezone.utc) - timedelta(hours=24)
+    suspended = db.query(User).filter(User.is_suspended.is_(True)).count()
+    open_reports = db.query(SafetyReport).filter(SafetyReport.status == ReportStatus.OPEN).count()
+    failed_pay = (
+        db.query(Payment)
+        .filter(Payment.status == PaymentStatus.FAILED, Payment.updated_at >= since)
+        .count()
+    )
+    night = 0
+    for r in db.query(Ride).filter(Ride.is_active.is_(True)).all():
+        if is_night_departure(r.departure_time):
+            night += 1
+    pending_kyc = (
+        db.query(User).filter(User.verification_status == VerificationStatus.PENDING).count()
+    )
+    active_alerts = db.query(RideAlert).filter(RideAlert.is_active.is_(True)).count()
+
+    flags = []
+    # Utilisateurs avec ≥2 signalements ouverts
+    multi = (
+        db.query(SafetyReport.reported_user_id, func.count(SafetyReport.id))
+        .filter(SafetyReport.status == ReportStatus.OPEN)
+        .group_by(SafetyReport.reported_user_id)
+        .having(func.count(SafetyReport.id) >= 2)
+        .all()
+    )
+    for uid, cnt in multi:
+        u = db.get(User, uid)
+        flags.append(
+            {
+                "kind": "multi_report",
+                "severity": "high" if cnt >= settings.auto_suspend_report_threshold else "medium",
+                "label": f"{u.full_name if u else uid} — {cnt} signalements ouverts",
+                "ref_id": uid,
+            }
+        )
+    # Paiements échoués récents groupés
+    if failed_pay >= 3:
+        flags.append(
+            {
+                "kind": "payment_failures",
+                "severity": "medium",
+                "label": f"{failed_pay} paiements échoués (24 h)",
+                "ref_id": None,
+            }
+        )
+    for r in db.query(Ride).filter(Ride.is_active.is_(True)).all():
+        if is_night_departure(r.departure_time) and r.price_per_seat < 1500:
+            flags.append(
+                {
+                    "kind": "suspicious_night_price",
+                    "severity": "low",
+                    "label": f"Trajet nuit #{r.id} prix bas ({r.price_per_seat} XOF)",
+                    "ref_id": r.id,
+                }
+            )
+
+    return {
+        "suspended_users": suspended,
+        "open_reports": open_reports,
+        "failed_payments_24h": failed_pay,
+        "night_rides_active": night,
+        "unverified_pending": pending_kyc,
+        "active_alerts": active_alerts,
+        "flags": flags[:30],
+        "uemoa_coming_soon": settings.uemoa_coming_soon_list,
+    }
+
+
+@router.get("/me/alerts", response_model=list[RideAlertOut])
+def my_alerts(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> list[RideAlert]:
+    return (
+        db.query(RideAlert)
+        .filter(RideAlert.user_id == user.id)
+        .order_by(RideAlert.created_at.desc())
+        .all()
+    )
+
+
+@router.post("/me/alerts", response_model=RideAlertOut, status_code=status.HTTP_201_CREATED)
+def create_alert(
+    payload: RideAlertCreate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> RideAlert:
+    ensure_active(user)
+    origin = payload.origin_city.strip().title()
+    destination = payload.destination_city.strip().title()
+    if origin.casefold() == destination.casefold():
+        raise HTTPException(status_code=400, detail="Départ et arrivée doivent être différents")
+    if not corridor_allowed(origin, destination):
+        raise HTTPException(status_code=400, detail="Corridor hors couverture Niger actuelle")
+    alert = RideAlert(
+        user_id=user.id,
+        origin_city=origin,
+        destination_city=destination,
+        max_price=payload.max_price,
+        is_active=True,
+    )
+    db.add(alert)
+    db.commit()
+    db.refresh(alert)
+    return alert
+
+
+@router.delete("/me/alerts/{alert_id}", response_model=MessageOut)
+def delete_alert(
+    alert_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MessageOut:
+    alert = db.get(RideAlert, alert_id)
+    if not alert or alert.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Alerte introuvable")
+    alert.is_active = False
+    db.commit()
+    return MessageOut(message="Alerte désactivée")
 
 
 @router.get("/payments/providers", response_model=list[str])

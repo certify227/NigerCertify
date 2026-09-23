@@ -389,6 +389,7 @@ class ProductConfigOut(BaseModel):
     insurance_fee_xof: int = 500
     insurance_partner_name: str = "Zumunci Protect (pilote)"
     ussd_service_code: str = "*789#"
+    uemoa_coming_soon: list[str] = []
 
 
 class FieldAgentOut(BaseModel):
@@ -416,3 +417,38 @@ class UssdOut(BaseModel):
     action: str
     phone: str | None = None
     service_code: str
+
+
+class RideAlertCreate(BaseModel):
+    origin_city: str = Field(min_length=2, max_length=80)
+    destination_city: str = Field(min_length=2, max_length=80)
+    max_price: int | None = Field(default=None, ge=500, le=200_000)
+
+
+class RideAlertOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    origin_city: str
+    destination_city: str
+    max_price: int | None = None
+    is_active: bool
+    created_at: datetime
+
+
+class FraudFlagOut(BaseModel):
+    kind: str
+    severity: str
+    label: str
+    ref_id: int | None = None
+
+
+class FraudOverviewOut(BaseModel):
+    suspended_users: int
+    open_reports: int
+    failed_payments_24h: int
+    night_rides_active: int
+    unverified_pending: int
+    active_alerts: int
+    flags: list[FraudFlagOut]
+    uemoa_coming_soon: list[str]

@@ -138,6 +138,7 @@ export type ProductConfig = {
   insurance_fee_xof?: number;
   insurance_partner_name?: string;
   ussd_service_code?: string;
+  uemoa_coming_soon?: string[];
 };
 
 export type FieldAgent = {
@@ -149,6 +150,26 @@ export type FieldAgent = {
   languages: string;
   is_active: boolean;
   notes: string | null;
+};
+
+export type RideAlert = {
+  id: number;
+  origin_city: string;
+  destination_city: string;
+  max_price: number | null;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type FraudOverview = {
+  suspended_users: number;
+  open_reports: number;
+  failed_payments_24h: number;
+  night_rides_active: number;
+  unverified_pending: number;
+  active_alerts: number;
+  flags: { kind: string; severity: string; label: string; ref_id: number | null }[];
+  uemoa_coming_soon: string[];
 };
 
 export type SafetyCharter = {
@@ -207,6 +228,12 @@ export const api = {
       "/ussd",
       { method: "POST", body: JSON.stringify(body) },
     ),
+  myAlerts: () => request<RideAlert[]>("/me/alerts"),
+  createAlert: (body: { origin_city: string; destination_city: string; max_price?: number | null }) =>
+    request<RideAlert>("/me/alerts", { method: "POST", body: JSON.stringify(body) }),
+  deleteAlert: (id: number) =>
+    request<{ message: string }>(`/me/alerts/${id}`, { method: "DELETE" }),
+  fraudOverview: () => request<FraudOverview>("/admin/fraud/overview"),
   charter: () => request<SafetyCharter>("/safety/charter"),
   rides: (params: URLSearchParams) => request<Ride[]>(`/rides?${params}`),
   ride: (id: number) => request<Ride>(`/rides/${id}`),
