@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: #0c0e12;
+  --color-panel: #14181f;
+  --color-panel-2: #1c222c;
+  --color-line: #2c3442;
+  --color-ink: #f3efe6;
+  --color-muted: #a8a092;
+  --color-accent: #e2a13a;
+  --color-accent-ink: #1c1408;
+  --color-ok: #8fceab;
+}
+
+html[data-theme='light'] {
+  --color-canvas: #f4f0e8;
+  --color-panel: #fffdf8;
+  --color-panel-2: #efe8dc;
+  --color-line: #e0d6c6;
+  --color-ink: #1d1a16;
+  --color-muted: #6f675c;
+  --color-accent: #9a640c;
+  --color-accent-ink: #fffaf2;
+  --color-ok: #1f7a4d;
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      1000px 420px at 0% -10%,
+      color-mix(in srgb, var(--color-accent) 16%, transparent),
+      transparent 60%
+    ),
+    var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
