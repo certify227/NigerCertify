@@ -42,6 +42,7 @@
 1. Burkina, Mali, Sénégal (même devise XOF) — annoncé (`uemoa_coming_soon`)
 2. Multi-langue FR / HA / Zarma — partiel (hero FR/HA/ZAR)
 3. Data warehouse + fraude — fait (dashboard admin `/admin/fraud/overview` + alertes trajets)
+4. Reçus, gains conducteur, KPI admin, filtre prix — fait (v1.1)
 
 ## Organisation recommandée (équipe minimale)
 

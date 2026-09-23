@@ -656,3 +656,53 @@ def test_ride_alerts_notify_on_publish(client):
     aid = alert.json()["id"]
     off = client.delete(f"/api/me/alerts/{aid}", headers=p_headers)
     assert off.status_code == 200
+
+
+def test_max_price_filter(client):
+    cheap = client.get("/api/rides", params={"origin": "Niamey", "max_price": 4000})
+    assert cheap.status_code == 200
+    assert all(r["price_per_seat"] <= 4000 for r in cheap.json())
+
+
+def test_receipt_and_earnings_and_kpi(client):
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {passenger.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride = rides.json()[0]
+    book = client.post(
+        f"/api/rides/{ride['id']}/book",
+        headers=p_headers,
+        json={
+            "seats": 1,
+            "payment_provider": "orange_money",
+            "accept_women_priority_rules": True,
+        },
+    )
+    assert book.status_code == 201
+    booking_id = book.json()["id"]
+    pay_id = book.json()["payment"]["id"]
+    confirm = client.post(
+        f"/api/payments/{pay_id}/confirm",
+        headers=p_headers,
+        json={"success": True},
+    )
+    assert confirm.status_code == 200
+
+    receipt = client.get(f"/api/bookings/{booking_id}/receipt", headers=p_headers)
+    assert receipt.status_code == 200
+    assert "RECU ZumunciTravel" in receipt.json()["receipt_text"]
+    assert receipt.json()["paid"] is True
+
+    driver = client.post("/api/auth/login", json={"phone": "90000001", "password": "zumunci123"})
+    d_headers = {"Authorization": f"Bearer {driver.json()['access_token']}"}
+    earn = client.get("/api/me/earnings", headers=d_headers)
+    assert earn.status_code == 200
+    assert earn.json()["bookings_paid"] >= 1
+    assert earn.json()["gross_driver_amount"] >= 1
+
+    admin = client.post("/api/auth/login", json={"phone": "90000099", "password": "zumunci123"})
+    a_headers = {"Authorization": f"Bearer {admin.json()['access_token']}"}
+    kpi = client.get("/api/admin/kpi", headers=a_headers)
+    assert kpi.status_code == 200
+    assert kpi.json()["bookings_paid"] >= 1
+    assert kpi.json()["gmv_xof"] >= 1
