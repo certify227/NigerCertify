@@ -23,7 +23,9 @@ from app.models.entities import (
     ReportReason,
     ReportStatus,
     Ride,
+    RideMode,
     SafetyReport,
+    TransportCompany,
     User,
     UserRole,
     VerificationStatus,
@@ -36,6 +38,7 @@ from app.schemas.schemas import (
     BookingCompleteIn,
     CancelBookingIn,
     CityOut,
+    CompanyOut,
     ContactRevealOut,
     EmergencyContactIn,
     HealthOut,
@@ -114,6 +117,25 @@ def _driver_brief(driver: User, *, reveal_phone: bool, db: Session | None = None
 
 
 def serialize_ride(ride: Ride, *, reveal_phone: bool = False, db: Session | None = None) -> dict:
+    company = None
+    if ride.company_id and getattr(ride, "company", None) is not None:
+        company = {
+            "id": ride.company.id,
+            "slug": ride.company.slug,
+            "name": ride.company.name,
+            "city_hub": ride.company.city_hub,
+            "is_verified": ride.company.is_verified,
+        }
+    elif ride.company_id and db is not None:
+        c = db.get(TransportCompany, ride.company_id)
+        if c:
+            company = {
+                "id": c.id,
+                "slug": c.slug,
+                "name": c.name,
+                "city_hub": c.city_hub,
+                "is_verified": c.is_verified,
+            }
     return {
         "id": ride.id,
         "origin_city": ride.origin_city,
@@ -132,6 +154,7 @@ def serialize_ride(ride: Ride, *, reveal_phone: bool = False, db: Session | None
         "night_departure": is_night_departure(ride.departure_time),
         "is_active": ride.is_active,
         "driver": _driver_brief(ride.driver, reveal_phone=reveal_phone, db=db),
+        "company": company,
     }
 
 
@@ -151,6 +174,8 @@ def serialize_booking(booking: Booking, viewer: User, db: Session | None = None)
         "total_amount": booking.total_amount,
         "platform_fee": booking.platform_fee,
         "driver_amount": booking.driver_amount,
+        "insurance_fee": booking.insurance_fee or 0,
+        "with_insurance": bool(booking.with_insurance),
         "status": booking.status,
         "contact_unlocked": booking.contact_unlocked,
         "created_at": booking.created_at,
@@ -245,6 +270,8 @@ def product_config() -> ProductConfigOut:
         default_locale=settings.default_locale,
         payment_providers=settings.payment_provider_list,
         booking_pending_ttl_minutes=settings.booking_pending_ttl_minutes,
+        insurance_fee_xof=settings.insurance_fee_xof,
+        insurance_partner_name=settings.insurance_partner_name,
     )
 
 
@@ -471,6 +498,52 @@ def list_cities(db: Session = Depends(get_db)) -> list[City]:
     return db.query(City).filter(City.is_active.is_(True)).order_by(City.name).all()
 
 
+@router.get("/companies", response_model=list[CompanyOut])
+def list_companies(db: Session = Depends(get_db)) -> list[dict]:
+    rows = (
+        db.query(TransportCompany)
+        .filter(TransportCompany.is_active.is_(True))
+        .order_by(TransportCompany.name)
+        .all()
+    )
+    out = []
+    for c in rows:
+        count = db.query(Ride).filter(Ride.company_id == c.id, Ride.is_active.is_(True)).count()
+        out.append(
+            {
+                "id": c.id,
+                "slug": c.slug,
+                "name": c.name,
+                "city_hub": c.city_hub,
+                "phone": c.phone,
+                "description": c.description,
+                "is_verified": c.is_verified,
+                "is_active": c.is_active,
+                "ride_count": count,
+            }
+        )
+    return out
+
+
+@router.get("/companies/{company_id}", response_model=CompanyOut)
+def get_company(company_id: int, db: Session = Depends(get_db)) -> dict:
+    c = db.get(TransportCompany, company_id)
+    if not c or not c.is_active:
+        raise HTTPException(status_code=404, detail="Compagnie introuvable")
+    count = db.query(Ride).filter(Ride.company_id == c.id, Ride.is_active.is_(True)).count()
+    return {
+        "id": c.id,
+        "slug": c.slug,
+        "name": c.name,
+        "city_hub": c.city_hub,
+        "phone": c.phone,
+        "description": c.description,
+        "is_verified": c.is_verified,
+        "is_active": c.is_active,
+        "ride_count": count,
+    }
+
+
 @router.get("/rides", response_model=list[RideOut])
 def search_rides(
     origin: str | None = Query(default=None),
@@ -479,13 +552,14 @@ def search_rides(
     mode: str | None = Query(default=None),
     women_priority: bool | None = Query(default=None),
     region: str | None = Query(default=None),
+    company_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     viewer: User | None = Depends(get_optional_user),
 ) -> list[dict]:
     expire_stale_pending_bookings(db)
     q = (
         db.query(Ride)
-        .options(joinedload(Ride.driver))
+        .options(joinedload(Ride.driver), joinedload(Ride.company))
         .filter(Ride.is_active.is_(True), Ride.seats_available > 0)
         .join(User, Ride.driver_id == User.id)
         .filter(
@@ -503,6 +577,8 @@ def search_rides(
         q = q.filter(Ride.mode == mode)
     if women_priority is True:
         q = q.filter(Ride.women_priority.is_(True))
+    if company_id is not None:
+        q = q.filter(Ride.company_id == company_id)
     rides = q.order_by(Ride.departure_date, Ride.departure_time).all()
     if settings.national_coverage or settings.pilot_mode:
         rides = [r for r in rides if corridor_allowed(r.origin_city, r.destination_city)]
@@ -560,8 +636,19 @@ def publish_ride(
                 "Choisissez des villes desservies dans les 8 régions du Niger."
             ),
         )
+    company_id = payload.company_id
+    if company_id is not None:
+        company = db.get(TransportCompany, company_id)
+        if not company or not company.is_active:
+            raise HTTPException(status_code=400, detail="Compagnie partenaire introuvable")
+        if payload.mode == RideMode.CARPOOL:
+            raise HTTPException(
+                status_code=400,
+                detail="Une compagnie partenaire s'applique aux modes bus / taxi brousse",
+            )
     ride = Ride(
         driver_id=user.id,
+        company_id=company_id,
         origin_city=origin,
         destination_city=destination,
         departure_date=payload.departure_date,
@@ -580,7 +667,7 @@ def publish_ride(
     db.refresh(ride)
     ride = (
         db.query(Ride)
-        .options(joinedload(Ride.driver))
+        .options(joinedload(Ride.driver), joinedload(Ride.company))
         .filter(Ride.id == ride.id)
         .one()
     )
@@ -596,7 +683,12 @@ def book_ride(
 ) -> dict:
     ensure_can_transact(user)
     expire_stale_pending_bookings(db)
-    ride = db.query(Ride).options(joinedload(Ride.driver)).filter(Ride.id == ride_id).first()
+    ride = (
+        db.query(Ride)
+        .options(joinedload(Ride.driver), joinedload(Ride.company))
+        .filter(Ride.id == ride_id)
+        .first()
+    )
     if not ride or not ride.is_active:
         raise HTTPException(status_code=404, detail="Trajet introuvable")
     if ride.driver.verification_status != VerificationStatus.VERIFIED or ride.driver.is_suspended:
@@ -616,8 +708,10 @@ def book_ride(
 
     assert_payment_allowed(ride.mode, payload.payment_provider.value)
 
-    total = payload.seats * ride.price_per_seat
-    platform_fee, driver_amount = compute_fees(total)
+    seats_total = payload.seats * ride.price_per_seat
+    insurance_fee = settings.insurance_fee_xof if payload.with_insurance else 0
+    total = seats_total + insurance_fee
+    platform_fee, driver_amount = compute_fees(seats_total)
     payment_phone = payload.payment_phone or user.phone
     booking = Booking(
         ride_id=ride.id,
@@ -626,6 +720,8 @@ def book_ride(
         total_amount=total,
         platform_fee=platform_fee,
         driver_amount=driver_amount,
+        insurance_fee=insurance_fee,
+        with_insurance=payload.with_insurance,
         status=BookingStatus.PENDING,
         contact_unlocked=False,
     )
@@ -645,6 +741,24 @@ def book_ride(
         external_ref=init.external_ref,
     )
     db.add(payment)
+
+    # SMS confirmation bas débit (simulé) à la création
+    sms_body = (
+        f"ZumunciTravel: reservation #{booking.id} {ride.origin_city}->{ride.destination_city} "
+        f"le {ride.departure_date} {ride.departure_time}. "
+        f"Montant {total} XOF a confirmer"
+        + (" (assurance incluse)." if payload.with_insurance else ".")
+    )
+    db.add(
+        Notification(
+            user_id=user.id,
+            channel="sms",
+            title="Reservation en attente",
+            body=sms_body,
+            booking_id=booking.id,
+        )
+    )
+    user.last_sms_at = datetime.now(timezone.utc)
     db.commit()
 
     booking = (
@@ -653,6 +767,7 @@ def book_ride(
             joinedload(Booking.payment),
             joinedload(Booking.passenger),
             joinedload(Booking.ride).joinedload(Ride.driver),
+            joinedload(Booking.ride).joinedload(Ride.company),
         )
         .filter(Booking.id == booking.id)
         .one()

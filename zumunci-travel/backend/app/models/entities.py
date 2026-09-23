@@ -137,11 +137,30 @@ class City(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
+class TransportCompany(Base):
+    """Compagnies de bus / transporteurs partenaires (Rimbo, Sahel, etc.)."""
+
+    __tablename__ = "transport_companies"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), unique=True)
+    city_hub: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    rides: Mapped[list["Ride"]] = relationship(back_populates="company")
+
+
 class Ride(Base):
     __tablename__ = "rides"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     driver_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    company_id: Mapped[int | None] = mapped_column(ForeignKey("transport_companies.id"), nullable=True, index=True)
     origin_city: Mapped[str] = mapped_column(String(80), index=True)
     destination_city: Mapped[str] = mapped_column(String(80), index=True)
     departure_date: Mapped[date] = mapped_column(Date, index=True)
@@ -158,6 +177,7 @@ class Ride(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     driver: Mapped[User] = relationship(back_populates="rides")
+    company: Mapped[TransportCompany | None] = relationship(back_populates="rides")
     bookings: Mapped[list[Booking]] = relationship(back_populates="ride")
 
 
@@ -171,6 +191,8 @@ class Booking(Base):
     total_amount: Mapped[int] = mapped_column(Integer)
     platform_fee: Mapped[int] = mapped_column(Integer, default=0)
     driver_amount: Mapped[int] = mapped_column(Integer, default=0)
+    insurance_fee: Mapped[int] = mapped_column(Integer, default=0)
+    with_insurance: Mapped[bool] = mapped_column(Boolean, default=False)
     status: Mapped[BookingStatus] = mapped_column(SAEnum(BookingStatus), default=BookingStatus.PENDING)
     contact_unlocked: Mapped[bool] = mapped_column(Boolean, default=False)
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
