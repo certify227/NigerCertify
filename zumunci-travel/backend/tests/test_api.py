@@ -375,3 +375,65 @@ def test_women_priority_requires_accept(client):
         },
     )
     assert ok.status_code == 201
+
+
+def test_complete_and_bidirectional_rating(client):
+    login = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride_id = rides.json()[0]["id"]
+    booking = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=p_headers,
+        json={
+            "seats": 1,
+            "payment_provider": "orange_money",
+            "accept_women_priority_rules": True,
+        },
+    )
+    assert booking.status_code == 201
+    booking_id = booking.json()["id"]
+    client.post(
+        f"/api/payments/{booking.json()['payment']['id']}/confirm",
+        headers=p_headers,
+        json={"success": True},
+    )
+
+    driver = client.post("/api/auth/login", json={"phone": "90000001", "password": "zumunci123"})
+    d_headers = {"Authorization": f"Bearer {driver.json()['access_token']}"}
+    done = client.post(f"/api/bookings/{booking_id}/complete", headers=d_headers, json={})
+    assert done.status_code == 200
+    assert done.json()["status"] == "completed"
+
+    rate_p = client.post(
+        f"/api/bookings/{booking_id}/rate",
+        headers=p_headers,
+        json={"score": 5, "comment": "Excellent conducteur"},
+    )
+    assert rate_p.status_code == 201
+    rate_d = client.post(
+        f"/api/bookings/{booking_id}/rate",
+        headers=d_headers,
+        json={"score": 4, "comment": "Passager ponctuel"},
+    )
+    assert rate_d.status_code == 201
+
+    ride = client.get(f"/api/rides/{ride_id}").json()
+    assert ride["driver"]["rating_count"] >= 1
+    assert ride["driver"]["rating_avg"] is not None
+
+
+def test_admin_moderate_ride(client):
+    admin = client.post("/api/auth/login", json={"phone": "90000099", "password": "zumunci123"})
+    headers = {"Authorization": f"Bearer {admin.json()['access_token']}"}
+    rides = client.get("/api/admin/rides", headers=headers)
+    assert rides.status_code == 200
+    assert len(rides.json()) >= 1
+    ride_id = rides.json()[0]["id"]
+    hidden = client.post(
+        f"/api/admin/rides/{ride_id}/moderate",
+        headers=headers,
+        json={"is_active": False, "notes": "Contenu suspect"},
+    )
+    assert hidden.status_code == 200
+    assert hidden.json()["is_active"] is False

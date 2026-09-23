@@ -12,11 +12,11 @@
 
 **Objectif :** 200–500 utilisateurs actifs, axes Niamey ↔ Dosso / Maradi / Tillabéri.
 
-1. Brancher **Orange Money** (sandbox puis prod)
-2. Vérification téléphone OTP SMS (ex. Twilio, ou API opérateur)
-3. Support WhatsApp deep-link vers le conducteur
-4. Modération manuelle des trajets (admin basique)
-5. Landing marketing en français + haoussa (messages clés)
+1. Brancher **Orange Money** (sandbox puis prod) — mock + flux confirm en place
+2. Vérification téléphone OTP SMS (ex. Twilio, ou API opérateur) — OTP simulé en place
+3. Support WhatsApp deep-link vers le conducteur — fait
+4. Modération manuelle des trajets (admin basique) — fait (`/admin/rides`)
+5. Landing marketing en français + haoussa (messages clés) — fait (toggle FR/HA)
 
 **KPI pilote :** trajets publiés / semaine, taux de réservation, % paiements réussis, NPS.
 

@@ -143,6 +143,8 @@ class DriverBrief(BaseModel):
     verification_status: VerificationStatus
     city: str | None = None
     contact_hidden: bool = True
+    rating_avg: float | None = None
+    rating_count: int = 0
 
 
 class RideOut(BaseModel):
@@ -165,6 +167,15 @@ class RideOut(BaseModel):
     night_departure: bool = False
     is_active: bool
     driver: DriverBrief
+
+
+class RideModerationIn(BaseModel):
+    is_active: bool
+    notes: str | None = Field(default=None, max_length=255)
+
+
+class BookingCompleteIn(BaseModel):
+    note: str | None = Field(default=None, max_length=255)
 
 
 class BookingCreate(BaseModel):

@@ -64,6 +64,8 @@ export type Ride = {
     verification_status: VerificationStatus;
     city: string | null;
     contact_hidden: boolean;
+    rating_avg?: number | null;
+    rating_count?: number;
   };
 };
 
@@ -225,8 +227,23 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ score, comment }),
     }),
+  completeBooking: (bookingId: number, note?: string) =>
+    request<Booking>(`/bookings/${bookingId}/complete`, {
+      method: "POST",
+      body: JSON.stringify({ note }),
+    }),
   deactivateRide: (rideId: number) =>
     request<{ message: string }>(`/rides/${rideId}`, { method: "DELETE" }),
+  adminRides: (activeOnly?: boolean) => {
+    const q =
+      activeOnly === undefined ? "" : `?active_only=${activeOnly ? "true" : "false"}`;
+    return request<Ride[]>(`/admin/rides${q}`);
+  },
+  moderateRide: (rideId: number, is_active: boolean, notes?: string) =>
+    request<Ride>(`/admin/rides/${rideId}/moderate`, {
+      method: "POST",
+      body: JSON.stringify({ is_active, notes }),
+    }),
   report: (body: Record<string, unknown>) =>
     request("/safety/reports", { method: "POST", body: JSON.stringify(body) }),
   providers: () => request<string[]>("/payments/providers"),

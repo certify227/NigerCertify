@@ -201,6 +201,7 @@ function HomePage() {
   const [origin, setOrigin] = useState("Niamey");
   const [destination, setDestination] = useState("Maradi");
   const [date, setDate] = useState("");
+  const [locale, setLocale] = useState<"fr" | "ha">("fr");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -217,19 +218,49 @@ function HomePage() {
     navigate(`/search?${params}`);
   };
 
+  const copy =
+    locale === "ha"
+      ? {
+          eyebrow: "Sufuri lafiya · Nijar",
+          brand: "ZumunciTravel",
+          line: "Yi tafiya ba da zamba ba, ba da mugun hali ba.",
+          lead: "An tabbatar da asali kafin haduwa. Lambar waya tana budewa bayan biyan Mobile Money kawai.",
+          search: "Nemo",
+        }
+      : {
+          eyebrow: "Transport sécurisé · Niger",
+          brand: "ZumunciTravel",
+          line: "Voyagez sans arnaque ni relation déplacée.",
+          lead: "Identité vérifiée avant mise en relation. Contact débloqué uniquement après paiement Mobile Money.",
+          search: "Rechercher",
+        };
+
   return (
     <section className="hero">
       <div className="hero-panel">
         <div className="hero-copy">
-          <p className="eyebrow">Transport sécurisé · Niger</p>
+          <div className="locale-switch">
+            <button
+              type="button"
+              className={locale === "fr" ? "is-active" : undefined}
+              onClick={() => setLocale("fr")}
+            >
+              FR
+            </button>
+            <button
+              type="button"
+              className={locale === "ha" ? "is-active" : undefined}
+              onClick={() => setLocale("ha")}
+            >
+              HA
+            </button>
+          </div>
+          <p className="eyebrow">{copy.eyebrow}</p>
           <h1>
-            <span className="brand-inline">ZumunciTravel</span>
-            <span className="hero-line">Voyagez sans arnaque ni relation déplacée.</span>
+            <span className="brand-inline">{copy.brand}</span>
+            <span className="hero-line">{copy.line}</span>
           </h1>
-          <p className="hero-lead">
-            Identité vérifiée avant mise en relation. Contact débloqué uniquement après paiement
-            Mobile Money.
-          </p>
+          <p className="hero-lead">{copy.lead}</p>
         </div>
         <form className="search-card" onSubmit={onSubmit}>
           <label>
@@ -259,7 +290,7 @@ function HomePage() {
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
           <button className="btn btn-primary" type="submit">
-            Rechercher
+            {copy.search}
           </button>
         </form>
       </div>
@@ -307,6 +338,9 @@ function RideCard({ ride }: { ride: Ride }) {
       <p className="muted">
         {ride.driver.full_name}
         {ride.driver.is_verified ? " · ✓ vérifié" : ""}
+        {ride.driver.rating_avg
+          ? ` · ★ ${ride.driver.rating_avg} (${ride.driver.rating_count || 0})`
+          : ""}
         {" · "}
         {ride.driver.contact_hidden ? "contact masqué" : ride.driver.phone}
         {ride.women_priority ? " · priorité femmes" : ""}
@@ -1093,6 +1127,16 @@ function AccountPage({
     }
   };
 
+  const complete = async (booking: Booking) => {
+    try {
+      await api.completeBooking(booking.id, "Trajet terminé");
+      setReportMsg("Réservation marquée comme terminée.");
+      await reload();
+    } catch (e) {
+      setReportMsg((e as Error).message);
+    }
+  };
+
   const unpublish = async (ride: Ride) => {
     try {
       await api.deactivateRide(ride.id);
@@ -1185,6 +1229,16 @@ function AccountPage({
                 </button>
               )}
               {b.status === "paid" && (
+                <>
+                  <button type="button" className="btn btn-small" onClick={() => void complete(b)}>
+                    Terminer
+                  </button>
+                  <button type="button" className="btn btn-small" onClick={() => void rate(b)}>
+                    Noter 5★
+                  </button>
+                </>
+              )}
+              {b.status === "completed" && (
                 <button type="button" className="btn btn-small" onClick={() => void rate(b)}>
                   Noter 5★
                 </button>
@@ -1220,6 +1274,18 @@ function AccountPage({
               Passager : {b.passenger_name || "—"}
               {b.passenger_phone ? ` · ${b.passenger_phone}` : " · contact masqué"}
             </p>
+            <div className="row-actions">
+              {b.status === "paid" && (
+                <button type="button" className="btn btn-small" onClick={() => void complete(b)}>
+                  Marquer terminé
+                </button>
+              )}
+              {(b.status === "paid" || b.status === "completed") && (
+                <button type="button" className="btn btn-small" onClick={() => void rate(b)}>
+                  Noter le passager
+                </button>
+              )}
+            </div>
           </article>
         ))}
       </div>
@@ -1261,11 +1327,13 @@ function AccountPage({
 function AdminPage({ user }: { user: User | null }) {
   const [pending, setPending] = useState<User[]>([]);
   const [reports, setReports] = useState<import("./api").SafetyReport[]>([]);
+  const [rides, setRides] = useState<Ride[]>([]);
   const [msg, setMsg] = useState("");
 
   const load = async () => {
     setPending(await api.pendingVerifications());
     setReports(await api.adminReports());
+    setRides(await api.adminRides());
   };
 
   useEffect(() => {
@@ -1278,6 +1346,12 @@ function AdminPage({ user }: { user: User | null }) {
   const review = async (id: number, approve: boolean) => {
     await api.reviewVerification(id, approve, approve ? "Validé" : "Rejeté");
     setMsg(approve ? "Identité validée (OTP téléphone reste requis)" : "Dossier rejeté");
+    await load();
+  };
+
+  const moderate = async (rideId: number, isActive: boolean) => {
+    await api.moderateRide(rideId, isActive, isActive ? "Réactivé" : "Masqué par modération");
+    setMsg(isActive ? "Trajet réactivé" : "Trajet masqué");
     await load();
   };
 
@@ -1318,6 +1392,45 @@ function AdminPage({ user }: { user: User | null }) {
               >
                 Rejeter
               </button>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <h2>Modération des trajets</h2>
+      <div className="ride-list">
+        {rides.length === 0 && <div className="empty">Aucun trajet.</div>}
+        {rides.map((ride) => (
+          <article key={ride.id} className="ride-card static">
+            <div className="ride-top">
+              <span className="badge">{ride.is_active ? "actif" : "masqué"}</span>
+              <strong>{MODE_LABELS[ride.mode]}</strong>
+            </div>
+            <h3>
+              {ride.origin_city} → {ride.destination_city}
+            </h3>
+            <p className="muted">
+              {ride.departure_date} · {ride.driver.full_name}
+              {ride.driver.rating_avg ? ` · ★ ${ride.driver.rating_avg}` : ""}
+            </p>
+            <div className="row-actions">
+              {ride.is_active ? (
+                <button
+                  type="button"
+                  className="btn btn-small danger"
+                  onClick={() => void moderate(ride.id, false)}
+                >
+                  Masquer
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-small"
+                  onClick={() => void moderate(ride.id, true)}
+                >
+                  Réactiver
+                </button>
+              )}
             </div>
           </article>
         ))}

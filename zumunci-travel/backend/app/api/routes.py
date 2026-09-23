@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
 from app import __version__
@@ -31,6 +31,7 @@ from app.schemas.schemas import (
     AdminUserOut,
     BookingCreate,
     BookingOut,
+    BookingCompleteIn,
     CancelBookingIn,
     CityOut,
     ContactRevealOut,
@@ -46,6 +47,7 @@ from app.schemas.schemas import (
     RatingOut,
     ReportStatusUpdate,
     RideCreate,
+    RideModerationIn,
     RideOut,
     SafetyCharterOut,
     SafetyReportCreate,
@@ -76,7 +78,22 @@ router = APIRouter()
 settings = get_settings()
 
 
-def _driver_brief(driver: User, *, reveal_phone: bool) -> dict:
+def _driver_rating_stats(db: Session, driver_id: int) -> tuple[float | None, int]:
+    row = (
+        db.query(func.avg(Rating.score), func.count(Rating.id))
+        .filter(Rating.reviewee_id == driver_id)
+        .one()
+    )
+    avg, count = row[0], int(row[1] or 0)
+    if not count:
+        return None, 0
+    return round(float(avg), 1), count
+
+
+def _driver_brief(driver: User, *, reveal_phone: bool, db: Session | None = None) -> dict:
+    rating_avg, rating_count = (None, 0)
+    if db is not None:
+        rating_avg, rating_count = _driver_rating_stats(db, driver.id)
     return {
         "id": driver.id,
         "full_name": driver.full_name,
@@ -85,10 +102,12 @@ def _driver_brief(driver: User, *, reveal_phone: bool) -> dict:
         "verification_status": driver.verification_status,
         "city": driver.city,
         "contact_hidden": not reveal_phone,
+        "rating_avg": rating_avg,
+        "rating_count": rating_count,
     }
 
 
-def serialize_ride(ride: Ride, *, reveal_phone: bool = False) -> dict:
+def serialize_ride(ride: Ride, *, reveal_phone: bool = False, db: Session | None = None) -> dict:
     return {
         "id": ride.id,
         "origin_city": ride.origin_city,
@@ -106,11 +125,11 @@ def serialize_ride(ride: Ride, *, reveal_phone: bool = False) -> dict:
         "women_priority": ride.women_priority,
         "night_departure": is_night_departure(ride.departure_time),
         "is_active": ride.is_active,
-        "driver": _driver_brief(ride.driver, reveal_phone=reveal_phone),
+        "driver": _driver_brief(ride.driver, reveal_phone=reveal_phone, db=db),
     }
 
 
-def serialize_booking(booking: Booking, viewer: User) -> dict:
+def serialize_booking(booking: Booking, viewer: User, db: Session | None = None) -> dict:
     ride = booking.ride
     reveal = contact_may_be_revealed(booking.status, booking.contact_unlocked)
     is_party = viewer.id in {booking.passenger_id, ride.driver_id}
@@ -129,7 +148,7 @@ def serialize_booking(booking: Booking, viewer: User) -> dict:
         "status": booking.status,
         "contact_unlocked": booking.contact_unlocked,
         "created_at": booking.created_at,
-        "ride": serialize_ride(ride, reveal_phone=show_contact),
+        "ride": serialize_ride(ride, reveal_phone=show_contact, db=db),
         "payment": booking.payment,
         "driver_phone": ride.driver.phone if show_contact else None,
         "passenger_phone": booking.passenger.phone if show_contact and booking.passenger else None,
@@ -461,7 +480,8 @@ def search_rides(
             if r.origin_city.casefold() in city_cf or r.destination_city.casefold() in city_cf
         ]
     return [
-        serialize_ride(ride, reveal_phone=user_can_see_driver_phone(db, viewer, ride)) for ride in rides
+        serialize_ride(ride, reveal_phone=user_can_see_driver_phone(db, viewer, ride), db=db)
+        for ride in rides
     ]
 
 
@@ -479,7 +499,7 @@ def get_ride(
     )
     if not ride:
         raise HTTPException(status_code=404, detail="Trajet introuvable")
-    return serialize_ride(ride, reveal_phone=user_can_see_driver_phone(db, viewer, ride))
+    return serialize_ride(ride, reveal_phone=user_can_see_driver_phone(db, viewer, ride), db=db)
 
 
 @router.post("/rides", response_model=RideOut, status_code=status.HTTP_201_CREATED)
@@ -525,7 +545,7 @@ def publish_ride(
         .filter(Ride.id == ride.id)
         .one()
     )
-    return serialize_ride(ride, reveal_phone=True)
+    return serialize_ride(ride, reveal_phone=True, db=db)
 
 
 @router.post("/rides/{ride_id}/book", response_model=BookingOut, status_code=status.HTTP_201_CREATED)
@@ -598,7 +618,7 @@ def book_ride(
         .filter(Booking.id == booking.id)
         .one()
     )
-    return serialize_booking(booking, user)
+    return serialize_booking(booking, user, db=db)
 
 
 @router.get("/me/bookings", response_model=list[BookingOut])
@@ -614,7 +634,7 @@ def my_bookings(user: User = Depends(get_current_user), db: Session = Depends(ge
         .order_by(Booking.created_at.desc())
         .all()
     )
-    return [serialize_booking(b, user) for b in rows]
+    return [serialize_booking(b, user, db=db) for b in rows]
 
 
 @router.get("/me/rides", response_model=list[RideOut])
@@ -626,7 +646,7 @@ def my_rides(user: User = Depends(get_current_user), db: Session = Depends(get_d
         .order_by(Ride.departure_date.desc())
         .all()
     )
-    return [serialize_ride(r, reveal_phone=True) for r in rides]
+    return [serialize_ride(r, reveal_phone=True, db=db) for r in rides]
 
 
 @router.get("/me/incoming-bookings", response_model=list[BookingOut])
@@ -648,7 +668,7 @@ def my_incoming_bookings(
         .order_by(Booking.created_at.desc())
         .all()
     )
-    return [serialize_booking(b, user) for b in rows]
+    return [serialize_booking(b, user, db=db) for b in rows]
 
 
 @router.post("/payments/{payment_id}/confirm", response_model=PaymentOut)
@@ -804,7 +824,7 @@ def cancel_booking(
         .filter(Booking.id == booking_id)
         .one()
     )
-    return serialize_booking(booking, user)
+    return serialize_booking(booking, user, db=db)
 
 
 @router.get("/bookings/{booking_id}/share", response_model=TripShareOut)
@@ -909,6 +929,49 @@ def review_report(
     return report
 
 
+@router.post("/bookings/{booking_id}/complete", response_model=BookingOut)
+def complete_booking(
+    booking_id: int,
+    payload: BookingCompleteIn,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.payment),
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+        )
+        .filter(Booking.id == booking_id)
+        .first()
+    )
+    if not booking:
+        raise HTTPException(status_code=404, detail="Réservation introuvable")
+    ride = booking.ride
+    if user.id not in {booking.passenger_id, ride.driver_id}:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    if booking.status == BookingStatus.COMPLETED:
+        return serialize_booking(booking, user, db=db)
+    if booking.status != BookingStatus.PAID:
+        raise HTTPException(status_code=400, detail="Seules les réservations payées peuvent être clôturées")
+    booking.status = BookingStatus.COMPLETED
+    _ = payload.note  # reserved for future audit trail
+    db.commit()
+    db.refresh(booking)
+    booking = (
+        db.query(Booking)
+        .options(
+            joinedload(Booking.payment),
+            joinedload(Booking.passenger),
+            joinedload(Booking.ride).joinedload(Ride.driver),
+        )
+        .filter(Booking.id == booking_id)
+        .one()
+    )
+    return serialize_booking(booking, user, db=db)
+
+
 @router.post("/bookings/{booking_id}/rate", response_model=RatingOut, status_code=status.HTTP_201_CREATED)
 def rate_booking(
     booking_id: int,
@@ -916,16 +979,21 @@ def rate_booking(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> Rating:
-    booking = db.query(Booking).filter(Booking.id == booking_id).first()
+    booking = (
+        db.query(Booking)
+        .options(joinedload(Booking.ride))
+        .filter(Booking.id == booking_id)
+        .first()
+    )
     if not booking:
         raise HTTPException(status_code=404, detail="Réservation introuvable")
-    if booking.passenger_id != user.id:
-        raise HTTPException(status_code=403, detail="Seul le passager peut noter pour l'instant")
+    ride = booking.ride
+    if user.id not in {booking.passenger_id, ride.driver_id}:
+        raise HTTPException(status_code=403, detail="Seul le passager ou le conducteur peut noter")
     if booking.status not in {BookingStatus.PAID, BookingStatus.COMPLETED}:
         raise HTTPException(status_code=400, detail="La réservation doit être payée")
 
-    ride = db.get(Ride, booking.ride_id)
-    assert ride is not None
+    reviewee_id = ride.driver_id if user.id == booking.passenger_id else booking.passenger_id
     existing = (
         db.query(Rating)
         .filter(Rating.booking_id == booking_id, Rating.reviewer_id == user.id)
@@ -937,15 +1005,55 @@ def rate_booking(
     rating = Rating(
         booking_id=booking.id,
         reviewer_id=user.id,
-        reviewee_id=ride.driver_id,
+        reviewee_id=reviewee_id,
         score=payload.score,
         comment=payload.comment,
     )
-    booking.status = BookingStatus.COMPLETED
+    if booking.status == BookingStatus.PAID:
+        booking.status = BookingStatus.COMPLETED
     db.add(rating)
     db.commit()
     db.refresh(rating)
     return rating
+
+
+@router.get("/admin/rides", response_model=list[RideOut])
+def admin_list_rides(
+    active_only: bool | None = Query(default=None),
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+    q = db.query(Ride).options(joinedload(Ride.driver))
+    if active_only is True:
+        q = q.filter(Ride.is_active.is_(True))
+    elif active_only is False:
+        q = q.filter(Ride.is_active.is_(False))
+    rides = q.order_by(Ride.departure_date.desc(), Ride.id.desc()).limit(100).all()
+    return [serialize_ride(r, reveal_phone=True, db=db) for r in rides]
+
+
+@router.post("/admin/rides/{ride_id}/moderate", response_model=RideOut)
+def admin_moderate_ride(
+    ride_id: int,
+    payload: RideModerationIn,
+    admin: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+    ride = db.query(Ride).options(joinedload(Ride.driver)).filter(Ride.id == ride_id).first()
+    if not ride:
+        raise HTTPException(status_code=404, detail="Trajet introuvable")
+    ride.is_active = payload.is_active
+    if payload.notes:
+        note = payload.notes.strip()
+        ride.notes = f"[Modération] {note}" if not ride.notes else f"{ride.notes}\n[Modération] {note}"
+    db.commit()
+    db.refresh(ride)
+    ride = db.query(Ride).options(joinedload(Ride.driver)).filter(Ride.id == ride_id).one()
+    return serialize_ride(ride, reveal_phone=True, db=db)
 
 
 @router.get("/payments/providers", response_model=list[str])

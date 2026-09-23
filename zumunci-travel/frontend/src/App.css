@@ -250,6 +250,31 @@
   margin-bottom: 1.1rem;
 }
 
+.locale-switch {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-bottom: 0.65rem;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.2rem;
+  border-radius: 0.55rem;
+}
+
+.locale-switch button {
+  border: 0;
+  background: transparent;
+  color: #dff4f2;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  font-family: var(--font-display);
+}
+
+.locale-switch button.is-active {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--brand-deep);
+}
+
 .hero-copy h1 {
   margin: 0.35rem 0 0.7rem;
   font-family: var(--font-display);
