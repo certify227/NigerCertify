@@ -253,6 +253,14 @@ class PaymentConfirm(BaseModel):
     external_ref: str | None = None
 
 
+class PaymentWebhookIn(BaseModel):
+    """Callback sandbox agrégateur Mobile Money (ZumunciPay)."""
+
+    external_ref: str = Field(min_length=6, max_length=80)
+    status: str = Field(default="success", pattern="^(success|failed)$")
+    provider_ref: str | None = Field(default=None, max_length=80)
+
+
 class RatingCreate(BaseModel):
     score: int = Field(ge=1, le=5)
     comment: str | None = Field(default=None, max_length=500)
@@ -400,6 +408,7 @@ class ProductConfigOut(BaseModel):
     uemoa_corridors_enabled: bool = True
     payment_aggregator: str = "ZumunciPay Sandbox"
     sms_provider_name: str = "ZumunciSMS Sandbox"
+    payment_webhook_enabled: bool = True
 
 
 class FieldAgentOut(BaseModel):
@@ -483,6 +492,18 @@ class DriverEarningsOut(BaseModel):
     bookings_completed: int
     gross_driver_amount: int
     seats_sold: int
+    currency: str = "XOF"
+
+
+class CompanyOverviewOut(BaseModel):
+    company_id: int
+    company_name: str
+    rides_active: int
+    rides_total: int
+    bookings_pending: int
+    bookings_paid: int
+    seats_sold: int
+    gmv_xof: int
     currency: str = "XOF"
 
 

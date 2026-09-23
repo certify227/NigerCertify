@@ -80,11 +80,12 @@ class Settings(BaseSettings):
     ussd_service_code: str = "*789#"
     # Expansion UEMOA — corridors live (XOF)
     uemoa_live_cities: str = "Ouagadougou,Bamako"
-    uemoa_coming_soon: str = "Dakar,Bobodioulasso"
+    uemoa_coming_soon: str = "Dakar,Bobodioulasso,Cotonou,Lomé"
     uemoa_corridors_enabled: bool = True
     # Sandbox paiements / SMS
     payment_aggregator: str = "ZumunciPay Sandbox"
     sms_provider_name: str = "ZumunciSMS Sandbox"
+    payment_webhook_secret: str = "zumunci-webhook-sandbox"
     otp_demo_code: str = "123456"
 
     @property

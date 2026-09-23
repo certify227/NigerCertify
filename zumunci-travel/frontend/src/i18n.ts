@@ -1,4 +1,4 @@
-/** Libellés UI FR / HA / ZAR (zarma) — périmètre élargi v1.2 */
+/** Libellés UI FR / HA / ZAR (zarma) — périmètre élargi v1.3 */
 
 export type AppLocale = "fr" | "ha" | "dje";
 
@@ -26,8 +26,21 @@ const FR: Dict = {
   account_alerts: "Alertes trajets",
   account_earnings: "Gains conducteur",
   account_bookings: "Mes réservations",
+  account_company: "Tableau compagnie",
   uemoa_live: "Corridors UEMOA live",
+  uemoa_soon: "Bientôt UEMOA",
   sandbox_pay: "Paiement sandbox",
+  usp_kyc_title: "Vérification KYC",
+  usp_kyc_body: "CNI / passeport / permis validés avant publication ou réservation.",
+  usp_contact_title: "Contact protégé",
+  usp_contact_body: "Numéro masqué jusqu’au paiement Mobile Money confirmé.",
+  usp_scam_title: "Anti-arnaque",
+  usp_scam_body: "Paiement sur plateforme + signalement immédiat des abus.",
+  coverage_national: "Couverture nationale",
+  pay_confirm: "Confirmer le paiement (démo)",
+  pay_webhook: "Simuler webhook agrégateur",
+  pay_fail: "Échec / annuler",
+  pay_pending: "Paiement en attente",
 };
 
 const HA: Dict = {
@@ -52,8 +65,21 @@ const HA: Dict = {
   account_alerts: "Faɗakarwa",
   account_earnings: "Riba",
   account_bookings: "Ajiye na",
+  account_company: "Allon kamfani",
   uemoa_live: "Hanyoyin UEMOA",
+  uemoa_soon: "UEMOA nan gaba",
   sandbox_pay: "Biya gwaji",
+  usp_kyc_title: "Tabbatar da shafi",
+  usp_kyc_body: "CNI / fasfo / lasisi kafin wallafa ko ajiye.",
+  usp_contact_title: "Lamba a ɓoye",
+  usp_contact_body: "Ba a nuna lamba ba sai bayan biyan Mobile Money.",
+  usp_scam_title: "Hana zamba",
+  usp_scam_body: "Biya a cikin app + rahoto nan take.",
+  coverage_national: "Ƙasa gaba ɗaya",
+  pay_confirm: "Tabbatar da biya (gwaji)",
+  pay_webhook: "Gwaji webhook",
+  pay_fail: "Kasa / soke",
+  pay_pending: "Ana jiran biya",
 };
 
 const DJE: Dict = {
@@ -78,8 +104,21 @@ const DJE: Dict = {
   account_alerts: "Bangayan",
   account_earnings: "Alfaa",
   account_bookings: "Nyaŋey",
+  account_company: "Kampani tablo",
   uemoa_live: "Fondiyan UEMOA",
+  uemoa_soon: "UEMOA manantire",
   sandbox_pay: "Bannda gwaji",
+  usp_kyc_title: "Tabatandi KYC",
+  usp_kyc_body: "CNI / paspor / permis jina wallafi wala nyaŋandi.",
+  usp_contact_title: "Caw buusu",
+  usp_contact_body: "Caw ga buusu hala Mobile Money koyandi.",
+  usp_scam_title: "Zamba si",
+  usp_scam_body: "Bannda app ra + bangayandi zaari.",
+  coverage_national: "Laabu kulu",
+  pay_confirm: "Bannda tabatandi (gwaji)",
+  pay_webhook: "Webhook gwaji",
+  pay_fail: "Hasara / kayandi",
+  pay_pending: "Bannda ga batu",
 };
 
 const TABLES: Record<AppLocale, Dict> = { fr: FR, ha: HA, dje: DJE };

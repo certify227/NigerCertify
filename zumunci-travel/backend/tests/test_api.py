@@ -793,3 +793,60 @@ def test_otp_sms_sandbox_and_payment_sandbox_fields(client):
     )
     assert log.status_code == 200
     assert isinstance(log.json(), list)
+
+
+def test_payment_webhook_sandbox_and_company_overview(client):
+    from app.core.config import get_settings
+
+    secret = get_settings().payment_webhook_secret
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {passenger.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Ouagadougou"})
+    assert rides.status_code == 200 and rides.json()
+    book = client.post(
+        f"/api/rides/{rides.json()[0]['id']}/book",
+        headers=p_headers,
+        json={"seats": 1, "payment_provider": "airtel_money"},
+    )
+    assert book.status_code == 201
+    ref = book.json()["payment"]["external_ref"]
+    assert ref
+
+    bad = client.post(
+        "/api/payments/webhook/sandbox",
+        json={"external_ref": ref, "status": "success"},
+        headers={"X-Zumunci-Webhook-Secret": "wrong"},
+    )
+    assert bad.status_code == 401
+
+    ok = client.post(
+        "/api/payments/webhook/sandbox",
+        json={"external_ref": ref, "status": "success"},
+        headers={"X-Zumunci-Webhook-Secret": secret},
+    )
+    assert ok.status_code == 200
+    assert ok.json()["status"] == "success"
+
+    # Idempotent
+    again = client.post(
+        "/api/payments/webhook/sandbox",
+        json={"external_ref": ref, "status": "success"},
+        headers={"X-Zumunci-Webhook-Secret": secret},
+    )
+    assert again.status_code == 200
+
+    company = client.post("/api/auth/login", json={"phone": "90000050", "password": "zumunci123"})
+    c_headers = {"Authorization": f"Bearer {company.json()['access_token']}"}
+    overview = client.get("/api/me/company/overview", headers=c_headers)
+    assert overview.status_code == 200
+    body = overview.json()
+    assert body["company_name"] == "Rimbo Transport"
+    assert body["rides_total"] >= 1
+    assert body["bookings_paid"] >= 1
+
+    cfg = client.get("/api/product/config").json()
+    assert "Cotonou" in cfg["uemoa_coming_soon"] or "Lomé" in cfg["uemoa_coming_soon"]
+    assert cfg.get("payment_webhook_enabled") is True
+
+    passenger_ov = client.get("/api/me/company/overview", headers=p_headers)
+    assert passenger_ov.status_code == 403
