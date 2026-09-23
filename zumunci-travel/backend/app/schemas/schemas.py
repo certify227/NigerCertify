@@ -77,6 +77,8 @@ class AdminUserOut(UserOut):
     id_document_number: str | None = None
     id_full_name: str | None = None
     verification_notes: str | None = None
+    has_document_image: bool = False
+    id_document_image: str | None = None
 
 
 class OtpSendOut(BaseModel):
@@ -242,6 +244,48 @@ class VerificationSubmit(BaseModel):
     id_document_number: str = Field(min_length=4, max_length=64)
     id_full_name: str = Field(min_length=2, max_length=120)
     accept_safety_charter: bool = True
+    id_document_image: str | None = Field(default=None, max_length=500_000)
+
+
+class PublicRatingOut(BaseModel):
+    score: int
+    comment: str | None = None
+    created_at: datetime
+
+
+class PublicProfileOut(BaseModel):
+    id: int
+    full_name: str
+    city: str | None = None
+    is_verified: bool
+    role: UserRole
+    bio: str | None = None
+    rating_avg: float | None = None
+    rating_count: int = 0
+    ratings: list[PublicRatingOut] = []
+
+
+class NotificationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    channel: str
+    title: str
+    body: str
+    booking_id: int | None = None
+    created_at: datetime
+
+
+class PaymentConfirmResult(BaseModel):
+    id: int
+    provider: PaymentProvider
+    phone: str
+    amount: int
+    currency: str
+    status: PaymentStatus
+    external_ref: str | None
+    created_at: datetime
+    sms_preview: str | None = None
 
 
 class VerificationReview(BaseModel):

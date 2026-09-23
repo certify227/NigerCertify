@@ -508,7 +508,7 @@ function RideDetailPage({ user }: { user: User | null }) {
     if (!pendingBooking?.payment) return;
     setError("");
     try {
-      await api.confirmPayment(pendingBooking.payment.id, success);
+      const pay = await api.confirmPayment(pendingBooking.payment.id, success);
       if (!success) {
         setPendingBooking(null);
         setMessage("Paiement annulé. Les places ont été libérées.");
@@ -518,7 +518,8 @@ function RideDetailPage({ user }: { user: User | null }) {
       const contact = await api.revealContact(pendingBooking.id);
       setWhatsappUrl(contact.driver_whatsapp_url);
       setMessage(
-        `Paiement confirmé. Contact : ${contact.driver_phone}. ${contact.warning}`,
+        `Paiement confirmé. Contact : ${contact.driver_phone}. ${contact.warning}` +
+          (pay.sms_preview ? ` SMS: ${pay.sms_preview}` : ""),
       );
       setPendingBooking(null);
       if (ride) setRide(await api.ride(ride.id));
@@ -545,8 +546,10 @@ function RideDetailPage({ user }: { user: User | null }) {
           <strong>Places :</strong> {ride.seats_available}/{ride.seats_total}
         </li>
         <li>
-          <strong>Convoyeur :</strong> {ride.driver.full_name}{" "}
+          <strong>Convoyeur :</strong>{" "}
+          <Link to={`/drivers/${ride.driver.id}`}>{ride.driver.full_name}</Link>{" "}
           {ride.driver.is_verified ? "(✓ vérifié)" : ""}
+          {ride.driver.rating_avg ? ` · ★ ${ride.driver.rating_avg}` : ""}
         </li>
         <li>
           <strong>Téléphone :</strong>{" "}
@@ -749,6 +752,7 @@ function VerifyPage({ user, onRefresh }: { user: User | null; onRefresh: () => P
   const [docType, setDocType] = useState("national_id");
   const [docNumber, setDocNumber] = useState("");
   const [idName, setIdName] = useState(user?.full_name || "");
+  const [docImage, setDocImage] = useState<string | null>(null);
   const [accept, setAccept] = useState(true);
   const [otpCode, setOtpCode] = useState("");
   const [demoOtp, setDemoOtp] = useState<string | null>(null);
@@ -790,6 +794,7 @@ function VerifyPage({ user, onRefresh }: { user: User | null; onRefresh: () => P
         id_document_number: docNumber,
         id_full_name: idName,
         accept_safety_charter: accept,
+        id_document_image: docImage,
       });
       setOk("Dossier envoyé. Un agent ZumunciTravel validera votre identité avant mise en relation.");
       await onRefresh();
@@ -848,6 +853,28 @@ function VerifyPage({ user, onRefresh }: { user: User | null; onRefresh: () => P
             Nom sur la pièce
             <input value={idName} onChange={(e) => setIdName(e.target.value)} required />
           </label>
+          <label>
+            Photo de la pièce (optionnel)
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) {
+                  setDocImage(null);
+                  return;
+                }
+                if (file.size > 220_000) {
+                  setError("Image trop lourde (max ~200 Ko pour la démo).");
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => setDocImage(String(reader.result || ""));
+                reader.readAsDataURL(file);
+              }}
+            />
+          </label>
+          {docImage && <p className="muted">Photo prête à l’envoi.</p>}
           <label className="check">
             <input type="checkbox" checked={accept} onChange={(e) => setAccept(e.target.checked)} />
             J’accepte la charte : transport uniquement, pas de relations déplacées, pas de paiement
@@ -1054,6 +1081,9 @@ function AccountPage({
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [incoming, setIncoming] = useState<Booking[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
+  const [notes, setNotes] = useState<
+    { id: number; title: string; body: string; channel: string; created_at: string }[]
+  >([]);
   const [reportMsg, setReportMsg] = useState("");
   const [reportReason, setReportReason] = useState("inappropriate_behavior");
   const [emName, setEmName] = useState(user?.emergency_contact_name || "");
@@ -1066,6 +1096,11 @@ function AccountPage({
       setIncoming(await api.myIncomingBookings());
     } catch {
       setIncoming([]);
+    }
+    try {
+      setNotes(await api.notifications());
+    } catch {
+      setNotes([]);
     }
   };
 
@@ -1171,6 +1206,17 @@ function AccountPage({
           Complétez <Link to="/verify">OTP + identité</Link> pour réserver ou publier.
         </div>
       )}
+
+      <h3>Notifications SMS (simulées)</h3>
+      <div className="ride-list">
+        {notes.length === 0 && <div className="empty">Aucune notification pour l’instant.</div>}
+        {notes.slice(0, 5).map((n) => (
+          <article key={n.id} className="ride-card static">
+            <strong>{n.title}</strong>
+            <p className="muted">{n.body}</p>
+          </article>
+        ))}
+      </div>
 
       <form className="form narrow" onSubmit={(e) => void saveEmergency(e)}>
         <h3>Contact d’urgence</h3>
@@ -1380,7 +1426,17 @@ function AdminPage({ user }: { user: User | null }) {
               <li>
                 <strong>OTP :</strong> {u.phone_verified ? "vérifié" : "non vérifié"}
               </li>
+              <li>
+                <strong>Photo pièce :</strong> {u.has_document_image ? "fournie" : "absente"}
+              </li>
             </ul>
+            {u.id_document_image && (
+              <img
+                src={u.id_document_image}
+                alt="Pièce d'identité"
+                style={{ maxWidth: "100%", borderRadius: "0.75rem", marginTop: "0.5rem" }}
+              />
+            )}
             <div className="row-actions">
               <button type="button" className="btn btn-small" onClick={() => void review(u.id, true)}>
                 Approuver
@@ -1483,6 +1539,45 @@ function AdminPage({ user }: { user: User | null }) {
   );
 }
 
+function DriverProfilePage() {
+  const { id } = useParams();
+  const [profile, setProfile] = useState<Awaited<ReturnType<typeof api.publicProfile>> | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!id) return;
+    void api
+      .publicProfile(Number(id))
+      .then(setProfile)
+      .catch((e: Error) => setError(e.message));
+  }, [id]);
+
+  if (error) return <p className="error">{error}</p>;
+  if (!profile) return <p>Chargement…</p>;
+
+  return (
+    <section className="stack">
+      <h2>{profile.full_name}</h2>
+      <p className="muted">
+        {profile.city || "Niger"} · {profile.is_verified ? "✓ vérifié" : "non vérifié"}
+        {profile.rating_avg ? ` · ★ ${profile.rating_avg} (${profile.rating_count})` : " · pas encore d’avis"}
+      </p>
+      {profile.bio && <p>{profile.bio}</p>}
+      <h3>Derniers avis</h3>
+      <div className="ride-list">
+        {profile.ratings.length === 0 && <div className="empty">Aucun avis pour l’instant.</div>}
+        {profile.ratings.map((r, idx) => (
+          <article key={`${r.created_at}-${idx}`} className="ride-card static">
+            <strong>★ {r.score}/5</strong>
+            <p className="muted">{r.comment || "Sans commentaire"}</p>
+          </article>
+        ))}
+      </div>
+      <Link to="/">Retour à la recherche</Link>
+    </section>
+  );
+}
+
 export default function App() {
   const auth = useAuth();
   const ready = useMemo(() => !auth.loading, [auth.loading]);
@@ -1497,6 +1592,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/rides/:id" element={<RideDetailPage user={auth.user} />} />
+        <Route path="/drivers/:id" element={<DriverProfilePage />} />
         <Route path="/publish" element={<PublishPage user={auth.user} />} />
         <Route
           path="/me"

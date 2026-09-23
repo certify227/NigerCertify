@@ -16,9 +16,11 @@ from app.models.entities import (
     Booking,
     BookingStatus,
     City,
+    Notification,
     Payment,
     PaymentStatus,
     Rating,
+    ReportReason,
     ReportStatus,
     Ride,
     SafetyReport,
@@ -40,9 +42,13 @@ from app.schemas.schemas import (
     MessageOut,
     OtpSendOut,
     OtpVerifyIn,
+    NotificationOut,
     PaymentConfirm,
+    PaymentConfirmResult,
     PaymentOut,
     ProductConfigOut,
+    PublicProfileOut,
+    PublicRatingOut,
     RatingCreate,
     RatingOut,
     ReportStatusUpdate,
@@ -375,6 +381,13 @@ def submit_verification(
     user.id_document_type = payload.id_document_type
     user.id_document_number = payload.id_document_number.strip().upper()
     user.id_full_name = payload.id_full_name.strip()
+    if payload.id_document_image:
+        img = payload.id_document_image.strip()
+        if len(img) > settings.kyc_image_max_chars:
+            raise HTTPException(status_code=400, detail="Image KYC trop lourde — compressez la photo")
+        if not (img.startswith("data:image/") or img.startswith("http")):
+            raise HTTPException(status_code=400, detail="Image KYC invalide (data-URL ou URL attendue)")
+        user.id_document_image = img
     user.verification_status = VerificationStatus.PENDING
     user.verification_notes = "Dossier soumis — en attente de validation ZumunciTravel"
     user.is_verified = False
@@ -383,19 +396,45 @@ def submit_verification(
     return user
 
 
+def _admin_user_out(u: User) -> dict:
+    return {
+        "id": u.id,
+        "phone": u.phone,
+        "full_name": u.full_name,
+        "role": u.role,
+        "city": u.city,
+        "is_verified": u.is_verified,
+        "verification_status": u.verification_status,
+        "accepted_safety_charter": u.accepted_safety_charter,
+        "phone_verified": u.phone_verified,
+        "emergency_contact_name": u.emergency_contact_name,
+        "emergency_contact_phone": u.emergency_contact_phone,
+        "is_suspended": u.is_suspended,
+        "bio": u.bio,
+        "created_at": u.created_at,
+        "id_document_type": u.id_document_type,
+        "id_document_number": u.id_document_number,
+        "id_full_name": u.id_full_name,
+        "verification_notes": u.verification_notes,
+        "has_document_image": bool(u.id_document_image),
+        "id_document_image": u.id_document_image,
+    }
+
+
 @router.get("/admin/verifications/pending", response_model=list[AdminUserOut])
 def pending_verifications(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> list[User]:
+) -> list[dict]:
     if user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Accès admin requis")
-    return (
+    rows = (
         db.query(User)
         .filter(User.verification_status == VerificationStatus.PENDING)
         .order_by(User.created_at.asc())
         .all()
     )
+    return [_admin_user_out(u) for u in rows]
 
 
 @router.post("/admin/verifications/{user_id}/review", response_model=AdminUserOut)
@@ -424,7 +463,7 @@ def review_verification(
         target.verification_notes = payload.notes or "Dossier rejeté — veuillez resoumettre"
     db.commit()
     db.refresh(target)
-    return target
+    return _admin_user_out(target)
 
 
 @router.get("/cities", response_model=list[CityOut])
@@ -671,16 +710,19 @@ def my_incoming_bookings(
     return [serialize_booking(b, user, db=db) for b in rows]
 
 
-@router.post("/payments/{payment_id}/confirm", response_model=PaymentOut)
+@router.post("/payments/{payment_id}/confirm", response_model=PaymentConfirmResult)
 def confirm_payment(
     payment_id: int,
     payload: PaymentConfirm,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> Payment:
+) -> dict:
     payment = (
         db.query(Payment)
-        .options(joinedload(Payment.booking).joinedload(Booking.ride))
+        .options(
+            joinedload(Payment.booking).joinedload(Booking.ride).joinedload(Ride.driver),
+            joinedload(Payment.booking).joinedload(Booking.passenger),
+        )
         .filter(Payment.id == payment_id)
         .first()
     )
@@ -693,7 +735,17 @@ def confirm_payment(
 
     # Idempotence : ne pas rejouer un paiement déjà tranché.
     if payment.status in {PaymentStatus.SUCCESS, PaymentStatus.REFUNDED}:
-        return payment
+        return {
+            "id": payment.id,
+            "provider": payment.provider,
+            "phone": payment.phone,
+            "amount": payment.amount,
+            "currency": payment.currency,
+            "status": payment.status,
+            "external_ref": payment.external_ref,
+            "created_at": payment.created_at,
+            "sms_preview": None,
+        }
     if payment.status == PaymentStatus.FAILED and booking.status != BookingStatus.PENDING:
         raise HTTPException(status_code=400, detail="Ce paiement est déjà clôturé")
     if booking.status != BookingStatus.PENDING:
@@ -702,12 +754,31 @@ def confirm_payment(
             detail=f"Réservation non confirmable (statut : {booking.status.value})",
         )
 
+    sms_preview = None
     if payload.success:
         payment.status = PaymentStatus.SUCCESS
         booking.status = BookingStatus.PAID
         booking.contact_unlocked = True
         if payload.external_ref:
             payment.external_ref = payload.external_ref
+        sms_preview = (
+            f"ZumunciTravel: reservation #{booking.id} confirmee "
+            f"{ride.origin_city}->{ride.destination_city} le {ride.departure_date}. "
+            f"Contact debloque. Merci."
+        )
+        for uid in {booking.passenger_id, ride.driver_id}:
+            db.add(
+                Notification(
+                    user_id=uid,
+                    channel="sms",
+                    title="Confirmation de réservation",
+                    body=sms_preview,
+                    booking_id=booking.id,
+                )
+            )
+        passenger = booking.passenger
+        if passenger:
+            passenger.last_sms_at = datetime.now(timezone.utc)
     else:
         payment.status = PaymentStatus.FAILED
         ride.seats_available = min(ride.seats_total, ride.seats_available + booking.seats)
@@ -717,7 +788,17 @@ def confirm_payment(
         booking.cancel_reason = "Paiement échoué"
     db.commit()
     db.refresh(payment)
-    return payment
+    return {
+        "id": payment.id,
+        "provider": payment.provider,
+        "phone": payment.phone,
+        "amount": payment.amount,
+        "currency": payment.currency,
+        "status": payment.status,
+        "external_ref": payment.external_ref,
+        "created_at": payment.created_at,
+        "sms_preview": sms_preview,
+    }
 
 
 @router.get("/bookings/{booking_id}/contact", response_model=ContactRevealOut)
@@ -892,6 +973,29 @@ def create_report(
         details=payload.details.strip(),
     )
     db.add(report)
+    db.flush()
+    serious = {
+        ReportReason.SCAM,
+        ReportReason.HARASSMENT,
+        ReportReason.INAPPROPRIATE_BEHAVIOR,
+        ReportReason.FAKE_PROFILE,
+    }
+    if payload.reason in serious and reported.role != UserRole.ADMIN:
+        open_count = (
+            db.query(SafetyReport)
+            .filter(
+                SafetyReport.reported_user_id == reported.id,
+                SafetyReport.status == ReportStatus.OPEN,
+                SafetyReport.reason.in_(list(serious)),
+            )
+            .count()
+        )
+        if open_count >= settings.auto_suspend_report_threshold:
+            reported.is_suspended = True
+            report.details = (
+                report.details
+                + f"\n[Auto] Compte suspendu après {open_count} signalements ouverts."
+            )
     db.commit()
     db.refresh(report)
     return report
@@ -1071,6 +1175,49 @@ def suggest_cities(q: str = Query(min_length=1), db: Session = Depends(get_db)) 
         .all()
     )
     return [r[0] for r in rows]
+
+
+
+@router.get("/users/{user_id}/public", response_model=PublicProfileOut)
+def public_profile(user_id: int, db: Session = Depends(get_db)) -> dict:
+    target = db.get(User, user_id)
+    if not target or target.is_suspended:
+        raise HTTPException(status_code=404, detail="Profil introuvable")
+    avg, count = _driver_rating_stats(db, target.id)
+    ratings = (
+        db.query(Rating)
+        .filter(Rating.reviewee_id == target.id)
+        .order_by(Rating.created_at.desc())
+        .limit(10)
+        .all()
+    )
+    return {
+        "id": target.id,
+        "full_name": target.full_name,
+        "city": target.city,
+        "is_verified": target.is_verified,
+        "role": target.role,
+        "bio": target.bio,
+        "rating_avg": avg,
+        "rating_count": count,
+        "ratings": [
+            {"score": r.score, "comment": r.comment, "created_at": r.created_at} for r in ratings
+        ],
+    }
+
+
+@router.get("/me/notifications", response_model=list[NotificationOut])
+def my_notifications(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[Notification]:
+    return (
+        db.query(Notification)
+        .filter(Notification.user_id == user.id)
+        .order_by(Notification.created_at.desc())
+        .limit(50)
+        .all()
+    )
 
 
 @router.delete("/rides/{ride_id}", response_model=MessageOut)

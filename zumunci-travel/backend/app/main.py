@@ -7,6 +7,7 @@ from app import __version__
 from app.api.routes import router
 from app.core.config import get_settings
 from app.core.database import Base, SessionLocal, engine
+from app.core.schema_patch import ensure_sqlite_columns
 from app.services.seed import seed_database
 
 settings = get_settings()
@@ -19,6 +20,7 @@ async def lifespan(_: FastAPI):
     if cfg.reset_db_on_start:
         Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    ensure_sqlite_columns(engine)
     db = SessionLocal()
     try:
         seed_database(db)

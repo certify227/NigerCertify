@@ -22,11 +22,13 @@
 
 ## Phase 2 — Confiance & densité
 
-1. KYC pièce d’identité (photo)
-2. Système d’avis bi-directionnel
-3. Signalement / blacklist
-4. Assurance partenariat (optionnel)
-5. Onboarding compagnies de bus (Sahel, Rimbo, etc.)
+1. KYC pièce d’identité (photo) — fait (upload data-URL + revue admin)
+2. Système d’avis bi-directionnel — fait
+3. Signalement / blacklist — fait (auto-suspension après N signalements sérieux)
+4. Profil public conducteur — fait (`/users/{id}/public`, UI `/drivers/:id`)
+5. Notifications SMS simulées + inbox — fait (confirm paiement)
+6. Assurance partenariat (optionnel)
+7. Onboarding compagnies de bus (Sahel, Rimbo, etc.)
 
 ## Phase 3 — Couverture nationale
 

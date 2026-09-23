@@ -69,6 +69,10 @@ class Settings(BaseSettings):
     booking_pending_ttl_minutes: int = 30
     # En development, drop_all uniquement si true (évite d'effacer le volume Docker)
     reset_db_on_start: bool = False
+    # Auto-suspension après N signalements ouverts "sérieux"
+    auto_suspend_report_threshold: int = 3
+    # Taille max image KYC (caractères data-URL)
+    kyc_image_max_chars: int = 350_000
 
     @property
     def cors_origin_list(self) -> list[str]:

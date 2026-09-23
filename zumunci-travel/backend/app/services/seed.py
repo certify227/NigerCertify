@@ -54,65 +54,91 @@ def _verified_user(**kwargs) -> User:
     )
 
 
+def _ensure_user(db: Session, phone: str, factory) -> User:
+    existing = db.query(User).filter_by(phone=phone).first()
+    if existing:
+        return existing
+    user = factory()
+    db.add(user)
+    db.flush()
+    return user
+
+
 def seed_database(db: Session) -> None:
     if db.query(City).count() == 0:
         for name, region, lat, lon in NIGER_CITIES:
             db.add(City(name=name, region=region, latitude=lat, longitude=lon))
         db.commit()
 
-    if db.query(User).count() == 0:
-        demo_users = [
-            _verified_user(
-                phone="+22790000001",
-                full_name="Ibrahim Conducteur",
-                password_hash=hash_password("zumunci123"),
-                role=UserRole.DRIVER,
-                city="Niamey",
-                bio="Conducteur régulier Niamey–Maradi / Zinder.",
-                id_document_number="NE-CNI-000001",
-                id_full_name="Ibrahim Conducteur",
-            ),
-            _verified_user(
-                phone="+22790000002",
-                full_name="Aïcha Voyageuse",
-                password_hash=hash_password("zumunci123"),
-                role=UserRole.PASSENGER,
-                city="Niamey",
-                id_document_number="NE-CNI-000002",
-                id_full_name="Aïcha Voyageuse",
-            ),
-            _verified_user(
-                phone="+22790000003",
-                full_name="Moussa Taxi Brousse",
-                password_hash=hash_password("zumunci123"),
-                role=UserRole.DRIVER,
-                city="Zinder",
-                bio="Liaisons Est : Zinder, Diffa, Agadez.",
-                id_document_number="NE-CNI-000003",
-                id_full_name="Moussa Taxi Brousse",
-            ),
-            _verified_user(
-                phone="+22790000099",
-                full_name="Admin Zumunci",
-                password_hash=hash_password("zumunci123"),
-                role=UserRole.ADMIN,
-                city="Niamey",
-                id_document_number="NE-ADM-000099",
-                id_full_name="Admin Zumunci",
-            ),
-            User(
-                phone="+22790000004",
-                full_name="Nouveau Sans Verif",
-                password_hash=hash_password("zumunci123"),
-                role=UserRole.BOTH,
-                city="Niamey",
-                is_verified=False,
-                verification_status=VerificationStatus.UNVERIFIED,
-                accepted_safety_charter=False,
-            ),
-        ]
-        db.add_all(demo_users)
-        db.commit()
+    _ensure_user(
+        db,
+        "+22790000001",
+        lambda: _verified_user(
+            phone="+22790000001",
+            full_name="Ibrahim Conducteur",
+            password_hash=hash_password("zumunci123"),
+            role=UserRole.DRIVER,
+            city="Niamey",
+            bio="Conducteur régulier Niamey–Maradi / Zinder.",
+            id_document_number="NE-CNI-000001",
+            id_full_name="Ibrahim Conducteur",
+        ),
+    )
+    _ensure_user(
+        db,
+        "+22790000002",
+        lambda: _verified_user(
+            phone="+22790000002",
+            full_name="Aïcha Voyageuse",
+            password_hash=hash_password("zumunci123"),
+            role=UserRole.PASSENGER,
+            city="Niamey",
+            id_document_number="NE-CNI-000002",
+            id_full_name="Aïcha Voyageuse",
+        ),
+    )
+    _ensure_user(
+        db,
+        "+22790000003",
+        lambda: _verified_user(
+            phone="+22790000003",
+            full_name="Moussa Taxi Brousse",
+            password_hash=hash_password("zumunci123"),
+            role=UserRole.DRIVER,
+            city="Zinder",
+            bio="Liaisons Est : Zinder, Diffa, Agadez.",
+            id_document_number="NE-CNI-000003",
+            id_full_name="Moussa Taxi Brousse",
+        ),
+    )
+    _ensure_user(
+        db,
+        "+22790000099",
+        lambda: _verified_user(
+            phone="+22790000099",
+            full_name="Admin Zumunci",
+            password_hash=hash_password("zumunci123"),
+            role=UserRole.ADMIN,
+            city="Niamey",
+            id_document_number="NE-ADM-000099",
+            id_full_name="Admin Zumunci",
+        ),
+    )
+    _ensure_user(
+        db,
+        "+22790000004",
+        lambda: User(
+            phone="+22790000004",
+            full_name="Nouveau Sans Verif",
+            password_hash=hash_password("zumunci123"),
+            role=UserRole.BOTH,
+            city="Niamey",
+            is_verified=False,
+            verification_status=VerificationStatus.UNVERIFIED,
+            accepted_safety_charter=False,
+        ),
+    )
+    db.commit()
 
     if db.query(Ride).count() == 0:
         ibrahim = db.query(User).filter_by(phone="+22790000001").one()

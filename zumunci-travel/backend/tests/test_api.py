@@ -437,3 +437,99 @@ def test_admin_moderate_ride(client):
     )
     assert hidden.status_code == 200
     assert hidden.json()["is_active"] is False
+
+
+def test_sms_notification_after_payment(client):
+    login = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    ride_id = rides.json()[0]["id"]
+    booking = client.post(
+        f"/api/rides/{ride_id}/book",
+        headers=headers,
+        json={
+            "seats": 1,
+            "payment_provider": "orange_money",
+            "accept_women_priority_rules": True,
+        },
+    )
+    pay = client.post(
+        f"/api/payments/{booking.json()['payment']['id']}/confirm",
+        headers=headers,
+        json={"success": True},
+    )
+    assert pay.status_code == 200
+    assert pay.json()["sms_preview"]
+    notes = client.get("/api/me/notifications", headers=headers)
+    assert notes.status_code == 200
+    assert len(notes.json()) >= 1
+
+
+def test_public_profile_and_kyc_image(client):
+    profile = client.get("/api/users/1/public")
+    assert profile.status_code == 200
+    assert profile.json()["full_name"]
+
+    reg = client.post(
+        "/api/auth/register",
+        json={
+            "phone": "90123456",
+            "full_name": "Hadiza Photo",
+            "password": "zumunci123",
+            "city": "Niamey",
+            "accept_safety_charter": True,
+        },
+    )
+    headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+    tiny = "data:image/png;base64,iVBORw0KGgo="
+    submit = client.post(
+        "/api/me/verification",
+        headers=headers,
+        json={
+            "id_document_type": "national_id",
+            "id_document_number": "NE-CNI-PHOTO-1",
+            "id_full_name": "Hadiza Photo",
+            "accept_safety_charter": True,
+            "id_document_image": tiny,
+        },
+    )
+    assert submit.status_code == 200
+    admin = client.post("/api/auth/login", json={"phone": "90000099", "password": "zumunci123"})
+    a_headers = {"Authorization": f"Bearer {admin.json()['access_token']}"}
+    pending = client.get("/api/admin/verifications/pending", headers=a_headers)
+    assert pending.status_code == 200
+    match = next(u for u in pending.json() if u["full_name"] == "Hadiza Photo")
+    assert match["has_document_image"] is True
+
+
+def test_auto_suspend_after_reports(client):
+    target_login = client.post("/api/auth/login", json={"phone": "90000003", "password": "zumunci123"})
+    assert target_login.status_code == 200
+    target_me = client.get(
+        "/api/me",
+        headers={"Authorization": f"Bearer {target_login.json()['access_token']}"},
+    )
+    assert target_me.status_code == 200
+    target_id = target_me.json()["id"]
+
+    reporter = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    headers = {"Authorization": f"Bearer {reporter.json()['access_token']}"}
+    for i in range(3):
+        r = client.post(
+            "/api/safety/reports",
+            headers=headers,
+            json={
+                "reported_user_id": target_id,
+                "reason": "scam",
+                "details": f"Tentative d'arnaque repetee numero {i} hors plateforme.",
+            },
+        )
+        assert r.status_code == 201
+
+    # ensure_active bloque le login des comptes suspendus
+    blocked = client.post("/api/auth/login", json={"phone": "90000003", "password": "zumunci123"})
+    assert blocked.status_code == 403
+    assert "suspendu" in blocked.json()["detail"].lower()
+
+    profile = client.get(f"/api/users/{target_id}/public")
+    assert profile.status_code == 404

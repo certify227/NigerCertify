@@ -111,6 +111,8 @@ class User(Base):
     emergency_contact_phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
     is_suspended: Mapped[bool] = mapped_column(Boolean, default=False)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
+    id_document_image: Mapped[str | None] = mapped_column(Text, nullable=True)
+    last_sms_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     rides: Mapped[list[Ride]] = relationship(back_populates="driver")
@@ -121,6 +123,7 @@ class User(Base):
     reports_made: Mapped[list[SafetyReport]] = relationship(
         back_populates="reporter", foreign_keys="SafetyReport.reporter_id"
     )
+    notifications: Mapped[list["Notification"]] = relationship(back_populates="user")
 
 
 class City(Base):
@@ -226,3 +229,17 @@ class SafetyReport(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     reporter: Mapped[User] = relationship(back_populates="reports_made", foreign_keys=[reporter_id])
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    channel: Mapped[str] = mapped_column(String(20), default="sms")
+    title: Mapped[str] = mapped_column(String(120))
+    body: Mapped[str] = mapped_column(Text)
+    booking_id: Mapped[int | None] = mapped_column(ForeignKey("bookings.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    user: Mapped[User] = relationship(back_populates="notifications")

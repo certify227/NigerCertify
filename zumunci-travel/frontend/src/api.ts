@@ -20,6 +20,8 @@ export type User = {
   id_document_number?: string | null;
   id_full_name?: string | null;
   verification_notes?: string | null;
+  has_document_image?: boolean;
+  id_document_image?: string | null;
 };
 
 export type SafetyReport = {
@@ -208,10 +210,29 @@ export const api = {
   myRides: () => request<Ride[]>("/me/rides"),
   myIncomingBookings: () => request<Booking[]>("/me/incoming-bookings"),
   confirmPayment: (paymentId: number, success = true) =>
-    request(`/payments/${paymentId}/confirm`, {
-      method: "POST",
-      body: JSON.stringify({ success }),
-    }),
+    request<{ id: number; status: string; sms_preview?: string | null }>(
+      `/payments/${paymentId}/confirm`,
+      {
+        method: "POST",
+        body: JSON.stringify({ success }),
+      },
+    ),
+  notifications: () =>
+    request<
+      { id: number; channel: string; title: string; body: string; booking_id: number | null; created_at: string }[]
+    >("/me/notifications"),
+  publicProfile: (userId: number) =>
+    request<{
+      id: number;
+      full_name: string;
+      city: string | null;
+      is_verified: boolean;
+      bio: string | null;
+      rating_avg: number | null;
+      rating_count: number;
+      ratings: { score: number; comment: string | null; created_at: string }[];
+    }>(`/users/${userId}/public`),
+  suggestCities: (q: string) => request<string[]>(`/search/suggest?q=${encodeURIComponent(q)}`),
   revealContact: (bookingId: number) => request<ContactReveal>(`/bookings/${bookingId}/contact`),
   cancelBooking: (bookingId: number, reason?: string) =>
     request<Booking>(`/bookings/${bookingId}/cancel`, {
