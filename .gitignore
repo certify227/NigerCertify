@@ -1,0 +1,14 @@
+# Python virtual environments (created by .cursor/install.sh)
+.venv/
+**/.venv/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+
+# Local env files
+.env
+
+# OS / editor noise
+.DS_Store
