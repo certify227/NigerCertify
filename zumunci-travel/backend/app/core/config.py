@@ -78,8 +78,14 @@ class Settings(BaseSettings):
     insurance_partner_name: str = "Zumunci Protect (pilote)"
     # Code USSD démo (inclusion feature phone)
     ussd_service_code: str = "*789#"
-    # Expansion UEMOA annoncée (villes bientôt)
-    uemoa_coming_soon: str = "Ouagadougou,Bamako,Dakar,Bobodioulasso"
+    # Expansion UEMOA — corridors live (XOF)
+    uemoa_live_cities: str = "Ouagadougou,Bamako"
+    uemoa_coming_soon: str = "Dakar,Bobodioulasso"
+    uemoa_corridors_enabled: bool = True
+    # Sandbox paiements / SMS
+    payment_aggregator: str = "ZumunciPay Sandbox"
+    sms_provider_name: str = "ZumunciSMS Sandbox"
+    otp_demo_code: str = "123456"
 
     @property
     def cors_origin_list(self) -> list[str]:
@@ -104,6 +110,19 @@ class Settings(BaseSettings):
     @property
     def uemoa_coming_soon_list(self) -> list[str]:
         return [c.strip() for c in self.uemoa_coming_soon.split(",") if c.strip()]
+
+    @property
+    def uemoa_live_city_list(self) -> list[str]:
+        return [c.strip() for c in self.uemoa_live_cities.split(",") if c.strip()]
+
+    @property
+    def all_service_cities(self) -> list[str]:
+        """Villes Niger + UEMOA live."""
+        seen: list[str] = []
+        for c in [*self.service_city_list, *self.uemoa_live_city_list]:
+            if c not in seen:
+                seen.append(c)
+        return seen
 
     @property
     def pilot_corridor_pairs(self) -> list[tuple[str, str]]:

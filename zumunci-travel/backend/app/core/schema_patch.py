@@ -17,6 +17,10 @@ def ensure_sqlite_columns(engine: Engine) -> None:
         ("rides", "company_id", "INTEGER"),
         ("bookings", "insurance_fee", "INTEGER DEFAULT 0"),
         ("bookings", "with_insurance", "BOOLEAN DEFAULT 0"),
+        ("users", "company_id", "INTEGER"),
+        ("payments", "instructions", "TEXT"),
+        ("payments", "checkout_url", "VARCHAR(255)"),
+        ("payments", "ussd_hint", "VARCHAR(40)"),
     ]
     with engine.begin() as conn:
         for table, column, coltype in statements:

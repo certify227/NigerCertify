@@ -115,6 +115,9 @@ export type Booking = {
     currency: string;
     status: string;
     external_ref: string | null;
+    instructions?: string | null;
+    checkout_url?: string | null;
+    ussd_hint?: string | null;
   };
 };
 
@@ -139,6 +142,10 @@ export type ProductConfig = {
   insurance_partner_name?: string;
   ussd_service_code?: string;
   uemoa_coming_soon?: string[];
+  uemoa_live_cities?: string[];
+  uemoa_corridors_enabled?: boolean;
+  payment_aggregator?: string;
+  sms_provider_name?: string;
 };
 
 export type FieldAgent = {

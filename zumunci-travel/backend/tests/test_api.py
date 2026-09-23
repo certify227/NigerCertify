@@ -609,7 +609,10 @@ def test_fraud_overview_admin(client):
     data = r.json()
     assert "suspended_users" in data
     assert "flags" in data
-    assert "Ouagadougou" in data["uemoa_coming_soon"]
+    assert "Dakar" in data["uemoa_coming_soon"] or "Ouagadougou" in data.get("uemoa_coming_soon", [])
+    # live cities sont dans product config
+    cfg = client.get("/api/product/config").json()
+    assert "Ouagadougou" in cfg["uemoa_live_cities"]
     passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
     denied = client.get(
         "/api/admin/fraud/overview",
@@ -706,3 +709,87 @@ def test_receipt_and_earnings_and_kpi(client):
     assert kpi.status_code == 200
     assert kpi.json()["bookings_paid"] >= 1
     assert kpi.json()["gmv_xof"] >= 1
+
+
+def test_uemoa_corridor_and_company_account(client):
+    cfg = client.get("/api/product/config").json()
+    assert "Ouagadougou" in cfg["uemoa_live_cities"]
+    assert "Bamako" in cfg["uemoa_live_cities"]
+    assert cfg["payment_aggregator"]
+    assert cfg["sms_provider_name"]
+
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Ouagadougou"})
+    assert rides.status_code == 200
+    assert len(rides.json()) >= 1
+
+    company = client.post("/api/auth/login", json={"phone": "90000050", "password": "zumunci123"})
+    assert company.status_code == 200
+    headers = {"Authorization": f"Bearer {company.json()['access_token']}"}
+    me = client.get("/api/me", headers=headers)
+    assert me.json()["role"] == "company"
+    assert me.json()["company_id"]
+
+    from datetime import date, timedelta
+
+    pub = client.post(
+        "/api/rides",
+        headers=headers,
+        json={
+            "origin_city": "Niamey",
+            "destination_city": "Ouagadougou",
+            "departure_date": str(date.today() + timedelta(days=8)),
+            "departure_time": "07:00",
+            "seats_total": 20,
+            "price_per_seat": 11000,
+            "mode": "carpool",  # forcé en bus côté API pour compte compagnie
+        },
+    )
+    assert pub.status_code == 201
+    assert pub.json()["mode"] == "bus"
+    assert pub.json()["company"]["slug"] == "rimbo"
+
+
+def test_otp_sms_sandbox_and_payment_sandbox_fields(client):
+    reg = client.post(
+        "/api/auth/register",
+        json={
+            "phone": "90888777",
+            "full_name": "OTP Sandbox",
+            "password": "zumunci123",
+            "city": "Niamey",
+            "accept_safety_charter": True,
+        },
+    )
+    headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+    otp = client.post("/api/me/otp/send", headers=headers)
+    assert otp.status_code == 200
+    assert otp.json()["sms_message_id"]
+    assert otp.json()["demo_code"] == "123456"
+
+    # complete OTP+KYC lite path for booking not needed — just payment fields via verified passenger
+    passenger = client.post("/api/auth/login", json={"phone": "90000002", "password": "zumunci123"})
+    p_headers = {"Authorization": f"Bearer {passenger.json()['access_token']}"}
+    rides = client.get("/api/rides", params={"origin": "Niamey", "destination": "Maradi"})
+    book = client.post(
+        f"/api/rides/{rides.json()[0]['id']}/book",
+        headers=p_headers,
+        json={
+            "seats": 1,
+            "payment_provider": "orange_money",
+            "accept_women_priority_rules": True,
+        },
+    )
+    assert book.status_code == 201
+    pay = book.json()["payment"]
+    assert pay["checkout_url"]
+    assert pay["ussd_hint"]
+    assert pay["instructions"]
+    assert "SANDBOX" in pay["instructions"]
+
+    admin = client.post("/api/auth/login", json={"phone": "90000099", "password": "zumunci123"})
+    log = client.get(
+        "/api/admin/sms/log",
+        headers={"Authorization": f"Bearer {admin.json()['access_token']}"},
+    )
+    assert log.status_code == 200
+    assert isinstance(log.json(), list)

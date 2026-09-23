@@ -72,6 +72,7 @@ Ou : `./scripts/dev.sh`
 | Conducteur vérifié | `90000001` | `zumunci123` |
 | Voyageuse vérifiée | `90000002` | `zumunci123` |
 | Non vérifié (blocage) | `90000004` | `zumunci123` |
+| Compagnie Rimbo | `90000050` | `zumunci123` |
 | Admin KYC | `90000099` | `zumunci123` |
 
 ## Tests

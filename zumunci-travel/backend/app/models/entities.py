@@ -26,6 +26,7 @@ class UserRole(str, Enum):
     DRIVER = "driver"
     BOTH = "both"
     ADMIN = "admin"
+    COMPANY = "company"
 
 
 class RideMode(str, Enum):
@@ -113,17 +114,21 @@ class User(Base):
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
     id_document_image: Mapped[str | None] = mapped_column(Text, nullable=True)
     last_sms_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    company_id: Mapped[int | None] = mapped_column(ForeignKey("transport_companies.id"), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    rides: Mapped[list[Ride]] = relationship(back_populates="driver")
-    bookings: Mapped[list[Booking]] = relationship(back_populates="passenger")
-    ratings_received: Mapped[list[Rating]] = relationship(
+    rides: Mapped[list["Ride"]] = relationship(back_populates="driver")
+    bookings: Mapped[list["Booking"]] = relationship(back_populates="passenger")
+    ratings_received: Mapped[list["Rating"]] = relationship(
         back_populates="reviewee", foreign_keys="Rating.reviewee_id"
     )
-    reports_made: Mapped[list[SafetyReport]] = relationship(
+    reports_made: Mapped[list["SafetyReport"]] = relationship(
         back_populates="reporter", foreign_keys="SafetyReport.reporter_id"
     )
     notifications: Mapped[list["Notification"]] = relationship(back_populates="user")
+    company_account: Mapped["TransportCompany | None"] = relationship(
+        foreign_keys=[company_id],
+    )
 
 
 class City(Base):
@@ -215,6 +220,9 @@ class Payment(Base):
     currency: Mapped[str] = mapped_column(String(8), default="XOF")
     status: Mapped[PaymentStatus] = mapped_column(SAEnum(PaymentStatus), default=PaymentStatus.INITIATED)
     external_ref: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    instructions: Mapped[str | None] = mapped_column(Text, nullable=True)
+    checkout_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    ussd_hint: Mapped[str | None] = mapped_column(String(40), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

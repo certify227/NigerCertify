@@ -67,6 +67,7 @@ class UserOut(BaseModel):
     emergency_contact_phone: str | None = None
     is_suspended: bool
     bio: str | None = None
+    company_id: int | None = None
     created_at: datetime
 
 
@@ -85,6 +86,8 @@ class OtpSendOut(BaseModel):
     message: str
     demo_code: str | None = None
     expires_in_seconds: int = 300
+    sms_message_id: str | None = None
+    sms_provider: str | None = None
 
 
 class OtpVerifyIn(BaseModel):
@@ -217,6 +220,9 @@ class PaymentOut(BaseModel):
     currency: str
     status: PaymentStatus
     external_ref: str | None
+    instructions: str | None = None
+    checkout_url: str | None = None
+    ussd_hint: str | None = None
     created_at: datetime
 
 
@@ -390,6 +396,10 @@ class ProductConfigOut(BaseModel):
     insurance_partner_name: str = "Zumunci Protect (pilote)"
     ussd_service_code: str = "*789#"
     uemoa_coming_soon: list[str] = []
+    uemoa_live_cities: list[str] = []
+    uemoa_corridors_enabled: bool = True
+    payment_aggregator: str = "ZumunciPay Sandbox"
+    sms_provider_name: str = "ZumunciSMS Sandbox"
 
 
 class FieldAgentOut(BaseModel):

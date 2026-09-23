@@ -108,20 +108,31 @@ def _normalize_city(name: str) -> str:
 
 
 def corridor_allowed(origin: str, destination: str) -> bool:
-    """Autorise tout trajet entre villes desservies du Niger (toutes régions)."""
+    """Autorise trajets Niger (+ corridors UEMOA live vers/depuis Niamey)."""
     settings = get_settings()
     o = _normalize_city(origin)
     d = _normalize_city(destination)
     if o == d:
         return False
 
-    allowed = {_normalize_city(c) for c in settings.service_city_list}
-    # Couverture nationale : toute ville du référentiel est valide
-    if settings.national_coverage:
-        return o in allowed and d in allowed
+    niger = {_normalize_city(c) for c in settings.service_city_list}
+    uemoa = {_normalize_city(c) for c in settings.uemoa_live_city_list}
+    allowed = niger | uemoa
 
-    # Fallback legacy : paires explicites
-    for a, b in settings.pilot_corridor_pairs:
-        if o == _normalize_city(a) and d == _normalize_city(b):
-            return True
+    if o not in allowed or d not in allowed:
+        return False
+
+    # Les deux au Niger
+    if o in niger and d in niger:
+        return bool(settings.national_coverage) or any(
+            o == _normalize_city(a) and d == _normalize_city(b)
+            for a, b in settings.pilot_corridor_pairs
+        )
+
+    # Corridor UEMOA : au moins une extrémité Niamey (hub) et l'autre UEMOA live
+    if not settings.uemoa_corridors_enabled:
+        return False
+    niamey = _normalize_city("Niamey")
+    if (o == niamey and d in uemoa) or (d == niamey and o in uemoa):
+        return True
     return False

@@ -81,6 +81,7 @@ from app.schemas.schemas import (
     VerificationSubmit,
 )
 from app.services.payments import get_payment_adapter
+from app.services.sms import get_sms_log, send_booking_sms, send_otp_sms
 from app.services.safety import (
     SAFETY_CHARTER,
     assert_payment_allowed,
@@ -271,7 +272,7 @@ def product_config() -> ProductConfigOut:
         pilot_hub=settings.pilot_hub,
         national_coverage=settings.national_coverage,
         regions=settings.region_list,
-        service_cities=settings.service_city_list,
+        service_cities=settings.all_service_cities,
         pilot_corridors=region_links,
         commission_rate=settings.commission_rate,
         currency=settings.currency,
@@ -286,6 +287,10 @@ def product_config() -> ProductConfigOut:
         insurance_partner_name=settings.insurance_partner_name,
         ussd_service_code=settings.ussd_service_code,
         uemoa_coming_soon=settings.uemoa_coming_soon_list,
+        uemoa_live_cities=settings.uemoa_live_city_list,
+        uemoa_corridors_enabled=settings.uemoa_corridors_enabled,
+        payment_aggregator=settings.payment_aggregator,
+        sms_provider_name=settings.sms_provider_name,
     )
 
 
@@ -352,15 +357,31 @@ def send_otp(user: User = Depends(get_current_user), db: Session = Depends(get_d
     ensure_active(user)
     if user.phone_verified:
         return OtpSendOut(message="Numéro déjà vérifié", demo_code=None, expires_in_seconds=0)
-    # MVP: OTP démo fixe en development pour tests Windows / QA
-    code = "123456" if settings.app_env == "development" else f"{secrets.randbelow(1_000_000):06d}"
+    code = (
+        settings.otp_demo_code
+        if settings.app_env == "development"
+        else f"{secrets.randbelow(1_000_000):06d}"
+    )
     user.otp_code = code
     user.otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+    sms = send_otp_sms(phone=user.phone, code=code)
+    user.last_sms_at = datetime.now(timezone.utc)
+    db.add(
+        Notification(
+            user_id=user.id,
+            channel="sms",
+            title="Code OTP",
+            body=sms.body,
+            booking_id=None,
+        )
+    )
     db.commit()
     return OtpSendOut(
-        message=f"Code OTP envoyé (simulé) vers {mask_phone(user.phone)}",
+        message=f"Code OTP envoyé via {sms.provider} vers {mask_phone(user.phone)}",
         demo_code=code if settings.app_env == "development" else None,
         expires_in_seconds=300,
+        sms_message_id=sms.message_id,
+        sms_provider=sms.provider,
     )
 
 
@@ -452,6 +473,7 @@ def _admin_user_out(u: User) -> dict:
         "emergency_contact_phone": u.emergency_contact_phone,
         "is_suspended": u.is_suspended,
         "bio": u.bio,
+        "company_id": u.company_id,
         "created_at": u.created_at,
         "id_document_type": u.id_document_type,
         "id_document_number": u.id_document_number,
@@ -671,19 +693,29 @@ def publish_ride(
             status_code=400,
             detail=(
                 "Trajet hors couverture ZumunciTravel. "
-                "Choisissez des villes desservies dans les 8 régions du Niger."
+                "Villes Niger (8 régions) ou corridors UEMOA live Niamey↔Ouagadougou/Bamako."
             ),
         )
     company_id = payload.company_id
+    mode = payload.mode
+    # Compte compagnie : force le rattachement partenaire
+    if user.role == UserRole.COMPANY:
+        if not user.company_id:
+            raise HTTPException(status_code=400, detail="Compte compagnie sans partenaire lié")
+        company_id = user.company_id
+        if mode == RideMode.CARPOOL:
+            mode = RideMode.BUS
     if company_id is not None:
         company = db.get(TransportCompany, company_id)
         if not company or not company.is_active:
             raise HTTPException(status_code=400, detail="Compagnie partenaire introuvable")
-        if payload.mode == RideMode.CARPOOL:
+        if mode == RideMode.CARPOOL:
             raise HTTPException(
                 status_code=400,
                 detail="Une compagnie partenaire s'applique aux modes bus / taxi brousse",
             )
+        if user.role == UserRole.COMPANY and company_id != user.company_id:
+            raise HTTPException(status_code=403, detail="Vous ne pouvez publier que pour votre compagnie")
     ride = Ride(
         driver_id=user.id,
         company_id=company_id,
@@ -694,7 +726,7 @@ def publish_ride(
         seats_total=payload.seats_total,
         seats_available=payload.seats_total,
         price_per_seat=payload.price_per_seat,
-        mode=payload.mode,
+        mode=mode,
         vehicle_info=payload.vehicle_info,
         meeting_point=payload.meeting_point,
         notes=payload.notes,
@@ -810,22 +842,26 @@ def book_ride(
         currency=settings.currency,
         status=PaymentStatus.PENDING,
         external_ref=init.external_ref,
+        instructions=init.instructions,
+        checkout_url=init.checkout_url,
+        ussd_hint=init.ussd_hint,
     )
     db.add(payment)
 
-    # SMS confirmation bas débit (simulé) à la création
+    # SMS confirmation via provider sandbox
     sms_body = (
         f"ZumunciTravel: reservation #{booking.id} {ride.origin_city}->{ride.destination_city} "
         f"le {ride.departure_date} {ride.departure_time}. "
         f"Montant {total} XOF a confirmer"
         + (" (assurance incluse)." if payload.with_insurance else ".")
     )
+    sms = send_booking_sms(phone=user.phone, body=sms_body)
     db.add(
         Notification(
             user_id=user.id,
             channel="sms",
             title="Reservation en attente",
-            body=sms_body,
+            body=f"{sms_body} [{sms.message_id}]",
             booking_id=booking.id,
         )
     )
@@ -1598,6 +1634,23 @@ def admin_kpi(
         "open_reports": open_reports,
         "currency": settings.currency,
     }
+
+
+@router.get("/admin/sms/log")
+def admin_sms_log(admin: User = Depends(get_current_user)) -> list[dict]:
+    if admin.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Accès admin requis")
+    return [
+        {
+            "message_id": s.message_id,
+            "to": s.to,
+            "body": s.body,
+            "provider": s.provider,
+            "sandbox": s.sandbox,
+            "sent_at": s.sent_at,
+        }
+        for s in get_sms_log(30)
+    ]
 
 
 @router.get("/payments/providers", response_model=list[str])
