@@ -19,7 +19,7 @@ from app.models.entities import (
     VerificationStatus,
 )
 
-# Chefs-lieux des 8 régions + villes secondaires
+# Chefs-lieux des 8 régions + villes secondaires + UEMOA live
 NIGER_CITIES = [
     ("Niamey", "Niamey", 13.5127, 2.1126),
     ("Maradi", "Maradi", 13.4833, 7.1000),
@@ -39,6 +39,9 @@ NIGER_CITIES = [
     ("N'Guigmi", "Diffa", 14.2520, 13.1100),
     ("Tchin-Tabaraden", "Tahoua", 15.8980, 5.7950),
     ("Ayorou", "Tillabéri", 14.7310, 0.9190),
+    # UEMOA live (XOF)
+    ("Ouagadougou", "UEMOA-BF", 12.3714, -1.5197),
+    ("Bamako", "UEMOA-ML", 12.6392, -8.0029),
 ]
 
 
@@ -69,6 +72,13 @@ def _ensure_user(db: Session, phone: str, factory) -> User:
 def seed_database(db: Session) -> None:
     if db.query(City).count() == 0:
         for name, region, lat, lon in NIGER_CITIES:
+            db.add(City(name=name, region=region, latitude=lat, longitude=lon))
+        db.commit()
+    else:
+        # Ajoute les villes UEMOA manquantes sans reset
+        for name, region, lat, lon in NIGER_CITIES:
+            if db.query(City).filter_by(name=name).first():
+                continue
             db.add(City(name=name, region=region, latitude=lat, longitude=lon))
         db.commit()
 
@@ -322,6 +332,66 @@ def seed_database(db: Session) -> None:
             ),
         ]
         db.add_all(rides)
+        db.commit()
+
+    # Compte compagnie Rimbo (publie des bus)
+    rimbo = db.query(TransportCompany).filter_by(slug="rimbo").first()
+    if rimbo and not db.query(User).filter_by(phone="+22790000050").first():
+        db.add(
+            _verified_user(
+                phone="+22790000050",
+                full_name="Rimbo Ops Niamey",
+                password_hash=hash_password("zumunci123"),
+                role=UserRole.COMPANY,
+                city="Niamey",
+                bio="Compte compagnie Rimbo Transport — publications bus.",
+                id_document_number="NE-CO-RIMBO",
+                id_full_name="Rimbo Transport",
+                company_id=rimbo.id,
+            )
+        )
+        db.commit()
+
+    # Trajets UEMOA démo (si absents)
+    if rimbo and db.query(Ride).filter(Ride.destination_city == "Ouagadougou").count() == 0:
+        company_user = db.query(User).filter_by(phone="+22790000050").first()
+        ibrahim = db.query(User).filter_by(phone="+22790000001").one()
+        driver_id = company_user.id if company_user else ibrahim.id
+        today = date.today()
+        db.add_all(
+            [
+                Ride(
+                    driver_id=driver_id,
+                    company_id=rimbo.id,
+                    origin_city="Niamey",
+                    destination_city="Ouagadougou",
+                    departure_date=today + timedelta(days=2),
+                    departure_time="06:00",
+                    seats_total=40,
+                    seats_available=28,
+                    price_per_seat=12000,
+                    mode=RideMode.BUS,
+                    vehicle_info="Bus Rimbo UEMOA",
+                    meeting_point="Gare routière de Niamey",
+                    notes="Corridor XOF Niamey–Ouagadougou (pilote UEMOA).",
+                ),
+                Ride(
+                    driver_id=driver_id,
+                    company_id=rimbo.id,
+                    origin_city="Niamey",
+                    destination_city="Bamako",
+                    departure_date=today + timedelta(days=3),
+                    departure_time="05:30",
+                    seats_total=40,
+                    seats_available=30,
+                    price_per_seat=18000,
+                    mode=RideMode.BUS,
+                    vehicle_info="Bus Rimbo UEMOA",
+                    meeting_point="Gare routière de Niamey",
+                    notes="Corridor XOF Niamey–Bamako (pilote UEMOA).",
+                ),
+            ]
+        )
         db.commit()
 
     # Ambassadeurs gares (idempotent)

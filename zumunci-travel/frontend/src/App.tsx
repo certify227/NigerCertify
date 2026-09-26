@@ -20,11 +20,13 @@ import {
   setToken,
   VERIF_LABELS,
 } from "./api";
+import { LOCALE_STORAGE_KEY, t, type AppLocale } from "./i18n";
 import type {
   AdminKpi,
   Booking,
   BookingReceipt,
   City,
+  CompanyOverview,
   DriverEarnings,
   FieldAgent,
   FraudOverview,
@@ -36,6 +38,31 @@ import type {
   User,
 } from "./api";
 import "./App.css";
+
+function useLocale() {
+  const [locale, setLocaleState] = useState<AppLocale>(() => {
+    const v = localStorage.getItem(LOCALE_STORAGE_KEY);
+    return v === "ha" || v === "dje" ? v : "fr";
+  });
+  useEffect(() => {
+    const sync = () => {
+      const v = localStorage.getItem(LOCALE_STORAGE_KEY);
+      setLocaleState(v === "ha" || v === "dje" ? v : "fr");
+    };
+    window.addEventListener("zumunci-locale", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("zumunci-locale", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  const setLocale = (l: AppLocale) => {
+    localStorage.setItem(LOCALE_STORAGE_KEY, l);
+    setLocaleState(l);
+    window.dispatchEvent(new Event("zumunci-locale"));
+  };
+  return { locale, setLocale };
+}
 
 function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -81,6 +108,7 @@ function Shell({
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [apiOk, setApiOk] = useState<boolean | null>(null);
+  const { locale } = useLocale();
 
   useEffect(() => {
     // Ferme le menu mobile dès qu'on change de page.
@@ -145,37 +173,37 @@ function Shell({
             id="primary-nav-links"
           >
             <Link to="/" className={location.pathname === "/" ? "is-active" : undefined}>
-              Rechercher
+              {t(locale, "nav_search")}
             </Link>
             <Link
               to="/publish"
               className={location.pathname.startsWith("/publish") ? "is-active" : undefined}
             >
-              Publier
+              {t(locale, "nav_publish")}
             </Link>
             <Link
               to="/companies"
               className={location.pathname.startsWith("/companies") ? "is-active" : undefined}
             >
-              Compagnies
+              {t(locale, "nav_companies")}
             </Link>
             <Link
               to="/agents"
               className={location.pathname.startsWith("/agents") ? "is-active" : undefined}
             >
-              Agents
+              {t(locale, "nav_agents")}
             </Link>
             <Link
               to="/ussd"
               className={location.pathname.startsWith("/ussd") ? "is-active" : undefined}
             >
-              USSD
+              {t(locale, "nav_ussd")}
             </Link>
             <Link
               to="/safety"
               className={location.pathname.startsWith("/safety") ? "is-active" : undefined}
             >
-              Sécurité
+              {t(locale, "nav_safety")}
             </Link>
             {user ? (
               <>
@@ -183,29 +211,29 @@ function Shell({
                   to="/verify"
                   className={location.pathname.startsWith("/verify") ? "is-active" : undefined}
                 >
-                  Vérification
+                  {t(locale, "nav_verify")}
                 </Link>
                 <Link
                   to="/me"
                   className={location.pathname.startsWith("/me") ? "is-active" : undefined}
                 >
-                  Compte
+                  {t(locale, "nav_account")}
                 </Link>
                 {user.role === "admin" && (
                   <Link
                     to="/admin"
                     className={location.pathname.startsWith("/admin") ? "is-active" : undefined}
                   >
-                    Admin
+                    {t(locale, "nav_admin")}
                   </Link>
                 )}
                 <button type="button" className="linkish" onClick={onLogout}>
-                  Sortir
+                  {t(locale, "nav_logout")}
                 </button>
               </>
             ) : (
               <Link to="/login" className="btn btn-small btn-nav">
-                Connexion
+                {t(locale, "nav_login")}
               </Link>
             )}
           </nav>
@@ -233,7 +261,7 @@ function HomePage() {
   const [origin, setOrigin] = useState("Niamey");
   const [destination, setDestination] = useState("Maradi");
   const [date, setDate] = useState("");
-  const [locale, setLocale] = useState<"fr" | "ha" | "dje">("fr");
+  const { locale, setLocale } = useLocale();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -344,28 +372,42 @@ function HomePage() {
 
       <div className="usp-grid">
         <article>
-          <h3>Vérification KYC</h3>
-          <p>CNI / passeport / permis validés avant publication ou réservation.</p>
+          <h3>{t(locale, "usp_kyc_title")}</h3>
+          <p>{t(locale, "usp_kyc_body")}</p>
         </article>
         <article>
-          <h3>Contact protégé</h3>
-          <p>Numéro masqué jusqu’au paiement Mobile Money confirmé.</p>
+          <h3>{t(locale, "usp_contact_title")}</h3>
+          <p>{t(locale, "usp_contact_body")}</p>
         </article>
         <article>
-          <h3>Anti-arnaque</h3>
-          <p>Paiement sur plateforme + signalement immédiat des abus.</p>
+          <h3>{t(locale, "usp_scam_title")}</h3>
+          <p>{t(locale, "usp_scam_body")}</p>
         </article>
       </div>
 
       {config && (
         <div className="notice notice-soft">
-          <strong>Couverture nationale</strong> — {config.regions.length} régions ·{" "}
+          <strong>{t(locale, "coverage_national")}</strong> — {config.regions.length} régions ·{" "}
           {config.service_cities.length} villes · commission{" "}
           {(config.commission_rate * 100).toFixed(0)} % · KYC ≤ {config.kyc_sla_hours}h
+          {config.uemoa_live_cities && config.uemoa_live_cities.length > 0 && (
+            <>
+              <br />
+              <strong>{t(locale, "uemoa_live")} :</strong> Niamey ↔{" "}
+              {config.uemoa_live_cities.join(" / ")}
+            </>
+          )}
           {config.uemoa_coming_soon && config.uemoa_coming_soon.length > 0 && (
             <>
               <br />
-              <strong>Bientôt UEMOA (XOF) :</strong> {config.uemoa_coming_soon.join(" · ")}
+              <strong>{t(locale, "uemoa_soon")} :</strong> {config.uemoa_coming_soon.join(" · ")}
+            </>
+          )}
+          {config.payment_aggregator && (
+            <>
+              <br />
+              <strong>{t(locale, "sandbox_pay")} :</strong> {config.payment_aggregator} · SMS{" "}
+              {config.sms_provider_name}
             </>
           )}
         </div>
@@ -413,6 +455,7 @@ function SearchPage() {
   const [womenOnly, setWomenOnly] = useState(params.get("women_priority") === "true");
   const [region, setRegion] = useState(params.get("region") || "");
   const [maxPrice, setMaxPrice] = useState(params.get("max_price") || "");
+  const { locale } = useLocale();
 
   useEffect(() => {
     setLoading(true);
@@ -439,13 +482,13 @@ function SearchPage() {
 
   return (
     <section className="stack">
-      <h2>Résultats</h2>
+      <h2>{t(locale, "search_results")}</h2>
       <p className="muted">
         Seuls les convoyeurs <strong>vérifiés</strong> apparaissent. Contacts masqués avant paiement.
       </p>
       <form className="form filters" onSubmit={applyFilters}>
         <label>
-          Mode
+          {t(locale, "search_mode")}
           <select value={mode} onChange={(e) => setMode(e.target.value)}>
             <option value="">Tous</option>
             <option value="carpool">Covoiturage</option>
@@ -454,7 +497,7 @@ function SearchPage() {
           </select>
         </label>
         <label>
-          Région
+          {t(locale, "search_region")}
           <select value={region} onChange={(e) => setRegion(e.target.value)}>
             <option value="">Toutes</option>
             {["Agadez", "Diffa", "Dosso", "Maradi", "Tahoua", "Tillabéri", "Zinder", "Niamey"].map(
@@ -467,7 +510,7 @@ function SearchPage() {
           </select>
         </label>
         <label>
-          Prix max / place
+          {t(locale, "search_max_price")}
           <input
             type="number"
             min={500}
@@ -482,10 +525,10 @@ function SearchPage() {
             checked={womenOnly}
             onChange={(e) => setWomenOnly(e.target.checked)}
           />
-          Priorité femmes uniquement
+          {t(locale, "search_women")}
         </label>
         <button className="btn btn-primary" type="submit">
-          Filtrer
+          {t(locale, "search_filter")}
         </button>
       </form>
       {loading && <p>Chargement…</p>}
@@ -505,6 +548,7 @@ function SearchPage() {
 function RideDetailPage({ user }: { user: User | null }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { locale } = useLocale();
   const [ride, setRide] = useState<Ride | null>(null);
   const [seats, setSeats] = useState(1);
   const [provider, setProvider] = useState("orange_money");
@@ -592,6 +636,24 @@ function RideDetailPage({ user }: { user: User | null }) {
       setWhatsappUrl(contact.driver_whatsapp_url);
       setMessage(
         `Paiement confirmé. Contact : ${contact.driver_phone}. ${contact.warning}` +
+          (pay.sms_preview ? ` SMS: ${pay.sms_preview}` : ""),
+      );
+      setPendingBooking(null);
+      if (ride) setRide(await api.ride(ride.id));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+
+  const confirmViaWebhook = async () => {
+    if (!pendingBooking?.payment?.external_ref) return;
+    setError("");
+    try {
+      const pay = await api.sandboxWebhook(pendingBooking.payment.external_ref, "success");
+      const contact = await api.revealContact(pendingBooking.id);
+      setWhatsappUrl(contact.driver_whatsapp_url);
+      setMessage(
+        `Webhook agrégateur OK (${pay.status}). Contact : ${contact.driver_phone}.` +
           (pay.sms_preview ? ` SMS: ${pay.sms_preview}` : ""),
       );
       setPendingBooking(null);
@@ -716,14 +778,30 @@ function RideDetailPage({ user }: { user: User | null }) {
       ) : (
         <div className="book-box">
           <p>
-            Paiement en attente · {formatXof(pendingBooking.total_amount)} via{" "}
+            {t(locale, "pay_pending")} · {formatXof(pendingBooking.total_amount)} via{" "}
             {pendingBooking.payment?.provider.replaceAll("_", " ")}
           </p>
+          {pendingBooking.payment?.instructions && (
+            <div className="notice">{pendingBooking.payment.instructions}</div>
+          )}
+          {pendingBooking.payment?.ussd_hint && (
+            <p className="muted">USSD opérateur : {pendingBooking.payment.ussd_hint}</p>
+          )}
+          {pendingBooking.payment?.checkout_url && (
+            <p className="muted">
+              Checkout sandbox : <code>{pendingBooking.payment.checkout_url}</code>
+            </p>
+          )}
           <button className="btn btn-primary" type="button" onClick={() => void confirmPay(true)}>
-            Confirmer le paiement (démo)
+            {t(locale, "pay_confirm")}
           </button>
+          {pendingBooking.payment?.external_ref && (
+            <button className="btn btn-small" type="button" onClick={() => void confirmViaWebhook()}>
+              {t(locale, "pay_webhook")}
+            </button>
+          )}
           <button className="btn btn-small danger" type="button" onClick={() => void confirmPay(false)}>
-            Échec / annuler
+            {t(locale, "pay_fail")}
           </button>
         </div>
       )}
@@ -854,6 +932,9 @@ function AuthPage({
             </button>
             <button type="button" className="btn btn-small" onClick={() => void quickLogin("90000099")}>
               Admin
+            </button>
+            <button type="button" className="btn btn-small" onClick={() => void quickLogin("90000050")}>
+              Compagnie Rimbo
             </button>
           </div>
         </div>
@@ -1227,6 +1308,7 @@ function AccountPage({
   user: User | null;
   onRefresh: () => Promise<void>;
 }) {
+  const { locale } = useLocale();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [incoming, setIncoming] = useState<Booking[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
@@ -1235,6 +1317,7 @@ function AccountPage({
   >([]);
   const [alerts, setAlerts] = useState<RideAlert[]>([]);
   const [earnings, setEarnings] = useState<DriverEarnings | null>(null);
+  const [companyOv, setCompanyOv] = useState<CompanyOverview | null>(null);
   const [receipt, setReceipt] = useState<BookingReceipt | null>(null);
   const [alertOrigin, setAlertOrigin] = useState("Niamey");
   const [alertDest, setAlertDest] = useState("Maradi");
@@ -1266,6 +1349,15 @@ function AccountPage({
       setEarnings(await api.myEarnings());
     } catch {
       setEarnings(null);
+    }
+    try {
+      if (user?.role === "company") {
+        setCompanyOv(await api.companyOverview());
+      } else {
+        setCompanyOv(null);
+      }
+    } catch {
+      setCompanyOv(null);
     }
   };
 
@@ -1394,16 +1486,53 @@ function AccountPage({
 
   return (
     <section className="stack">
-      <h2>Bonjour, {user.full_name}</h2>
+      <h2>
+        {t(locale, "account_hello")}, {user.full_name}
+      </h2>
       <p className="muted">
         {user.phone} · {user.phone_verified ? "OTP OK" : "OTP manquant"} ·{" "}
         {VERIF_LABELS[user.verification_status]}
         {user.accepted_safety_charter ? " · charte acceptée" : ""}
+        {user.role === "company" ? " · compte compagnie" : ""}
       </p>
+
+      {companyOv && (
+        <>
+          <h3>
+            {t(locale, "account_company")} — {companyOv.company_name}
+          </h3>
+          <div className="fraud-grid">
+            <div className="fraud-stat">
+              <strong>{companyOv.rides_active}</strong>
+              <span>trajets actifs</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.rides_total}</strong>
+              <span>trajets total</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.bookings_pending}</strong>
+              <span>en attente</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.bookings_paid}</strong>
+              <span>payées</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{formatXof(companyOv.gmv_xof)}</strong>
+              <span>GMV</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.seats_sold}</strong>
+              <span>places vendues</span>
+            </div>
+          </div>
+        </>
+      )}
 
       {earnings && (
         <>
-          <h3>Gains conducteur</h3>
+          <h3>{t(locale, "account_earnings")}</h3>
           <div className="fraud-grid">
             <div className="fraud-stat">
               <strong>{formatXof(earnings.gross_driver_amount)}</strong>
@@ -1425,7 +1554,7 @@ function AccountPage({
         </>
       )}
 
-      <h3>Alertes trajets</h3>
+      <h3>{t(locale, "account_alerts")}</h3>
       <p className="muted">Recevez un SMS / notification quand un trajet matching est publié.</p>
       <form className="form inline-filter" onSubmit={(e) => void addAlert(e)}>
         <label>

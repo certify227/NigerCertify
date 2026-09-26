@@ -67,6 +67,7 @@ class UserOut(BaseModel):
     emergency_contact_phone: str | None = None
     is_suspended: bool
     bio: str | None = None
+    company_id: int | None = None
     created_at: datetime
 
 
@@ -85,6 +86,8 @@ class OtpSendOut(BaseModel):
     message: str
     demo_code: str | None = None
     expires_in_seconds: int = 300
+    sms_message_id: str | None = None
+    sms_provider: str | None = None
 
 
 class OtpVerifyIn(BaseModel):
@@ -217,6 +220,9 @@ class PaymentOut(BaseModel):
     currency: str
     status: PaymentStatus
     external_ref: str | None
+    instructions: str | None = None
+    checkout_url: str | None = None
+    ussd_hint: str | None = None
     created_at: datetime
 
 
@@ -245,6 +251,14 @@ class BookingOut(BaseModel):
 class PaymentConfirm(BaseModel):
     success: bool = True
     external_ref: str | None = None
+
+
+class PaymentWebhookIn(BaseModel):
+    """Callback sandbox agrégateur Mobile Money (ZumunciPay)."""
+
+    external_ref: str = Field(min_length=6, max_length=80)
+    status: str = Field(default="success", pattern="^(success|failed)$")
+    provider_ref: str | None = Field(default=None, max_length=80)
 
 
 class RatingCreate(BaseModel):
@@ -390,6 +404,11 @@ class ProductConfigOut(BaseModel):
     insurance_partner_name: str = "Zumunci Protect (pilote)"
     ussd_service_code: str = "*789#"
     uemoa_coming_soon: list[str] = []
+    uemoa_live_cities: list[str] = []
+    uemoa_corridors_enabled: bool = True
+    payment_aggregator: str = "ZumunciPay Sandbox"
+    sms_provider_name: str = "ZumunciSMS Sandbox"
+    payment_webhook_enabled: bool = True
 
 
 class FieldAgentOut(BaseModel):
@@ -473,6 +492,18 @@ class DriverEarningsOut(BaseModel):
     bookings_completed: int
     gross_driver_amount: int
     seats_sold: int
+    currency: str = "XOF"
+
+
+class CompanyOverviewOut(BaseModel):
+    company_id: int
+    company_name: str
+    rides_active: int
+    rides_total: int
+    bookings_pending: int
+    bookings_paid: int
+    seats_sold: int
+    gmv_xof: int
     currency: str = "XOF"
 
 

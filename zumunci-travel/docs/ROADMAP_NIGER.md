@@ -39,10 +39,12 @@
 
 ## Phase 4 — Scale UEMOA
 
-1. Burkina, Mali, Sénégal (même devise XOF) — annoncé (`uemoa_coming_soon`)
-2. Multi-langue FR / HA / Zarma — partiel (hero FR/HA/ZAR)
+1. Burkina, Mali, Sénégal (même devise XOF) — partiel (Niamey↔Ouagadougou/Bamako live ; Dakar/Bobo/Cotonou/Lomé bientôt)
+2. Multi-langue FR / HA / Zarma — élargi (nav + hero + USP + paiement)
 3. Data warehouse + fraude — fait (dashboard admin `/admin/fraud/overview` + alertes trajets)
 4. Reçus, gains conducteur, KPI admin, filtre prix — fait (v1.1)
+5. Sandbox Mobile Money + SMS/OTP provider + compte compagnie — fait (v1.2)
+6. Webhook agrégateur sandbox + tableau de bord compagnie + i18n USP — fait (v1.3)
 
 ## Organisation recommandée (équipe minimale)
 
