@@ -26,6 +26,7 @@ import type {
   Booking,
   BookingReceipt,
   City,
+  CompanyOverview,
   DriverEarnings,
   FieldAgent,
   FraudOverview,
@@ -371,22 +372,22 @@ function HomePage() {
 
       <div className="usp-grid">
         <article>
-          <h3>Vérification KYC</h3>
-          <p>CNI / passeport / permis validés avant publication ou réservation.</p>
+          <h3>{t(locale, "usp_kyc_title")}</h3>
+          <p>{t(locale, "usp_kyc_body")}</p>
         </article>
         <article>
-          <h3>Contact protégé</h3>
-          <p>Numéro masqué jusqu’au paiement Mobile Money confirmé.</p>
+          <h3>{t(locale, "usp_contact_title")}</h3>
+          <p>{t(locale, "usp_contact_body")}</p>
         </article>
         <article>
-          <h3>Anti-arnaque</h3>
-          <p>Paiement sur plateforme + signalement immédiat des abus.</p>
+          <h3>{t(locale, "usp_scam_title")}</h3>
+          <p>{t(locale, "usp_scam_body")}</p>
         </article>
       </div>
 
       {config && (
         <div className="notice notice-soft">
-          <strong>Couverture nationale</strong> — {config.regions.length} régions ·{" "}
+          <strong>{t(locale, "coverage_national")}</strong> — {config.regions.length} régions ·{" "}
           {config.service_cities.length} villes · commission{" "}
           {(config.commission_rate * 100).toFixed(0)} % · KYC ≤ {config.kyc_sla_hours}h
           {config.uemoa_live_cities && config.uemoa_live_cities.length > 0 && (
@@ -399,7 +400,7 @@ function HomePage() {
           {config.uemoa_coming_soon && config.uemoa_coming_soon.length > 0 && (
             <>
               <br />
-              <strong>Bientôt UEMOA :</strong> {config.uemoa_coming_soon.join(" · ")}
+              <strong>{t(locale, "uemoa_soon")} :</strong> {config.uemoa_coming_soon.join(" · ")}
             </>
           )}
           {config.payment_aggregator && (
@@ -547,6 +548,7 @@ function SearchPage() {
 function RideDetailPage({ user }: { user: User | null }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { locale } = useLocale();
   const [ride, setRide] = useState<Ride | null>(null);
   const [seats, setSeats] = useState(1);
   const [provider, setProvider] = useState("orange_money");
@@ -634,6 +636,24 @@ function RideDetailPage({ user }: { user: User | null }) {
       setWhatsappUrl(contact.driver_whatsapp_url);
       setMessage(
         `Paiement confirmé. Contact : ${contact.driver_phone}. ${contact.warning}` +
+          (pay.sms_preview ? ` SMS: ${pay.sms_preview}` : ""),
+      );
+      setPendingBooking(null);
+      if (ride) setRide(await api.ride(ride.id));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+
+  const confirmViaWebhook = async () => {
+    if (!pendingBooking?.payment?.external_ref) return;
+    setError("");
+    try {
+      const pay = await api.sandboxWebhook(pendingBooking.payment.external_ref, "success");
+      const contact = await api.revealContact(pendingBooking.id);
+      setWhatsappUrl(contact.driver_whatsapp_url);
+      setMessage(
+        `Webhook agrégateur OK (${pay.status}). Contact : ${contact.driver_phone}.` +
           (pay.sms_preview ? ` SMS: ${pay.sms_preview}` : ""),
       );
       setPendingBooking(null);
@@ -758,7 +778,7 @@ function RideDetailPage({ user }: { user: User | null }) {
       ) : (
         <div className="book-box">
           <p>
-            Paiement en attente · {formatXof(pendingBooking.total_amount)} via{" "}
+            {t(locale, "pay_pending")} · {formatXof(pendingBooking.total_amount)} via{" "}
             {pendingBooking.payment?.provider.replaceAll("_", " ")}
           </p>
           {pendingBooking.payment?.instructions && (
@@ -773,10 +793,15 @@ function RideDetailPage({ user }: { user: User | null }) {
             </p>
           )}
           <button className="btn btn-primary" type="button" onClick={() => void confirmPay(true)}>
-            Confirmer le paiement (démo)
+            {t(locale, "pay_confirm")}
           </button>
+          {pendingBooking.payment?.external_ref && (
+            <button className="btn btn-small" type="button" onClick={() => void confirmViaWebhook()}>
+              {t(locale, "pay_webhook")}
+            </button>
+          )}
           <button className="btn btn-small danger" type="button" onClick={() => void confirmPay(false)}>
-            Échec / annuler
+            {t(locale, "pay_fail")}
           </button>
         </div>
       )}
@@ -1283,6 +1308,7 @@ function AccountPage({
   user: User | null;
   onRefresh: () => Promise<void>;
 }) {
+  const { locale } = useLocale();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [incoming, setIncoming] = useState<Booking[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
@@ -1291,6 +1317,7 @@ function AccountPage({
   >([]);
   const [alerts, setAlerts] = useState<RideAlert[]>([]);
   const [earnings, setEarnings] = useState<DriverEarnings | null>(null);
+  const [companyOv, setCompanyOv] = useState<CompanyOverview | null>(null);
   const [receipt, setReceipt] = useState<BookingReceipt | null>(null);
   const [alertOrigin, setAlertOrigin] = useState("Niamey");
   const [alertDest, setAlertDest] = useState("Maradi");
@@ -1322,6 +1349,15 @@ function AccountPage({
       setEarnings(await api.myEarnings());
     } catch {
       setEarnings(null);
+    }
+    try {
+      if (user?.role === "company") {
+        setCompanyOv(await api.companyOverview());
+      } else {
+        setCompanyOv(null);
+      }
+    } catch {
+      setCompanyOv(null);
     }
   };
 
@@ -1450,16 +1486,53 @@ function AccountPage({
 
   return (
     <section className="stack">
-      <h2>Bonjour, {user.full_name}</h2>
+      <h2>
+        {t(locale, "account_hello")}, {user.full_name}
+      </h2>
       <p className="muted">
         {user.phone} · {user.phone_verified ? "OTP OK" : "OTP manquant"} ·{" "}
         {VERIF_LABELS[user.verification_status]}
         {user.accepted_safety_charter ? " · charte acceptée" : ""}
+        {user.role === "company" ? " · compte compagnie" : ""}
       </p>
+
+      {companyOv && (
+        <>
+          <h3>
+            {t(locale, "account_company")} — {companyOv.company_name}
+          </h3>
+          <div className="fraud-grid">
+            <div className="fraud-stat">
+              <strong>{companyOv.rides_active}</strong>
+              <span>trajets actifs</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.rides_total}</strong>
+              <span>trajets total</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.bookings_pending}</strong>
+              <span>en attente</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.bookings_paid}</strong>
+              <span>payées</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{formatXof(companyOv.gmv_xof)}</strong>
+              <span>GMV</span>
+            </div>
+            <div className="fraud-stat">
+              <strong>{companyOv.seats_sold}</strong>
+              <span>places vendues</span>
+            </div>
+          </div>
+        </>
+      )}
 
       {earnings && (
         <>
-          <h3>Gains conducteur</h3>
+          <h3>{t(locale, "account_earnings")}</h3>
           <div className="fraud-grid">
             <div className="fraud-stat">
               <strong>{formatXof(earnings.gross_driver_amount)}</strong>
@@ -1481,7 +1554,7 @@ function AccountPage({
         </>
       )}
 
-      <h3>Alertes trajets</h3>
+      <h3>{t(locale, "account_alerts")}</h3>
       <p className="muted">Recevez un SMS / notification quand un trajet matching est publié.</p>
       <form className="form inline-filter" onSubmit={(e) => void addAlert(e)}>
         <label>

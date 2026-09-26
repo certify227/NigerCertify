@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta, timezone
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
@@ -53,6 +53,7 @@ from app.schemas.schemas import (
     PaymentConfirm,
     PaymentConfirmResult,
     PaymentOut,
+    PaymentWebhookIn,
     ProductConfigOut,
     PublicProfileOut,
     PublicRatingOut,
@@ -66,6 +67,7 @@ from app.schemas.schemas import (
     RideOut,
     BookingReceiptOut,
     DriverEarningsOut,
+    CompanyOverviewOut,
     AdminKpiOut,
     SafetyCharterOut,
     SafetyReportCreate,
@@ -80,7 +82,7 @@ from app.schemas.schemas import (
     VerificationReview,
     VerificationSubmit,
 )
-from app.services.payments import get_payment_adapter
+from app.services.payments import apply_payment_outcome, get_payment_adapter
 from app.services.sms import get_sms_log, send_booking_sms, send_otp_sms
 from app.services.safety import (
     SAFETY_CHARTER,
@@ -291,6 +293,7 @@ def product_config() -> ProductConfigOut:
         uemoa_corridors_enabled=settings.uemoa_corridors_enabled,
         payment_aggregator=settings.payment_aggregator,
         sms_provider_name=settings.sms_provider_name,
+        payment_webhook_enabled=True,
     )
 
 
@@ -900,13 +903,12 @@ def my_bookings(user: User = Depends(get_current_user), db: Session = Depends(ge
 
 @router.get("/me/rides", response_model=list[RideOut])
 def my_rides(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> list[dict]:
-    rides = (
-        db.query(Ride)
-        .options(joinedload(Ride.driver))
-        .filter(Ride.driver_id == user.id)
-        .order_by(Ride.departure_date.desc())
-        .all()
-    )
+    q = db.query(Ride).options(joinedload(Ride.driver), joinedload(Ride.company))
+    if user.role == UserRole.COMPANY and user.company_id:
+        q = q.filter(Ride.company_id == user.company_id)
+    else:
+        q = q.filter(Ride.driver_id == user.id)
+    rides = q.order_by(Ride.departure_date.desc()).all()
     return [serialize_ride(r, reveal_phone=True, db=db) for r in rides]
 
 
@@ -915,21 +917,60 @@ def my_incoming_bookings(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[dict]:
-    """Réservations reçues sur les trajets du conducteur."""
+    """Réservations reçues sur les trajets du conducteur / de la compagnie."""
     expire_stale_pending_bookings(db)
-    rows = (
+    q = (
         db.query(Booking)
         .options(
             joinedload(Booking.payment),
             joinedload(Booking.passenger),
             joinedload(Booking.ride).joinedload(Ride.driver),
+            joinedload(Booking.ride).joinedload(Ride.company),
         )
         .join(Ride, Booking.ride_id == Ride.id)
-        .filter(Ride.driver_id == user.id)
-        .order_by(Booking.created_at.desc())
+    )
+    if user.role == UserRole.COMPANY and user.company_id:
+        q = q.filter(Ride.company_id == user.company_id)
+    else:
+        q = q.filter(Ride.driver_id == user.id)
+    rows = q.order_by(Booking.created_at.desc()).all()
+    return [serialize_booking(b, user, db=db) for b in rows]
+
+
+@router.get("/me/company/overview", response_model=CompanyOverviewOut)
+def company_overview(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    if user.role != UserRole.COMPANY or not user.company_id:
+        raise HTTPException(status_code=403, detail="Réservé aux comptes compagnie")
+    company = db.get(TransportCompany, user.company_id)
+    if not company:
+        raise HTTPException(status_code=404, detail="Compagnie introuvable")
+    rides_total = db.query(Ride).filter(Ride.company_id == company.id).count()
+    rides_active = (
+        db.query(Ride).filter(Ride.company_id == company.id, Ride.is_active.is_(True)).count()
+    )
+    paid_statuses = [BookingStatus.PAID, BookingStatus.COMPLETED]
+    bookings = (
+        db.query(Booking)
+        .join(Ride, Booking.ride_id == Ride.id)
+        .filter(Ride.company_id == company.id)
         .all()
     )
-    return [serialize_booking(b, user, db=db) for b in rows]
+    pending = sum(1 for b in bookings if b.status == BookingStatus.PENDING)
+    paid = [b for b in bookings if b.status in paid_statuses]
+    return {
+        "company_id": company.id,
+        "company_name": company.name,
+        "rides_active": rides_active,
+        "rides_total": rides_total,
+        "bookings_pending": pending,
+        "bookings_paid": len(paid),
+        "seats_sold": sum(b.seats for b in paid),
+        "gmv_xof": sum(b.total_amount for b in paid),
+        "currency": settings.currency,
+    }
 
 
 @router.post("/payments/{payment_id}/confirm", response_model=PaymentConfirmResult)
@@ -952,7 +993,12 @@ def confirm_payment(
         raise HTTPException(status_code=404, detail="Paiement introuvable")
     booking = payment.booking
     ride = booking.ride
-    if booking.passenger_id != user.id and ride.driver_id != user.id:
+    is_company_ops = (
+        user.role == UserRole.COMPANY
+        and user.company_id
+        and ride.company_id == user.company_id
+    )
+    if booking.passenger_id != user.id and ride.driver_id != user.id and not is_company_ops:
         raise HTTPException(status_code=403, detail="Accès refusé")
 
     # Idempotence : ne pas rejouer un paiement déjà tranché.
@@ -976,38 +1022,79 @@ def confirm_payment(
             detail=f"Réservation non confirmable (statut : {booking.status.value})",
         )
 
-    sms_preview = None
-    if payload.success:
-        payment.status = PaymentStatus.SUCCESS
-        booking.status = BookingStatus.PAID
-        booking.contact_unlocked = True
-        if payload.external_ref:
-            payment.external_ref = payload.external_ref
-        sms_preview = (
-            f"ZumunciTravel: reservation #{booking.id} confirmee "
-            f"{ride.origin_city}->{ride.destination_city} le {ride.departure_date}. "
-            f"Contact debloque. Merci."
+    sms_preview = apply_payment_outcome(
+        db,
+        payment=payment,
+        booking=booking,
+        ride=ride,
+        success=payload.success,
+        external_ref=payload.external_ref,
+    )
+    db.commit()
+    db.refresh(payment)
+    return {
+        "id": payment.id,
+        "provider": payment.provider,
+        "phone": payment.phone,
+        "amount": payment.amount,
+        "currency": payment.currency,
+        "status": payment.status,
+        "external_ref": payment.external_ref,
+        "created_at": payment.created_at,
+        "sms_preview": sms_preview,
+    }
+
+
+@router.post("/payments/webhook/sandbox", response_model=PaymentConfirmResult)
+def payment_webhook_sandbox(
+    payload: PaymentWebhookIn,
+    db: Session = Depends(get_db),
+    x_zumunci_webhook_secret: str | None = Header(default=None),
+) -> dict:
+    """Callback sandbox agrégateur — simule PayGate/Hub2/CinetPay."""
+    if x_zumunci_webhook_secret != settings.payment_webhook_secret:
+        raise HTTPException(status_code=401, detail="Secret webhook invalide")
+    payment = (
+        db.query(Payment)
+        .options(
+            joinedload(Payment.booking).joinedload(Booking.ride).joinedload(Ride.driver),
+            joinedload(Payment.booking).joinedload(Booking.passenger),
         )
-        for uid in {booking.passenger_id, ride.driver_id}:
-            db.add(
-                Notification(
-                    user_id=uid,
-                    channel="sms",
-                    title="Confirmation de réservation",
-                    body=sms_preview,
-                    booking_id=booking.id,
-                )
-            )
-        passenger = booking.passenger
-        if passenger:
-            passenger.last_sms_at = datetime.now(timezone.utc)
-    else:
-        payment.status = PaymentStatus.FAILED
-        ride.seats_available = min(ride.seats_total, ride.seats_available + booking.seats)
-        booking.status = BookingStatus.CANCELLED
-        booking.contact_unlocked = False
-        booking.cancelled_at = datetime.now(timezone.utc)
-        booking.cancel_reason = "Paiement échoué"
+        .filter(Payment.external_ref == payload.external_ref)
+        .first()
+    )
+    if not payment:
+        raise HTTPException(status_code=404, detail="Paiement introuvable pour cette référence")
+    booking = payment.booking
+    ride = booking.ride
+
+    if payment.status in {PaymentStatus.SUCCESS, PaymentStatus.REFUNDED}:
+        return {
+            "id": payment.id,
+            "provider": payment.provider,
+            "phone": payment.phone,
+            "amount": payment.amount,
+            "currency": payment.currency,
+            "status": payment.status,
+            "external_ref": payment.external_ref,
+            "created_at": payment.created_at,
+            "sms_preview": None,
+        }
+    if booking.status != BookingStatus.PENDING:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Réservation non confirmable (statut : {booking.status.value})",
+        )
+
+    success = payload.status == "success"
+    sms_preview = apply_payment_outcome(
+        db,
+        payment=payment,
+        booking=booking,
+        ride=ride,
+        success=success,
+        external_ref=payload.provider_ref or payment.external_ref,
+    )
     db.commit()
     db.refresh(payment)
     return {
@@ -1571,14 +1658,23 @@ def booking_receipt(
 
 @router.get("/me/earnings", response_model=DriverEarningsOut)
 def my_earnings(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> dict:
-    rides_published = db.query(Ride).filter(Ride.driver_id == user.id).count()
     paid_statuses = [BookingStatus.PAID, BookingStatus.COMPLETED]
-    rows = (
-        db.query(Booking)
-        .join(Ride, Booking.ride_id == Ride.id)
-        .filter(Ride.driver_id == user.id, Booking.status.in_(paid_statuses))
-        .all()
-    )
+    if user.role == UserRole.COMPANY and user.company_id:
+        rides_published = db.query(Ride).filter(Ride.company_id == user.company_id).count()
+        rows = (
+            db.query(Booking)
+            .join(Ride, Booking.ride_id == Ride.id)
+            .filter(Ride.company_id == user.company_id, Booking.status.in_(paid_statuses))
+            .all()
+        )
+    else:
+        rides_published = db.query(Ride).filter(Ride.driver_id == user.id).count()
+        rows = (
+            db.query(Booking)
+            .join(Ride, Booking.ride_id == Ride.id)
+            .filter(Ride.driver_id == user.id, Booking.status.in_(paid_statuses))
+            .all()
+        )
     gross = sum(b.driver_amount for b in rows)
     seats = sum(b.seats for b in rows)
     completed = sum(1 for b in rows if b.status == BookingStatus.COMPLETED)

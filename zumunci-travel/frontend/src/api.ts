@@ -16,6 +16,7 @@ export type User = {
   emergency_contact_name: string | null;
   emergency_contact_phone: string | null;
   is_suspended: boolean;
+  company_id?: number | null;
   id_document_type?: string | null;
   id_document_number?: string | null;
   id_full_name?: string | null;
@@ -146,6 +147,7 @@ export type ProductConfig = {
   uemoa_corridors_enabled?: boolean;
   payment_aggregator?: string;
   sms_provider_name?: string;
+  payment_webhook_enabled?: boolean;
 };
 
 export type FieldAgent = {
@@ -198,6 +200,18 @@ export type DriverEarnings = {
   bookings_completed: number;
   gross_driver_amount: number;
   seats_sold: number;
+  currency: string;
+};
+
+export type CompanyOverview = {
+  company_id: number;
+  company_name: string;
+  rides_active: number;
+  rides_total: number;
+  bookings_pending: number;
+  bookings_paid: number;
+  seats_sold: number;
+  gmv_xof: number;
   currency: string;
 };
 
@@ -279,7 +293,28 @@ export const api = {
   fraudOverview: () => request<FraudOverview>("/admin/fraud/overview"),
   adminKpi: () => request<AdminKpi>("/admin/kpi"),
   myEarnings: () => request<DriverEarnings>("/me/earnings"),
+  companyOverview: () => request<CompanyOverview>("/me/company/overview"),
   bookingReceipt: (bookingId: number) => request<BookingReceipt>(`/bookings/${bookingId}/receipt`),
+  confirmPayment: (paymentId: number, success = true) =>
+    request<{ id: number; status: string; sms_preview?: string | null }>(
+      `/payments/${paymentId}/confirm`,
+      {
+        method: "POST",
+        body: JSON.stringify({ success }),
+      },
+    ),
+  sandboxWebhook: (external_ref: string, status: "success" | "failed" = "success") =>
+    request<{ id: number; status: string; sms_preview?: string | null }>(
+      "/payments/webhook/sandbox",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Zumunci-Webhook-Secret": "zumunci-webhook-sandbox",
+        },
+        body: JSON.stringify({ external_ref, status }),
+      },
+    ),
   charter: () => request<SafetyCharter>("/safety/charter"),
   rides: (params: URLSearchParams) => request<Ride[]>(`/rides?${params}`),
   ride: (id: number) => request<Ride>(`/rides/${id}`),
@@ -335,14 +370,6 @@ export const api = {
   myBookings: () => request<Booking[]>("/me/bookings"),
   myRides: () => request<Ride[]>("/me/rides"),
   myIncomingBookings: () => request<Booking[]>("/me/incoming-bookings"),
-  confirmPayment: (paymentId: number, success = true) =>
-    request<{ id: number; status: string; sms_preview?: string | null }>(
-      `/payments/${paymentId}/confirm`,
-      {
-        method: "POST",
-        body: JSON.stringify({ success }),
-      },
-    ),
   notifications: () =>
     request<
       { id: number; channel: string; title: string; body: string; booking_id: number | null; created_at: string }[]

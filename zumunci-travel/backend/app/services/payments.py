@@ -4,9 +4,20 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass
+from datetime import datetime, timezone
+
+from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
-from app.models.entities import PaymentProvider
+from app.models.entities import (
+    Booking,
+    BookingStatus,
+    Notification,
+    Payment,
+    PaymentProvider,
+    PaymentStatus,
+    Ride,
+)
 
 
 @dataclass
@@ -72,8 +83,8 @@ class SandboxMobileMoneyAdapter(PaymentProviderAdapter):
         ussd = USSD_HINTS.get(self.provider)
         instructions = (
             f"[SANDBOX {settings.payment_aggregator}] {label} — {amount_fmt} XOF depuis {phone}. "
-            f"Réf. {ref}. Validez sur le téléphone (USSD {ussd}) ou via "
-            f"/payments/{{id}}/confirm. Checkout: {checkout}"
+            f"Réf. {ref}. Validez sur le téléphone (USSD {ussd}), webhook sandbox "
+            f"(/payments/webhook/sandbox) ou /payments/{{id}}/confirm. Checkout: {checkout}"
         )
         return PaymentInitResult(
             external_ref=ref,
@@ -88,3 +99,48 @@ class SandboxMobileMoneyAdapter(PaymentProviderAdapter):
 
 def get_payment_adapter(provider: PaymentProvider) -> PaymentProviderAdapter:
     return SandboxMobileMoneyAdapter(provider)
+
+
+def apply_payment_outcome(
+    db: Session,
+    *,
+    payment: Payment,
+    booking: Booking,
+    ride: Ride,
+    success: bool,
+    external_ref: str | None = None,
+) -> str | None:
+    """Applique succès / échec paiement (confirm manuel ou webhook agrégateur)."""
+    sms_preview = None
+    if success:
+        payment.status = PaymentStatus.SUCCESS
+        booking.status = BookingStatus.PAID
+        booking.contact_unlocked = True
+        if external_ref:
+            payment.external_ref = external_ref
+        sms_preview = (
+            f"ZumunciTravel: reservation #{booking.id} confirmee "
+            f"{ride.origin_city}->{ride.destination_city} le {ride.departure_date}. "
+            f"Contact debloque. Merci."
+        )
+        for uid in {booking.passenger_id, ride.driver_id}:
+            db.add(
+                Notification(
+                    user_id=uid,
+                    channel="sms",
+                    title="Confirmation de réservation",
+                    body=sms_preview,
+                    booking_id=booking.id,
+                )
+            )
+        passenger = booking.passenger
+        if passenger:
+            passenger.last_sms_at = datetime.now(timezone.utc)
+    else:
+        payment.status = PaymentStatus.FAILED
+        ride.seats_available = min(ride.seats_total, ride.seats_available + booking.seats)
+        booking.status = BookingStatus.CANCELLED
+        booking.contact_unlocked = False
+        booking.cancelled_at = datetime.now(timezone.utc)
+        booking.cancel_reason = "Paiement échoué"
+    return sms_preview
